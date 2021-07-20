@@ -1,0 +1,37 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: "This template sets up Discngine 3decision infrastructure. (qs-1s40771km)."
+Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into an existing EKS cluster"
+  LintSpellExclude:
+    - Discngine
+    - 3decision
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      #      # TODO Add your parameters here
+      - Label:
+          default: "Discngine 3decision configuration"
+        Parameters:
+          - SampleParam1
+    ParameterLabels:
+      SampleParam1:
+        default: Sample Param
+Parameters:
+  # TODO Add Discngine 3decision parameters
+  SampleParam1:
+    Default: 'Hello world!'
+    Description: Sample parameter.
+    Type: String
+
+Resources:
+  ParamA:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Value: !Ref SampleParam1
+
+Outputs:
+  ParamOut:
+    Description: "Sample output"
+    Value: !Ref ParamA
