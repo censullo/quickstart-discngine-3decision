@@ -2,22 +2,24 @@
 //Should any sections not be applicable, remove them
 
 == Test the deployment
-// If steps are required to test the deployment, add them here. If not, remove the heading
+In order to test the deployment sucess, the best way is to test if the application is available. To do this, you first need to get the 3decision URL. Before you procede to post-deployment steps, this URL is the "lb-3dec-node" load balancer DNS name.
+Try to connect to this URL, you should reach 3decision home page. Try to login with the username and password you chose during the installation of the template.
+
 
 == Post-deployment steps
 // If post-deployment steps are required, add them here. If not, remove the heading
+=== Setup SSL certificates
+3decision creates 2 Amazon Elastic Load Balancers. Both listen by default on port 80. 
 
-== Best practices for using {partner-product-short-name} on AWS
-// Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
+- lb-3dec-node : this application load balancer serves the 3decision user UI. In order to add SLL, one solution is to create a new HTTPS listener on port 443 and add your certificate. In parallel you can will need to create a CNAME DNS entry in your DNS provider, pointing to the lb-3dec-node DNS name. Usually, this DNS will be: 3decision.<yourdomain>.<ext>.
 
-_Add any best practices for using the software._
+- lb-3dec-etl : this application load balancer serves the 3decision etl UI. This UI will only be used by admninistrators to add users or debug.
+In order to add SLL, one solution is to create a new HTTPS listener on port 443 and add your certificate. In parallel you can will need to create a CNAME DNS entry in your DNS provider, pointing to the lb-3dec-etl DNS name. Usually, this DNS will be: 3decision-admin.<yourdomain>.<ext>.
+
+//== Best practices for using {partner-product-short-name} on AWS
+
 
 == Security
+- 3decision will store your data in Amazon Oracle RDS and EBS volumes. In order to avoid any data-loss you should consider enabling backups for 3decision Amazon RDS and the EBS drives.
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
 
-_Add any security-related information._
-
-== Other useful information
-//Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
-
-_Add any other details that will help the customer use the software on AWS._
