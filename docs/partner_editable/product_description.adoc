@@ -12,17 +12,17 @@ Current Version: 2021.3.1-aws
 
 This section lists the features restrictions and limitations that currently apply to 3decision AWS version.
 
-- no Federated Login
+- no SSO Login
 
-OpenID and cookie based (session) authentication are currently only supported by SaaS and on-premise option. Support will be added into next major release (expected early january).
+OpenID Connect and LDAP authentication are currently only supported by 3decision SaaS and on-premise option. Support will be added into next major release (expected on March 15th).
 
 - single user limitation
 
-AWS 3decision version only comes with a single user for now. The possibility to have several users will be added into next major release (expected early january).
+AWS 3decision version 2021.3.1 only comes with a single user for now. The possibility to have several users will be added into next major release (expected on March 15th).
 
 - no docking
 
-Ligands docking is currently not possible. This feature will be release for AWS with next major release (expected early january).
+Ligands docking is currently not possible. This feature will be release for AWS with next major release (expected on March 15th).
 
 - Administration panel
 
