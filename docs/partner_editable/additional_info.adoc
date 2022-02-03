@@ -1,25 +1,57 @@
 // Add steps as necessary for accessing the software, post-configuration, and testing. Don’t include full usage instructions for your software, but add links to your product documentation for that information.
 //Should any sections not be applicable, remove them
 
-== Test the deployment
-In order to test the deployment sucess, the best way is to test if the application is available. To do this, you first need to get the 3decision URL. Before you procede to post-deployment steps, this URL is the "lb-3dec-node" load balancer DNS name.
-Try to connect to this URL, you should reach 3decision home page. Try to login with the username and password you chose during the installation of the template.
-
-
 == Post-deployment steps
 // If post-deployment steps are required, add them here. If not, remove the heading
-=== Setup SSL certificates
-3decision creates 2 Amazon Elastic Load Balancers. Both listen by default on port 80. 
 
-- lb-3dec-node : this application load balancer serves the 3decision user UI. In order to add SLL, one solution is to create a new HTTPS listener on port 443 and add your certificate. In parallel you can will need to create a CNAME DNS entry in your DNS provider, pointing to the lb-3dec-node DNS name. Usually, this DNS will be: 3decision.<yourdomain>.<ext>.
+=== [Optionnal] Add your certificate to the application load balancer
 
-- lb-3dec-etl : this application load balancer serves the 3decision etl UI. This UI will only be used by admninistrators to add users or debug.
-In order to add SLL, one solution is to create a new HTTPS listener on port 443 and add your certificate. In parallel you can will need to create a CNAME DNS entry in your DNS provider, pointing to the lb-3dec-etl DNS name. Usually, this DNS will be: 3decision-admin.<yourdomain>.<ext>.
+If you did not provide the ARN of an SSL certificate during the QuickStart installation, you will need to edit the load balancer listener:
+
+1 - HTTPS setup 
+
+As chown in  <<postinstall1>>, you need to edit the Application Load Balancer and switch the listener protocol from http to https.
+
+[#postinstall1]
+.Application Load Balancer HTTP to HTTPS switch
+image::../images/listener_https_settings.png[Postinstall]
+
+2 - SSL certificate setup
+
+As chown in  <<postinstall2>>, you need to change the default ssl certificate by either importing yours or selecting a certificate from IAM or ACM.
+
+[#postinstall2]
+.Application Load Balancer HTTP to HTTPS switch
+image::../images/listener_certificate_settings.png[Postinstall]
+
+
+
+
+=== [Optionnal] Create CNAME record in your DNS provider
+
+If you did not provide the a Route 53 Hosted Zone ARN during the QuickStart installation, you will need to create 2 DNS records into your DNS provider. 
+
+Both need to target the 3decision application load balancer. The address of this load balancer is the "DNS Name" as shown in <<postinstall3>>.
+
+
+The 2 hosts you must defined are:
+
+1 - 3decision.<your domain> (3decision user UI)
+ 
+2 - 3decision-etl.<your domain> (3decision admin UI)
+
+[#postinstall3]
+.Application Load Balancer HTTP to HTTPS switch
+image::../images/lb_dns_name.png[Postinstall]
+
+
+== Test the deployment
+You can simply test the application by connecting to https://3decision.<your domain>.<ext>. An HTTP GET on this URL should reply an HTTP 302 code.
 
 //== Best practices for using {partner-product-short-name} on AWS
 
 
 == Security
-- 3decision will store your data in Amazon Oracle RDS and EBS volumes. In order to avoid any data-loss you should consider enabling backups for 3decision Amazon RDS and the EBS drives.
+3decision data is stored in EBS volumes. Snapshot policies are not created by the QuickStart. It is highly recommende to configure snapshot policies on 3decision EBS volumes to prevent any data-loss.
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
 
