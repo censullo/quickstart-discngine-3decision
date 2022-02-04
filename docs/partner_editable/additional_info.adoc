@@ -6,19 +6,21 @@
 
 === [Optionnal] Add your certificate to the application load balancer
 
-If you did not provide the ARN of an SSL certificate during the QuickStart installation, you will need to edit the load balancer listener:
+If you did not provide an SSL certificate during the QuickStart installation, you cqn edit the load balancer listener in order to configure qn SSL certificate:
 
-1 - HTTPS setup 
+[start=1]
+. HTTPS setup 
 
-As chown in  <<postinstall1>>, you need to edit the Application Load Balancer and switch the listener protocol from http to https.
+As chown in  <<postinstall1>>, edit the Application Load Balancer and switch the listener protocol from http to https.
 
 [#postinstall1]
 .Application Load Balancer HTTP to HTTPS switch
 image::../images/listener_https_settings.png[Postinstall]
 
-2 - SSL certificate setup
+[start=2]
+. SSL certificate setup
 
-As chown in  <<postinstall2>>, you need to change the default ssl certificate by either importing yours or selecting a certificate from IAM or ACM.
+As chown in  <<postinstall2>>, change the default ssl certificate by either importing yours or selecting a certificate from IAM or ACM.
 
 [#postinstall2]
 .Application Load Balancer HTTP to HTTPS switch
@@ -36,9 +38,11 @@ Both need to target the 3decision application load balancer. The address of this
 
 The 2 hosts you must defined are:
 
-1 - 3decision.<your domain> (3decision user UI)
+[start=1] 
+. 3decision.<your domain> ( 3decision user UI )
  
-2 - 3decision-etl.<your domain> (3decision admin UI)
+[start=2]
+. 3decision-etl.<your domain> ( 3decision admin UI )
 
 [#postinstall3]
 .Application Load Balancer HTTP to HTTPS switch
@@ -46,7 +50,7 @@ image::../images/lb_dns_name.png[Postinstall]
 
 
 == Test the deployment
-You can simply test the application by connecting to https://3decision.<your domain>.<ext>. An HTTP GET on this URL should reply an HTTP 302 code.
+Connect to https://3decision.<your domain>.<ext>. An internet browser will show the 3decision login page. An HTTP GET on this URL should reply an HTTP 302 code.
 
 //== Best practices for using {partner-product-short-name} on AWS
 
