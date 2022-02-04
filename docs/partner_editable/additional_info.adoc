@@ -15,7 +15,7 @@ As shown in  <<postinstall1>>, edit the Application Load Balancer and switch the
 
 [#postinstall1]
 .Application Load Balancer HTTP to HTTPS switch
-image::../images/listener_https_settings.png[Postinstall]
+image::../images/listener_https_settings.png[Postinstall,width=70%,height=70%]
 
 [start=2]
 . SSL certificate setup
@@ -24,7 +24,7 @@ As shown in  <<postinstall2>>, change the default SSL certificate by either impo
 
 [#postinstall2]
 .Application Load Balancer HTTP to HTTPS switch
-image::../images/listener_certificate_settings.png[Postinstall]
+image::../images/listener_certificate_settings.png[Postinstall,width=70%,height=70%]
 
 
 
