@@ -846,12 +846,13 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_launch_the_quick_start">Launch the Quick Start</a></li>
 </ul>
 </li>
-<li><a href="#_test_the_deployment">Test the deployment</a></li>
 <li><a href="#_post_deployment_steps">Post-deployment steps</a>
 <ul class="sectlevel2">
-<li><a href="#_setup_ssl_certificates">Setup SSL certificates</a></li>
+<li><a href="#_optionnal_add_your_ssl_certificate_to_the_application_load_balancer">[Optionnal] Add your SSL certificate to the application load balancer</a></li>
+<li><a href="#_optionnal_create_cname_record_in_your_dns_provider">[Optionnal] Create CNAME record in your DNS provider</a></li>
 </ul>
 </li>
+<li><a href="#_test_the_deployment">Test the deployment</a></li>
 <li><a href="#_security">Security</a></li>
 <li><a href="#_faq">FAQ</a></li>
 <li><a href="#_customer_responsibility">Customer responsibility</a></li>
@@ -874,7 +875,7 @@ p.footer-text a{color:#d7d8d8}
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>December 2021</strong><br>
+<p><strong>February 2022</strong><br>
 <em>Jonathan Manassen, Alexandre Gillet, AWS Quick Start team</em></p>
 </div>
 <div class="admonitionblock tip text-left">
@@ -959,12 +960,12 @@ Amazon may share user-deployment information with the AWS Partner that collabora
 <div class="ulist">
 <ul>
 <li>
-<p>no Federated Login</p>
+<p>no SSO Login</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>OpenID and cookie based (session) authentication are currently only supported by SaaS and on-premise option. Support will be added into next major release (expected early january).</p>
+<p>OpenID Connect and LDAP authentication are currently only supported by 3decision SaaS and on-premise option. Support will be added into next major release (expected on March 15th).</p>
 </div>
 <div class="ulist">
 <ul>
@@ -974,7 +975,7 @@ Amazon may share user-deployment information with the AWS Partner that collabora
 </ul>
 </div>
 <div class="paragraph">
-<p>AWS 3decision version only comes with a single user for now. The possibility to have several users will be added into next major release (expected early january).</p>
+<p>AWS 3decision version 2021.3.1 only comes with a single user for now. The possibility to have several users will be added into next major release (expected on March 15th).</p>
 </div>
 <div class="ulist">
 <ul>
@@ -984,7 +985,7 @@ Amazon may share user-deployment information with the AWS Partner that collabora
 </ul>
 </div>
 <div class="paragraph">
-<p>Ligands docking is currently not possible. This feature will be release for AWS with next major release (expected early january).</p>
+<p>Ligands docking is currently not possible. This feature will be release for AWS with next major release (expected on March 15th).</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1254,7 +1255,10 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 <p><strong>Deploy 3decision into a new VPC</strong>. This option builds a new AWS environment consisting of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys 3decision into this new VPC.</p>
 </li>
 <li>
-<p><strong>Deploy 3decision into an existing VPC and existing EKS clsuter</strong>. This option provisions 3decision in your existing AWS infrastructure.</p>
+<p><strong>Deploy 3decision into an existing VPC</strong>. This option creates an EKS cluster, and then provisions 3decision in your existing AWS infrastructure.</p>
+</li>
+<li>
+<p><strong>Deploy 3decision into an existing VPC and existing EKS cluster</strong>. This option provisions 3decision in your existing AWS infrastructure.</p>
 </li>
 </ul>
 </div>
@@ -1316,6 +1320,10 @@ If you’re deploying 3decision into an existing VPC, make sure that your VPC ha
 <td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_launch_permalink" target="_blank" rel="noopener">Deploy 3decision into an existing VPC and existing EKS cluster on AWS</a></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_template_permalink" target="_blank" rel="noopener">View template</a></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_launch_permalink" target="_blank" rel="noopener">Deploy 3decision into an existing VPC on AWS</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_template_permalink" target="_blank" rel="noopener">View template</a></p></td>
+</tr>
 </tbody>
 </table>
 </li>
@@ -1349,45 +1357,93 @@ If you’re deploying 3decision into an existing VPC, make sure that your VPC ha
 </div>
 </div>
 <div class="sect1">
-<h2 id="_test_the_deployment">Test the deployment</h2>
+<h2 id="_post_deployment_steps">Post-deployment steps</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_optionnal_add_your_ssl_certificate_to_the_application_load_balancer">[Optionnal] Add your SSL certificate to the application load balancer</h3>
 <div class="paragraph">
-<p>In order to test the deployment sucess, the best way is to test if the application is available. To do this, you first need to get the 3decision URL. Before you procede to post-deployment steps, this URL is the "lb-3dec-node" load balancer DNS name.
-Try to connect to this URL, you should reach 3decision home page. Try to login with the username and password you chose during the installation of the template.</p>
+<p>If you did not provide an SSL certificate during the QuickStart installation, you can edit the load balancer listener in order to configure an SSL certificate:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="1">
+<li>
+<p>HTTPS setup</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>As shown in  <a href="#postinstall1">Figure 2</a>, edit the Application Load Balancer and switch the listener protocol from http to https.</p>
+</div>
+<div id="postinstall1" class="imageblock">
+<div class="content">
+<img src="images/listener_https_settings.png" alt="Postinstall">
+</div>
+<div class="title">Figure 2. Application Load Balancer HTTP to HTTPS switch</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="2">
+<li>
+<p>SSL certificate setup</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>As shown in  <a href="#postinstall2">Figure 3</a>, change the default SSL certificate by either importing yours or selecting a certificate from IAM or ACM.</p>
+</div>
+<div id="postinstall2" class="imageblock">
+<div class="content">
+<img src="images/listener_certificate_settings.png" alt="Postinstall">
+</div>
+<div class="title">Figure 3. Application Load Balancer HTTP to HTTPS switch</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_optionnal_create_cname_record_in_your_dns_provider">[Optionnal] Create CNAME record in your DNS provider</h3>
+<div class="paragraph">
+<p>If you did not provide the a Route 53 Hosted Zone ARN during the QuickStart installation, you will need to create 2 DNS records into your DNS provider.</p>
+</div>
+<div class="paragraph">
+<p>Both need to target the 3decision application load balancer. The address of this load balancer is the "DNS Name" as shown in <a href="#postinstall3">Figure 4</a>.</p>
+</div>
+<div class="paragraph">
+<p>The 2 hosts you must defined are:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="1">
+<li>
+<p>3decision.&lt;your domain&gt; ( 3decision user UI )</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="2">
+<li>
+<p>3decision-etl.&lt;your domain&gt; ( 3decision admin UI )</p>
+</li>
+</ol>
+</div>
+<div id="postinstall3" class="imageblock">
+<div class="content">
+<img src="images/lb_dns_name.png" alt="Postinstall">
+</div>
+<div class="title">Figure 4. Application Load Balancer HTTP to HTTPS switch</div>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_post_deployment_steps">Post-deployment steps</h2>
+<h2 id="_test_the_deployment">Test the deployment</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_setup_ssl_certificates">Setup SSL certificates</h3>
 <div class="paragraph">
-<p>3decision creates 2 Amazon Elastic Load Balancers. Both listen by default on port 80.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>lb-3dec-node : this application load balancer serves the 3decision user UI. In order to add SLL, one solution is to create a new HTTPS listener on port 443 and add your certificate. In parallel you can will need to create a CNAME DNS entry in your DNS provider, pointing to the lb-3dec-node DNS name. Usually, this DNS will be: 3decision.&lt;yourdomain&gt;.&lt;ext&gt;.</p>
-</li>
-<li>
-<p>lb-3dec-etl : this application load balancer serves the 3decision etl UI. This UI will only be used by admninistrators to add users or debug.
-In order to add SLL, one solution is to create a new HTTPS listener on port 443 and add your certificate. In parallel you can will need to create a CNAME DNS entry in your DNS provider, pointing to the lb-3dec-etl DNS name. Usually, this DNS will be: 3decision-admin.&lt;yourdomain&gt;.&lt;ext&gt;.</p>
-</li>
-</ul>
-</div>
+<p>Connect to <a href="https://3decision.&lt;your" class="bare">https://3decision.&lt;your</a> domain&gt;.&lt;ext&gt;. An internet browser will show the 3decision login page. An HTTP GET on this URL should reply an HTTP 302 code.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_security">Security</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>3decision will store your data in Amazon Oracle RDS and EBS volumes. In order to avoid any data-loss you should consider enabling backups for 3decision Amazon RDS and the EBS drives.</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>3decision data is stored in EBS volumes. Snapshot policies are not created by the QuickStart. It is highly recommende to configure snapshot policies on 3decision EBS volumes to prevent any data-loss.</p>
 </div>
 </div>
 </div>
