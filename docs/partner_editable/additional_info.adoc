@@ -4,14 +4,14 @@
 == Post-deployment steps
 // If post-deployment steps are required, add them here. If not, remove the heading
 
-=== [Optionnal] Add your certificate to the application load balancer
+=== [Optionnal] Add your SSL certificate to the application load balancer
 
-If you did not provide an SSL certificate during the QuickStart installation, you cqn edit the load balancer listener in order to configure qn SSL certificate:
+If you did not provide an SSL certificate during the QuickStart installation, you can edit the load balancer listener in order to configure an SSL certificate:
 
 [start=1]
 . HTTPS setup 
 
-As chown in  <<postinstall1>>, edit the Application Load Balancer and switch the listener protocol from http to https.
+As shown in  <<postinstall1>>, edit the Application Load Balancer and switch the listener protocol from http to https.
 
 [#postinstall1]
 .Application Load Balancer HTTP to HTTPS switch
@@ -20,7 +20,7 @@ image::../images/listener_https_settings.png[Postinstall]
 [start=2]
 . SSL certificate setup
 
-As chown in  <<postinstall2>>, change the default ssl certificate by either importing yours or selecting a certificate from IAM or ACM.
+As shown in  <<postinstall2>>, change the default SSL certificate by either importing yours or selecting a certificate from IAM or ACM.
 
 [#postinstall2]
 .Application Load Balancer HTTP to HTTPS switch
