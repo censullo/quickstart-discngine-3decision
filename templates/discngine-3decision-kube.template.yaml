@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: "This template deploys the 3decision helm chart, as well as related helm and kubernetes resources. (qs-1s40771km)."
+Description: "This template deploys the 3decision helm chart, as well as related helm and kubernetes resources. (qs-1snm79fel)."
 Metadata:
   cfn-lint: { config: { ignore_checks: [ E3001 ] } }
   QuickStartDocumentation:

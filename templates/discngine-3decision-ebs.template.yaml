@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: "This template deploys a Volume based on a public snapshot (qs-1s40771km)."
+Description: "This template deploys a Volume based on a public snapshot (qs-1snm79fe6)."
 Metadata:
   QuickStartDocumentation:
     EntrypointName: "3decision EBS volume creation"
