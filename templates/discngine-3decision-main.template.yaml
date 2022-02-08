@@ -395,6 +395,17 @@ Parameters:
     Default: "3decision-etl"
     Description: "Subpath of the 3decision etl page. Will add route to hostedZone if given as recordName.domainName"
     Type: String
+
+Rules:
+  DiscngineSupportedRegionRule:
+    Assertions:
+      - Assert:
+          Fn::Contains:
+            - - us-east-1
+              - eu-central-1
+            - !Ref AWS::Region
+        AssertDescription: The Quick Start is supported only in us-east-1 and eu-central-1 AWS Regions. Please contact Discngine to request support for other Regions.
+
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
