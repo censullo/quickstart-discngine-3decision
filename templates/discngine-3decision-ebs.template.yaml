@@ -1,0 +1,43 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: "This template deploys a Volume based on a public snapshot (qs-1s40771km)."
+Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "3decision EBS volume creation"
+  LintSpellExclude:
+    - Discngine
+    - 3decision
+Mappings: 
+  RegionMap: 
+    us-east-1:
+      Collection: snap-0b2bfb398a8fcadbc
+      Data3Dec: snap-03bef781d32ece8ef
+    eu-central-1:
+      Collection: snap-064065f29ff3d074a
+      Data3Dec: snap-0864d7a064ccaff25
+Resources:
+  Collection:
+    Type: "AWS::EC2::Volume"
+    Properties:
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      SnapshotId: !FindInMap [RegionMap, !Ref "AWS::Region", Collection]
+      Encrypted: true
+  Data3Dec:
+    Type: "AWS::EC2::Volume"
+    Properties:
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      SnapshotId: !FindInMap [RegionMap, !Ref "AWS::Region", Data3Dec]
+      Encrypted: true
+Outputs:
+  CollectionVolumeID:
+    Description: ID of the collection volume
+    Value: !Ref Collection
+  DataVolumeID:
+    Description: ID of the data3dec volume
+    Value: !Ref Data3Dec

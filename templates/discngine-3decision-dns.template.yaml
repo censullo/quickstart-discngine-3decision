@@ -1,0 +1,54 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: "This template deploys A records in a given route53 hosted zone (qs-1s40771km)."
+Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "3decision Route53 DNS creation"
+  LintSpellExclude:
+    - Discngine
+    - 3decision
+Parameters:
+  HostedZoneId:
+    Type: String
+  DomainName:
+    Type: String
+  TdecRecordName:
+    Type: String
+  EtlRecordName:
+    Type: String
+Mappings:
+  Config:
+    Prefix: { Value: 'eks-quickstart' }
+Resources:
+  DNSName:
+    Type: Custom::CliQuery
+    Properties:
+      ServiceToken: !Sub ['arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Prefix}-ResourceReader', {Prefix: !FindInMap [Config, Prefix, Value]}]
+      AwsCliCommand: "elbv2 describe-load-balancers --names lb-3dec --query 'LoadBalancers[0].{DNSName: DNSName}'"
+      IdField: 'DNSName'
+  CanonicalHostedZoneId:
+    Type: Custom::CliQuery
+    Properties:
+      ServiceToken: !Sub ['arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Prefix}-ResourceReader', {Prefix: !FindInMap [Config, Prefix, Value]}]
+      AwsCliCommand: "elbv2 describe-load-balancers --names lb-3dec --query 'LoadBalancers[0].{CanonicalHostedZoneId: CanonicalHostedZoneId}'"
+      IdField: 'CanonicalHostedZoneId'
+  tdecRecord:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      AliasTarget:
+        DNSName: !Ref DNSName
+        EvaluateTargetHealth: true
+        HostedZoneId: !Ref CanonicalHostedZoneId
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "${TdecRecordName}.${DomainName}"
+      Type: A
+  tdecEtlRecord:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      AliasTarget:
+        DNSName: !Ref DNSName
+        EvaluateTargetHealth: true
+        HostedZoneId: !Ref CanonicalHostedZoneId
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "${EtlRecordName}.${DomainName}"
+      Type: A
