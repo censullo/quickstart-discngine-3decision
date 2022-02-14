@@ -3,3 +3,27 @@
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
 <Describe how the software works on AWS.>
+
+3decision AWS Quick-start aims to help installing and configuring the plateform in a matter of clicks. 
+
+Current Version: 2021.3.1-aws
+
+=== Restrictions and Limitations
+
+This section lists the features restrictions and limitations that currently apply to 3decision AWS version.
+
+- no SSO Login
+
+OpenID Connect and LDAP authentication are currently only supported by 3decision SaaS and on-premise option. Support will be added into next major release (expected on March 15th).
+
+- single user limitation
+
+AWS 3decision version 2021.3.1 only comes with a single user for now. The possibility to have several users will be added into next major release (expected on March 15th).
+
+- no docking
+
+Ligands docking is currently not possible. This feature will be release for AWS with next major release (expected on March 15th).
+
+- Administration panel
+
+Once you have completed the  link:#_additional_info[Post-Deployment steps] you will be able to access the administration panel with a URL like https://3decision-admin.<yourdomain>.<ext>/admin. Don't omit "/admin" at the end of the URL, as it is the only enabled endpoint.

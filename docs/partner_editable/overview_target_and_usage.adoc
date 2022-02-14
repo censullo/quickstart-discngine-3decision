@@ -4,4 +4,20 @@
 
 This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture on the AWS Cloud.
 
-This Quick Start is for users who <target audience and usage scenario>
+This Quick Start is for users who want to deploy 3decision in an AWS subscription.
+This Quick Start is an alternative to 3decision SaaS version for organizations that want to keep their data in their AWS scope.
+
+3decision for AWS does not have the full flavor of 3decision vanilla SaaS version: 
+It comes with a few link:#_product_description[Restrictions and Limitations], although they will disapear in the following weeks with the release of the next major version.
+
+Other limitations exist and concern support, monitoring and maintenance:
+
+- infrastructure monitoring is not included in this Quick Start.
+
+- maintenance: 3decision updates are provided as helm charts updates. Although these upgrades are provided freely, the customer will need to apply helm upgrades himself to the EKS cluster.
+
+- support: the Quick Start does not include a log collection mecanism. Support Requests to Discngine might require the customer to collect logs himself.
+
+
+
+
