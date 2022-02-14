@@ -1,0 +1,28 @@
+project:
+  name: quickstart-discngine-3decision
+  owner: quickstart-eng@amazon.com
+  regions:
+    - eu-central-1
+    - us-east-1
+  template: templates/discngine-3decision-main.template.yaml
+  s3_regional_buckets: true
+  parameters:
+    RemoteAccessCIDR: 10.0.0.0/16
+    QSS3BucketName: $[taskcat_autobucket]
+    QSS3BucketRegion: $[taskcat_current_region]
+  lambda_source_path: functions/source
+  lambda_zip_path: functions/packages
+tests:
+  new-vpc:
+    regions:
+      # - eu-central-1
+      - us-east-1
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_3]
+      KeyPairName: $[taskcat_getkeypair]
+      JWTPrivateKey: override
+      JWTPublicKey: override
+      EtlPassword: override
+      DBPassword: override
+      DomainName: example.com
+    template: templates/discngine-3decision-main.template.yaml

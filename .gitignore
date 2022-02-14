@@ -1,0 +1,7 @@
+.idea
+.taskcat_overrides.yml
+.taskcat
+taskcat_outputs
+.DS_Store
+screen-logs.txt
+*.zip
