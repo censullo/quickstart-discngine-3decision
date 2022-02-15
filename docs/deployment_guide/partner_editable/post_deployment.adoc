@@ -1,3 +1,48 @@
 //Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps leave this file empty.
 
 == Postdeployment steps
+
+=== [Optional] Add your SSL certificate to the application load balancer
+
+If you did not provide an SSL certificate during the QuickStart installation, you can edit the load balancer listener in order to configure an SSL certificate:
+
+[start=1]
+. HTTPS setup
+
+As shown in  <<postinstall1>>, edit the Application Load Balancer and switch the listener protocol from http to https.
+
+[#postinstall1]
+.Application Load Balancer HTTP to HTTPS switch
+image::../docs/deployment_guide/images/listener_https_settings.png[Postinstall,width=70%,height=70%]
+
+[start=2]
+. SSL certificate setup
+
+As shown in  <<postinstall2>>, change the default SSL certificate by either importing yours or selecting a certificate from IAM or ACM.
+
+[#postinstall2]
+.Application Load Balancer HTTP to HTTPS switch
+image::../docs/deployment_guide/images/listener_certificate_settings.png[Postinstall,width=70%,height=70%]
+
+
+
+
+=== [Optional] Create CNAME record in your DNS provider
+
+If you did not provide the a Route 53 Hosted Zone ARN during the QuickStart installation, you will need to create 2 DNS records into your DNS provider.
+
+Both need to target the 3decision application load balancer. The address of this load balancer is the "DNS Name" as shown in <<postinstall3>>.
+
+
+The 2 hosts you must defined are:
+
+[start=1]
+. 3decision.<your domain> ( 3decision user UI )
+
+[start=2]
+. 3decision-etl.<your domain> ( 3decision admin UI )
+
+[#postinstall3]
+.Application Load Balancer HTTP to HTTPS switch
+image::../docs/deployment_guide/images/lb_dns_name.png[Postinstall]
+

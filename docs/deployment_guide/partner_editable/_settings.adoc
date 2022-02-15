@@ -1,14 +1,13 @@
-:quickstart-project-name: quickstart-repo-name
+:quickstart-project-name: quickstart-discngine-3decision
 :quickstart-github-org: aws-quickstart
-:partner-product-name: Full Product Name
-:partner-product-short-name: Product Name
-:partner-company-name: Example Company Name, Ltd.
-:doc-month: January
+:partner-product-name: Discngine 3decision
+:partner-product-short-name: 3decision
+:partner-company-name: Discngine S.A.S.
+:doc-month: February
 :doc-year: 2022
-:partner-contributors: John Smith, {partner-company-name}
+:partner-contributors: Jonathan Manassen, and Alexandre Gillet, {partner-company-name}
 //:other-contributors: Akua Mansa, Trek10
-:aws-contributors: Janine Singh, AWS IoT Partner team
-:aws-ia-contributors: Toni Jones, AWS Integration & Automation team
-:deployment_time: 15 minutes
-:default_deployment_region: us-east-1
+:aws-ia-contributors: Dattaprasad Sadwelkar, and Vinod Shukla, AWS Integration & Automation team
+:deployment_time: 2 hours
+:default_deployment_region: eu-central-1
 // :private_repo:
