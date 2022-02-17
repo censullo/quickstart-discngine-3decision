@@ -49,7 +49,7 @@ image::../docs/deployment_guide/images/lb_dns_name.png[Postinstall]
 
 === [Optional] Additionnal accounts creation
 
-Additionnal accounts can be created by connecting to the admin UI: 
+The 3decision stack will create a 3decision user named ``3decision`` (you can change this default name during the stack deployment). Additionnal accounts can be created by connecting to the admin UI: 
 
 [start=1]
 . Connect to the admin pannel
@@ -60,6 +60,8 @@ Connect to https://3decision-etl.<your domain>
 . Navigate to users management
 
 Navigate to Security/Users as shown in <<postinstall4>>.
+
+Connect with the account ``3decision`` and the password you provided during the installation.
 
 [#postinstall4]
 .Users configuration panel
