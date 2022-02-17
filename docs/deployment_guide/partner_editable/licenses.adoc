@@ -1,5 +1,5 @@
 // Include details about any licenses and how to sign up. Provide links as appropriate.
 
-This Quick Start requires a license for {partner-product-short-name}. To use the Quick Start in your production environment, contact contact@discngine.com to acquire a license.
+This Quick Start requires a license for {partner-product-short-name}. To use the Quick Start in your production environment, contact contact@discngine.com to acquire a license. Dev and Test environments do not require a 3decision license.
 
-There is no cost to use this Quick Start, however you will be billed for the resources deployed. For more information see the http://general-content-file[AWS Quick Start General Content Guide].
+There is no cost to use this Quick Start, however you will be billed by AWS for the resources deployed. For more information see the http://general-content-file[AWS Quick Start General Content Guide].
