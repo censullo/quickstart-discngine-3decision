@@ -1,6 +1,6 @@
 //Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps leave this file empty.
 
-== Postdeployment steps
+== Post-deployment steps
 
 === [Optional] Add your SSL certificate to the application load balancer
 
@@ -29,12 +29,12 @@ image::../docs/deployment_guide/images/listener_certificate_settings.png[Postins
 
 === [Optional] Create CNAME record in your DNS provider
 
-If you did not provide the a Route 53 Hosted Zone ARN during the QuickStart installation, you will need to create 2 DNS records into your DNS provider.
+If you did not provide the Route 53 Hosted Zone Id during the QuickStart installation, you will need to create 2 DNS records into your DNS provider.
 
 Both need to target the 3decision application load balancer. The address of this load balancer is the "DNS Name" as shown in <<postinstall3>>.
 
 
-The 2 hosts you must defined are:
+The 2 hosts you must define are:
 
 [start=1]
 . 3decision.<your domain> ( 3decision user UI )
