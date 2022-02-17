@@ -56,12 +56,12 @@ The 3decision stack will create a 3decision user named ``3decision`` (you can ch
 
 Connect to https://3decision-etl.<your domain>
 
+Connect with the account ``3decision`` and the password you provided during the installation.
+
 [start=2]
 . Navigate to users management
 
 Navigate to Security/Users as shown in <<postinstall4>>.
-
-Connect with the account ``3decision`` and the password you provided during the installation.
 
 [#postinstall4]
 .Users configuration panel
