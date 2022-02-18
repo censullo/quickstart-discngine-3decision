@@ -1,6 +1,6 @@
 //Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps leave this file empty.
 
-== Postdeployment steps
+== Post-deployment steps
 
 === [Optional] Add your SSL certificate to the application load balancer
 
@@ -21,7 +21,7 @@ image::../docs/deployment_guide/images/listener_https_settings.png[Postinstall,w
 As shown in  <<postinstall2>>, change the default SSL certificate by either importing yours or selecting a certificate from IAM or ACM.
 
 [#postinstall2]
-.Application Load Balancer HTTP to HTTPS switch
+.Application Load Balancer SSL certificate setup
 image::../docs/deployment_guide/images/listener_certificate_settings.png[Postinstall,width=70%,height=70%]
 
 
@@ -29,12 +29,12 @@ image::../docs/deployment_guide/images/listener_certificate_settings.png[Postins
 
 === [Optional] Create CNAME record in your DNS provider
 
-If you did not provide the a Route 53 Hosted Zone ARN during the QuickStart installation, you will need to create 2 DNS records into your DNS provider.
+If you did not provide the Route 53 Hosted Zone Id during the QuickStart installation, you will need to create 2 DNS records into your DNS provider.
 
 Both need to target the 3decision application load balancer. The address of this load balancer is the "DNS Name" as shown in <<postinstall3>>.
 
 
-The 2 hosts you must defined are:
+The 2 hosts you must define are:
 
 [start=1]
 . 3decision.<your domain> ( 3decision user UI )
@@ -43,6 +43,31 @@ The 2 hosts you must defined are:
 . 3decision-etl.<your domain> ( 3decision admin UI )
 
 [#postinstall3]
-.Application Load Balancer HTTP to HTTPS switch
+.Application Load Balancer DNS Name
 image::../docs/deployment_guide/images/lb_dns_name.png[Postinstall]
 
+
+=== [Optional] Additionnal accounts creation
+
+The 3decision stack will create a 3decision user named ``3decision`` (you can change this default name during the stack deployment). Additionnal accounts can be created by connecting to the admin UI: 
+
+[start=1]
+. Connect to the admin pannel
+
+Connect to https://3decision-etl.<your domain>
+
+Connect with the account ``3decision`` and the password you provided during the installation.
+
+[start=2]
+. Navigate to users management
+
+Navigate to Security/Users as shown in <<postinstall4>>.
+
+[#postinstall4]
+.Users configuration panel
+image::../docs/deployment_guide/images/users_config.png[Postinstall]
+
+[start=3]
+. Add users
+
+Add users by specifing their user name and password.

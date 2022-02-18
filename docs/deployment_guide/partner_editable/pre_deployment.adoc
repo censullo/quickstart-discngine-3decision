@@ -1,3 +1,24 @@
 //Include any predeployment steps here, such as signing up for a Marketplace AMI or making any changes to a Partner account. If there are none leave this file empty.
 
-//== Predeployment steps
+== Predeployment steps
+
+[start=1]
+During deployment, you will be asked to provide a public/private SSH key pair. This key must be provided in base64 with line wrapping disabled (`` -w 0``).
+
+....
+ssh-keygen -t rsa -b 2048 -C "your_email@example.com" -q -N "" -f ./id_rsa_3decision
+....
+
+Encode both keys in base64 with the following commands:
+
+....
+base64 -w 0 id_rsa_3decision
+
+base64 -w 0 id_rsa_3decision.pub
+....
+
+Copy the base64 string of both keys as you will need it during the cloudformation stack deployment.
+
+[start=2]
+If you are deploying 3decision in an existing VPC, you must ensure that the private subnets have correct tags:
+please refer to the AWS EKS QuickStart: https://aws-quickstart.github.io/quickstart-amazon-eks/#_launch_the_quick_start
