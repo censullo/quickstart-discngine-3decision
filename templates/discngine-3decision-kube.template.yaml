@@ -12,9 +12,6 @@ Parameters:
   TNamespace:
     Default: tdecision
     Type: String
-  JWTSecretName:
-    Default: 3decision-jwt-secret
-    Type: String
   JWTPrivateKey:
     Type: String
     NoEcho: true
@@ -43,6 +40,8 @@ Parameters:
   TdecRecordName:
     Type: String
   EtlRecordName:
+    Type: String
+  LoadBalancerType:
     Type: String
 Resources:
   TDecisionNamespace:
@@ -80,7 +79,7 @@ Resources:
         apiVersion: v1
         type: opaque
         metadata:
-          name: ${JWTSecretName}
+          name: 3decision-jwt-secret
           namespace: ${TNamespace}
         data:
           id_rsa: ${JWTPrivateKey}
@@ -119,7 +118,7 @@ Resources:
                 memory: 250Mi
   TdecisionChart:
     Type: "AWSQS::Kubernetes::Helm"
-    DependsOn: [ JWTSecret, RabbitMQChart ]
+    DependsOn: [ JWTSecret, ChangeDBPass ]
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
     Properties:
       ClusterID: !Ref EKSClusterName
@@ -127,7 +126,7 @@ Resources:
       Namespace: !Ref TNamespace
       Chart: oci://fra.ocir.io/discngine1/3decision_kube/3decision-aws:latest
       Values:
-        nodeCloud.volumes.jwtSecret.name: !Ref JWTSecretName
+        nodeCloud.volumes.jwtSecret.name: "3decision-jwt-secret"
         oracle.password: !Ref DBPassword
         oracle.connectionString: !Ref DBConnectionString
         etl.volumes.data3dec.awsElasticBlockStore.volumeID: !Ref DataVolumeID
@@ -139,6 +138,7 @@ Resources:
         ingress.certificateArn: !Ref CertificateArn
         ingress.node.host: !Ref TdecRecordName
         ingress.etl.host: !Ref EtlRecordName
+        ingress.visibility: !Ref LoadBalancerType
   ChoralChart:
     Type: "AWSQS::Kubernetes::Helm"
     DependsOn: ChangeDBPass
@@ -200,7 +200,7 @@ Resources:
                 DROP INDEX IDX_CHOR_TAU_CMP_STRUC;\n
                 DROP INDEX IDX_CHOR_TAUISO_CMP_STRUC;\n
                 DROP INDEX IDX_CHOR_STRICT_CMP_STRUC;\n' > delete_chembl_29_index.sql;
-                exit | /root/sqlcl/bin/sql PD_T1_DNG_THREEDECISION/${DBPassword}@${DBConnectionString} @delete_chembl_29_index.sql;        
+                exit | /root/sqlcl/bin/sql CHEMBL_29/${DBPassword}@${DBConnectionString} @delete_chembl_29_index.sql;        
                 exit 1;
               fi;
             resources:

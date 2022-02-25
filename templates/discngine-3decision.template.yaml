@@ -16,13 +16,14 @@ Metadata:
           - VPCID
           - ConfigureEKS
       - Label:
-          default: Discngine 3decision dns configuration
+          default: Discngine 3decision network configuration
         Parameters:
           - DomainName
           - HostedZoneId
           - CertificateArn
           - TdecRecordName
           - EtlRecordName
+          - LoadBalancerType
       - Label:
           default : Discngine 3decision database configuration
         Parameters:
@@ -38,7 +39,6 @@ Metadata:
           - EtlUser
           - EtlPassword
           - TNamespace
-          - JWTSecretName
           - JWTPrivateKey
           - JWTPublicKey
           - JWTKeysSecretName
@@ -73,8 +73,6 @@ Metadata:
         default: Whether the DB is highly available
       TNamespace:
         default: 3decision Helm chart namespace
-      JWTSecretName:
-        default: Name of secret used for JWT
       JWTPrivateKey:
         default: Private SSH key in base 64 used for JWT
       JWTPublicKey:
@@ -95,6 +93,8 @@ Metadata:
         default: Record name of main 3decision page
       EtlRecordName:
         default: Record name of etl page
+      LoadBalancerType:
+        default: Type of loadbalancer created
 Parameters:
   EKSClusterName:
     Description: "Required: The name of the EKS cluster in which the stacks will be deployed"
@@ -166,7 +166,8 @@ Parameters:
       - db.m5.2xlarge
       - db.m5.4xlarge
     Default: db.t3.medium
-    Description: Amazon RDS instance type for the Oracle Database instance
+    Description: Amazon RDS instance type for the Oracle Database instance.
+                 We recommend t3.xlarge for production use as a lower shape will be rather slow.
     Type: String
   DBMultiZone:
     Description: High Availability (Multi-AZ) for Oracle RDS.
@@ -180,26 +181,23 @@ Parameters:
                   This will default to tdecision if not given.
                   The namespace will be created if it doesn't already exists."
     Type: String
-  JWTSecretName:
-    Default: 3decision-jwt-secret
-    Description: "Optional: The name of the kubernetes secret that will contain the ssh key
-                  This will default to 3decision-jwt-secret.
-                  It will be placed in the same namespace as the 3decision helm chart"
-    Type: String
   JWTKeysSecretName:
     Default: ""
-    Description: "Conditional: The name of a secret in SecretsManager containing base64 keys in fields private_key and public_key
+    Description: "Conditional: The name of a secret in SecretsManager containing base64 keys in fields private_key and public_key.
+                  If used, you need to disable wrapping and paste the base64 encoded strings that you can retrieve by running 'base64 -w0 id_rsa' and 'base64 -w0 id_rsa.pub'.
                   By default, this will have no value, in which case the variables JWTPrivateKey and JWTPublicKey will be used."
     Type: String
   JWTPrivateKey:
     Default: ""
-    Description: "Conditional: An SSH private key in base64 format
+    Description: "Conditional: An SSH private key in base64 format.
+                  You need to disable wrapping and paste the base64 encoded string that you can retrieve by running 'base64 -w0 id_rsa'.
                   If JWTKeysSecretName is set, this variable is not used"
     Type: String
     NoEcho: true
   JWTPublicKey:
     Default: ""
-    Description: "Conditional: An SSH public key in base64 format.
+    Description: "Conditional: An SSH public key in base64 format.\n
+                  You need to disable wrapping and paste the base64 encoded string that you can retrieve by running 'base64 -w0 id_rsa.pub'.\n
                   If JWTKeysSecretName is set, this variable is not used"
     Type: String
   EtlUser:
@@ -224,7 +222,8 @@ Parameters:
     Description: "Optional: Creates dns records for the given route 53 hosted zone if given."
     Type: String
   DomainName:
-    Description: "Required: Domain name used for load balancer rules"
+    Description: "Required: Root domain name used for load balancer rules
+                  This is only the root domain name not the fqdn, eg: example.com"
     Type: String
   CertificateArn:
     Default: ""
@@ -237,6 +236,14 @@ Parameters:
   EtlRecordName:
     Default: "3decision-etl"
     Description: "Subpath of the 3decision etl page. Will add route to hostedZone if given as recordName.domainName"
+    Type: String
+  LoadBalancerType:
+    AllowedValues:
+      - internet-facing
+      - internal
+    Default: "internal"
+    Description: "Type of loadbalancer created.
+                  This can either be equal to internet-facing for public loadbalancer or internal for private loadbalancers"
     Type: String
 
 Rules:
@@ -301,7 +308,6 @@ Resources:
           S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
         TNamespace: !Ref TNamespace
-        JWTSecretName: !Ref JWTSecretName
         JWTPrivateKey: !If [UseJWTKeysSecret, !Sub '{{resolve:secretsmanager:${JWTKeysSecretName}:SecretString:private_key}}', !Ref JWTPrivateKey]
         JWTPublicKey: !If [UseJWTKeysSecret, !Sub '{{resolve:secretsmanager:${JWTKeysSecretName}:SecretString:public_key}}', !Ref JWTPublicKey]
         EKSClusterName: !Ref EKSClusterName
@@ -314,7 +320,8 @@ Resources:
         EtlUser: !Ref EtlUser
         EtlPassword: !Ref EtlPassword
         TdecRecordName: !Ref TdecRecordName
-        EtlRecordName: !Ref EtlRecordName        
+        EtlRecordName: !Ref EtlRecordName
+        LoadBalancerType: !Ref LoadBalancerType
   3decisionDNSStack:
     Type: AWS::CloudFormation::Stack
     Condition: ConfigureDNS
