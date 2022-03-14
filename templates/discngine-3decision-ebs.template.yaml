@@ -10,10 +10,10 @@ Metadata:
 Mappings: 
   RegionMap: 
     us-east-1:
-      Collection: snap-0b2bfb398a8fcadbc
+      Collection: snap-058536f2dbf479acc
       Data3Dec: snap-03bef781d32ece8ef
     eu-central-1:
-      Collection: snap-064065f29ff3d074a
+      Collection: snap-0cdb04f57958c2742
       Data3Dec: snap-0864d7a064ccaff25
 Resources:
   Collection:
