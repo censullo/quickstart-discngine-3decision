@@ -24,28 +24,22 @@ Parameters:
     NoEcho: true
   DBConnectionString:
     Type: String
-  CollectionVolumeID:
+  DataPubVolumeID:
     Type: String
-  DataVolumeID:
-    Type: String
-  EtlUser:
-    Type: String
-  EtlPassword:
-    Type: String
-    NoEcho: true
   DomainName:
     Type: String
   CertificateArn:
     Type: String
-  TdecRecordName:
+  HostString:
     Type: String
-  EtlRecordName:
+  DBName:
     Type: String
   LoadBalancerType:
     Type: String
 Resources:
   TDecisionNamespace:
     Type: "AWSQS::Kubernetes::Resource"
+    DeletionPolicy: Retain
     Properties:
       ClusterName: !Ref EKSClusterName
       Namespace: 'kube-system'
@@ -68,6 +62,41 @@ Resources:
         image.tag: 3.8.19-debian-10-r30
         rabbitmq.username: discngine
         rabbitmq.password: lapin79
+  CertManager:
+    Type: "AWSQS::Kubernetes::Helm"
+    Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
+    Properties:
+      ClusterID: !Ref EKSClusterName
+      Name: cert-manager
+      Namespace: cert-manager
+      Repository: https://charts.jetstack.io
+      Chart: cert-manager
+      Version: 1.4.0
+      Values:
+        installCRDs: true
+  IngressNginx:
+    Type: "AWSQS::Kubernetes::Helm"
+    Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
+    Properties:
+      ClusterID: !Ref EKSClusterName
+      Name: ingress-nginx
+      Namespace: ingress-nginx
+      Repository: https://kubernetes.github.io/ingress-nginx
+      Chart: ingress-nginx
+  RedisChart:
+    Type: "AWSQS::Kubernetes::Helm"
+    Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
+    Properties:
+      ClusterID: !Ref EKSClusterName
+      Name: redis-cluster
+      Namespace: redis-cluster
+      Repository: https://charts.bitnami.com/bitnami
+      Chart: redis-cluster
+      Version: 6.2.6
+      Values:
+        auth.password: "lapin80"
+        sentinel.image.tag: "6.2.6-debian-10-r120"
+        sentinel.enabled: true
   JWTSecret:
     Type: "AWSQS::Kubernetes::Resource"
     DependsOn: TDecisionNamespace
@@ -106,8 +135,7 @@ Resources:
               alter user ADMIN identified by "${DBPassword}";
               alter user PD_T1_DNG_THREEDECISION identified by "${DBPassword}";
               alter user PD_T1_DNG_CORE identified by "${DBPassword}";
-              alter user CHEMBL_29 identified by "${DBPassword}";
-              alter user CHORAL_OWNER identified by "${DBPassword}";' > changepwd.sql;
+              alter user CHEMBL_29 identified by "${DBPassword}";' > changepwd.sql;
               /root/sqlcl/bin/sql admin/Ch4ng3m3f0rs3cur3p4ss@${DBConnectionString} @changepwd.sql
             resources:
               limits:
@@ -118,36 +146,40 @@ Resources:
                 memory: 250Mi
   TdecisionChart:
     Type: "AWSQS::Kubernetes::Helm"
-    DependsOn: [ JWTSecret, ChangeDBPass ]
+    DependsOn: [ TDecisionNamespace, JWTSecret, RabbitMQChart ]
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
     Properties:
       ClusterID: !Ref EKSClusterName
       Name: tdecision
       Namespace: !Ref TNamespace
-      Chart: oci://fra.ocir.io/discngine1/3decision_kube/3decision-aws:latest
+      Chart: oci://fra.ocir.io/discngine1/3decision_kube/3decision-helm:1.0.0
       Values:
-        nodeCloud.volumes.jwtSecret.name: "3decision-jwt-secret"
+        nodeCloud.volumes.jwtSecret.name: 3decision-jwt-secret
         oracle.password: !Ref DBPassword
         oracle.connectionString: !Ref DBConnectionString
-        etl.volumes.data3dec.awsElasticBlockStore.volumeID: !Ref DataVolumeID
-        etl.volumes.collection.awsElasticBlockStore.volumeID: !Ref CollectionVolumeID
-        etl.user: !Ref EtlUser
-        etl.password: !Ref EtlPassword
-        volumes.availabilityZone: !Select [ 0, Fn::GetAZs: !Ref 'AWS::Region' ]
+        oracle.hostString: !Ref HostString
+        oracle.pdbString: !Ref DBName
+        choral.oracle.password: !Ref DBPassword
+        global.choral.enabled: false
+        volumes.claimPods.backend.publicdata.awsElasticBlockStore.fsType: "ext4"
+        volumes.claimPods.backend.publicdata.awsElasticBlockStore.volumeID: !Ref DataPubVolumeID
+        volumes.claimPods.backend.publicdata.awsElasticBlockStore.availabilityZone: !Select [ 0, Fn::GetAZs: !Ref 'AWS::Region' ]
         ingress.host: !Ref DomainName
         ingress.certificateArn: !Ref CertificateArn
-        ingress.node.host: !Ref TdecRecordName
-        ingress.etl.host: !Ref EtlRecordName
         ingress.visibility: !Ref LoadBalancerType
+        nest.env.internal_api_key.value: !Select [2, !Split ['/', !Ref AWS::StackId]]
+        ingress.class: alb
+        nest.env.azure_tenant.value: ""
+        nest.env.azure_client_id.value: ""
+        nest.env.azure_secret.value: ""
   ChoralChart:
     Type: "AWSQS::Kubernetes::Helm"
-    DependsOn: ChangeDBPass
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
     Properties:
       ClusterID: !Ref EKSClusterName
       Name: choral
       Namespace: choral
-      Chart: oci://fra.ocir.io/discngine1/3decision_kube/choral-helm:latest
+      Chart: oci://fra.ocir.io/discngine1/3decision_kube/choral-helm:1.0.0
       Values:
         oracle.password: !Ref DBPassword
         oracle.connectionString: !Ref DBConnectionString

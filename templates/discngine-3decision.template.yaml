@@ -21,8 +21,6 @@ Metadata:
           - DomainName
           - HostedZoneId
           - CertificateArn
-          - TdecRecordName
-          - EtlRecordName
           - LoadBalancerType
       - Label:
           default : Discngine 3decision database configuration
@@ -36,8 +34,6 @@ Metadata:
       - Label:
           default: Discngine 3decision kube configuration
         Parameters:
-          - EtlUser
-          - EtlPassword
           - TNamespace
           - JWTPrivateKey
           - JWTPublicKey
@@ -73,14 +69,12 @@ Metadata:
         default: Whether the DB is highly available
       TNamespace:
         default: 3decision Helm chart namespace
+      JWTKeysSecretName:
+        default: Secret Manager name containing ssh keys
       JWTPrivateKey:
         default: Private SSH key in base 64 used for JWT
       JWTPublicKey:
         default: Public SSH key in base 64 used for JWT
-      EtlUser:
-        default: Username used for etl
-      EtlPassword:
-        default: Password used for etl
       ConfigureEKS:
         default: Boolean determining whether to configure EKS
       HostedZoneId:
@@ -89,10 +83,6 @@ Metadata:
         default: Domain name used for load balancing
       CertificateArn:
         default: Arn of a certificate
-      TdecRecordName:
-        default: Record name of main 3decision page
-      EtlRecordName:
-        default: Record name of etl page
       LoadBalancerType:
         default: Type of loadbalancer created
 Parameters:
@@ -200,14 +190,6 @@ Parameters:
                   You need to disable wrapping and paste the base64 encoded string that you can retrieve by running 'base64 -w0 id_rsa.pub'.\n
                   If JWTKeysSecretName is set, this variable is not used"
     Type: String
-  EtlUser:
-    Default: "3decision"
-    Description: "Required: The username that will allow you to connect to the platform"
-    Type: String
-  EtlPassword:
-    Description: "Required: The password that will allow you to connect to the platform"
-    Type: String
-    NoEcho: true
   ConfigureEKS:
     Description: "Optionnal: Set to true to create EKS quickstart specific resources for your EKS cluster"
     Default: 'false'
@@ -228,14 +210,6 @@ Parameters:
   CertificateArn:
     Default: ""
     Description: "Optional: Arn of a certificate of the associated domain you want added to the load balancer"
-    Type: String
-  TdecRecordName:
-    Default: "3decision"
-    Description: "Subpath of the main 3decision page. Will add route to hostedZone if given as recordName.domainName"
-    Type: String
-  EtlRecordName:
-    Default: "3decision-etl"
-    Description: "Subpath of the 3decision etl page. Will add route to hostedZone if given as recordName.domainName"
     Type: String
   LoadBalancerType:
     AllowedValues:
@@ -311,16 +285,13 @@ Resources:
         JWTPrivateKey: !If [UseJWTKeysSecret, !Sub '{{resolve:secretsmanager:${JWTKeysSecretName}:SecretString:private_key}}', !Ref JWTPrivateKey]
         JWTPublicKey: !If [UseJWTKeysSecret, !Sub '{{resolve:secretsmanager:${JWTKeysSecretName}:SecretString:public_key}}', !Ref JWTPublicKey]
         EKSClusterName: !Ref EKSClusterName
-        DataVolumeID: !GetAtt EBSStack.Outputs.DataVolumeID
-        CollectionVolumeID: !GetAtt EBSStack.Outputs.CollectionVolumeID
+        DataPubVolumeID: !GetAtt EBSStack.Outputs.DataPubVolumeID
         DBConnectionString: !GetAtt RDSStack.Outputs.PrimaryConnectionString
         DBPassword: !Ref DBPassword
         DomainName: !Ref DomainName
         CertificateArn: !Ref CertificateArn
-        EtlUser: !Ref EtlUser
-        EtlPassword: !Ref EtlPassword
-        TdecRecordName: !Ref TdecRecordName
-        EtlRecordName: !Ref EtlRecordName
+        HostString: !GetAtt RDSStack.Outputs.PrimaryHostString
+        DBName: !GetAtt RDSStack.Outputs.PrimaryDBName
         LoadBalancerType: !Ref LoadBalancerType
   3decisionDNSStack:
     Type: AWS::CloudFormation::Stack
@@ -334,5 +305,3 @@ Resources:
       Parameters:
         HostedZoneId: !Ref HostedZoneId
         DomainName: !Ref DomainName
-        TdecRecordName: !Ref TdecRecordName
-        EtlRecordName: !Ref EtlRecordName
