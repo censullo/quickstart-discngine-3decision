@@ -13,21 +13,15 @@ image::../docs/deployment_guide/images/architecture_diagram.png[Architecture]
 As shown in <<architecture1>>, the Quick Start sets up the following:
 
 * A highly available architecture that spans three Availability Zones.*
-* A VPC configured with public and private subnets, according to AWS
-best practices, to provide you with your own virtual network on AWS.*
+* A virtual private cloud (VPC) configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.*
 * In the public subnets:
-** Managed network address translation (NAT) gateways to allow outbound
-internet access for resources in the private subnets.*
-** A Linux bastion host in an Auto Scaling group to allow inbound Secure
-Shell (SSH) access to EC2 instances in public and private subnets.*
-* In the private subnets:
-** Kubernetes nodes. By default deploys 1 node per availability domain. Additionnal nodes can be added.
-** An Amazon Oracle RDS that contains 3decision data and analysis
-** An Amazon EKS cluster: 3decision will run pods on linux hosts.
-** Amazon EBS volumes: kubernetes VPC will create volumes in Amazon EBS to persist data.
-** 2 Amazon ELB will be used to access 3decision:app-name:
-*** one for 3decision frontend
-*** a second one for the ETL configuration panel
-
+** Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.
+** A Linux bastion host in an Auto Scaling group to allow inbound SSH (Secure Shell) access to Amazon Elastic Compute Cloud (Amazon EC2) instances in public and private subnets.
+* In the private subnets, Kubernetes nodes in an Auto Scaling group that automatically sets up the 3decision software.
+* Amazon Elastic Load Balancing for the 3decision application front end and extract-transform-load (ETL) configuration panel.
+* Amazon Elastic Kubernetes Service (Amazon EKS) for Kubernetes orchestration of the EKS cluster of 3decision nodes.
+* Amazon Elastic Block Storage (Amazon EBS) for persistent storage of Kubernetes data.
+* Amazon Relational Database Service (Amazon RDS) for 3decision data and analysis.
+* Amazon Route 53 for a Domain Name System (DNS) record for accessing the 3decision deployment.
 
 [.small]#* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#

@@ -5,9 +5,9 @@
 :partner-company-name: Discngine S.A.S.
 :doc-month: February
 :doc-year: 2022
-:partner-contributors: Jonathan Manassen, and Alexandre Gillet, {partner-company-name}
+:partner-contributors: Jonathan Manassen and Alexandre Gillet, {partner-company-name}
 //:other-contributors: Akua Mansa, Trek10
-:aws-ia-contributors: Dattaprasad Sadwelkar, and Vinod Shukla, AWS Integration & Automation team
+:aws-ia-contributors: Dattaprasad Sadwelkar and Vinod Shukla, AWS Integration & Automation team
 :deployment_time: 2 hours
 :default_deployment_region: eu-central-1
 // :private_repo:
