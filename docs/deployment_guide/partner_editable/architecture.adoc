@@ -15,13 +15,13 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 * A highly available architecture that spans three Availability Zones.*
 * A virtual private cloud (VPC) configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.*
 * In the public subnets:
-** Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.
+** Managed network address translation (NAT) gateways for outbound internet access for resources in the private subnets.
 ** A Linux bastion host in an Auto Scaling group to allow inbound SSH (Secure Shell) access to Amazon Elastic Compute Cloud (Amazon EC2) instances in public and private subnets.
 * In the private subnets, Kubernetes nodes in an Auto Scaling group that automatically sets up the 3decision software.
-* Amazon Elastic Load Balancing for the 3decision application front end and extract-transform-load (ETL) configuration panel.
+* Elastic Load Balancing (ELB) for the frontend 3decision application and extract-transform-load (ETL) configuration panel.
 * Amazon Elastic Kubernetes Service (Amazon EKS) for Kubernetes orchestration of the EKS cluster of 3decision nodes.
 * Amazon Elastic Block Storage (Amazon EBS) for persistent storage of Kubernetes data.
-* Amazon Relational Database Service (Amazon RDS) for 3decision data and analysis.
+* Amazon Relational Database Service (Amazon RDS) for 3decision data and structural analysis.
 * Amazon Route 53 for a Domain Name System (DNS) record for accessing the 3decision deployment.
 
 [.small]#* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
