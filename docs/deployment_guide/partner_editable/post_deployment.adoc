@@ -1,73 +1,64 @@
 //Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps leave this file empty.
 
-== Post-deployment steps
+== Postdeployment steps
 
-=== [Optional] Add your SSL certificate to the application load balancer
+=== (Optional) Add your SSL certificate to the Application Load Balancer
 
-If you did not provide an SSL certificate during the QuickStart installation, you can edit the load balancer listener in order to configure an SSL certificate:
+If you did not provide an SSL certificate during the Quick Start deployment, edit the listener to configure an SSL certificate.
 
-[start=1]
-. HTTPS setup
+. Open the https://console.aws.amazon.com/ec2/[Amazon EC2] console.
 
-As shown in  <<postinstall1>>, edit the Application Load Balancer and switch the listener protocol from http to https.
+. In the navigation pane, under *Load Balancing*, choose *Load Balancers*.
 
-[#postinstall1]
-.Application Load Balancer HTTP to HTTPS switch
-image::../docs/deployment_guide/images/listener_https_settings.png[Postinstall,width=70%,height=70%]
+. Select the load balancer and choose *Listeners*.
 
-[start=2]
-. SSL certificate setup
+. Select the check box for the listener and then choose *Edit*.
 
-As shown in  <<postinstall2>>, change the default SSL certificate by either importing yours or selecting a certificate from IAM or ACM.
+. For *Protocol*, choose *HTTPS*.
 
-[#postinstall2]
-.Application Load Balancer SSL certificate setup
-image::../docs/deployment_guide/images/listener_certificate_settings.png[Postinstall,width=70%,height=70%]
+. Choose *Update*.
 
+. Change the default Secure Socket Layer (SSL) certificate. For *Default SSL certificate*, do one of the following:
 
+** If you created or https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html[imported] a certificate using AWS Certificate Manager, choose *From ACM* and choose the certificate.
 
+** If you uploaded a certificate using IAM, choose *From IAM* and choose the certificate.
 
-=== [Optional] Create CNAME record in your DNS provider
-
-If you did not provide the Route 53 Hosted Zone Id during the QuickStart installation, you will need to create 2 DNS records into your DNS provider.
-
-Both need to target the 3decision application load balancer. The address of this load balancer is the "DNS Name" as shown in <<postinstall3>>.
+** If you have a certificate that isn't managed by ACM or IAM, https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html[import] it to ACM and add it to your listener. For more information, refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html[Listeners for your Network Load Balancer].
 
 
-The 2 hosts you must define are:
+=== (Optional) Create a CNAME record in your DNS provider
 
-[start=1]
-. 3decision.<your domain> ( 3decision user UI )
+If you did not provide a Route 53 hosted zone ID during the Quick Start installation, you must create the following two DNS records.
 
-[start=2]
-. 3decision-etl.<your domain> ( 3decision admin UI )
+. 3decision user UI: `3decision.<your domain>`.
 
-[#postinstall3]
-.Application Load Balancer DNS Name
-image::../docs/deployment_guide/images/lb_dns_name.png[Postinstall]
+. 3decision administrator UI: `3decision-etl.<your domain>`.
 
+Both records must target the 3decision Application Load Balancer. To obtain the address of the Application Load Balancer, open the https://console.aws.amazon.com/ec2/[Amazon EC2] console. In the navigation pane, under *Load Balancing*, choose *Load Balancers*. The address of the Application Load Balancer is in the *DNS Name* column. For more information, refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html[Network Load Balancers].
 
-=== [Optional] Additionnal accounts creation
+=== (Optional) Create additional accounts
 
-The 3decision stack will create a 3decision user named ``3decision`` (you can change this default name during the stack deployment). Additionnal accounts can be created by connecting to the admin UI: 
+The Quick Start creates a 3decision user named `3decision`. (You can change the default name during deployment.) Additional user accounts can be created in the 3decision administrator UI. 
 
-[start=1]
-. Connect to the admin pannel
+. Navigate to `\https://3decision-etl.<your domain>`.
 
-Connect to https://3decision-etl.<your domain>
+. Log in with the account `3decision` and the password you provided during deployment.
 
-Connect with the account ``3decision`` and the password you provided during the installation.
+. Under *Admin Pages*, *Security*, choose *Users*.
 
-[start=2]
-. Navigate to users management
+. Enter *User Name*, *Password*, and *Confirm Password*.
 
-Navigate to Security/Users as shown in <<postinstall4>>.
+. Choose *Add*.
 
-[#postinstall4]
-.Users configuration panel
-image::../docs/deployment_guide/images/users_config.png[Postinstall]
+=== Additional information
 
-[start=3]
-. Add users
+This Quick Start does not include the following:
 
-Add users by specifing their user name and password.
+* Azure and Okta OpenID Connect authentication. Only local accounts are supported.
+
+* Infrastructure monitoring.
+
+* Log collection.
+
+3decision updates are provided as Helm charts updates. Although these updates are free, you must manually apply Helm upgrades to the deployed EKS cluster.

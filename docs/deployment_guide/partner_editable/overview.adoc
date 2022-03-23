@@ -5,23 +5,6 @@ This Quick Start deploys {partner-product-name} on the AWS Cloud. If you are unf
 // For information on using this Quick Start for migrations, see the https://{quickstart-github-org}.github.io/{quickstart-project-name}/migration/index.html[Migration guide].
 
 
-This Quick Start is for users who want to deploy 3decision in an AWS subscription. Discngine 3decision is a web-based solution that combines a fully annotated and searchable database with a collaborative user interface and state of-the-art structural analytical tool. It is designed to give molecular modelers, medicinal chemists, and structural biologists a common ground for structure-based drug discovery.
-
-This Quick Start is an alternative to Discngine 3decision SaaS and designed for organizations that want to keep their data in their AWS scope.
-
-3decision for AWS does not have the full flavor of the 3decision vanilla SaaS version:
-It comes with a few limitations, although they will disappear in the following weeks with the release of the next major version.
-
-Current 3decision Quick Start limitations :
-
-- Azure and Okta OpenID Connect authentication are not included yet. Only local accounts are supported.
-
-- infrastructure monitoring is not included in this Quick Start.
-
-- maintenance: 3decision updates are provided as helm charts updates. Although these upgrades are provided freely, the customer will need to apply helm upgrades himself to the EKS cluster.
-
-- support: the Quick Start does not include a log collection mechanism. Support requests to Discngine might require the customer to provide logs.
-
 
 
 
