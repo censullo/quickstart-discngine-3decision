@@ -41,8 +41,6 @@ Metadata:
           - DomainName
           - HostedZoneId
           - CertificateArn
-          - TdecRecordName
-          - EtlRecordName
           - LoadBalancerType
       - Label:
           default : Discngine 3decision database configuration
@@ -55,8 +53,6 @@ Metadata:
       - Label:
           default: Discngine 3decision kube configuration
         Parameters:
-          - EtlUser
-          - EtlPassword
           - TNamespace
           - JWTPrivateKey
           - JWTPublicKey
@@ -122,24 +118,18 @@ Metadata:
         default: Whether the DB is highly available
       TNamespace:
         default: 3decision Helm chart namespace
+      JWTKeysSecretName:
+        default: Secret Manager name containing ssh keys
       JWTPrivateKey:
         default: Private SSH key in base 64 used for JWT
       JWTPublicKey:
         default: Public SSH key in base 64 used for JWT
-      EtlUser:
-        default: Username used for etl
-      EtlPassword:
-        default: Password used for etl
       HostedZoneId:
         default: Route 53 hosted zone Id
       DomainName:
         default: Domain name used for load balancing
       CertificateArn:
         default: Arn of a certificate
-      TdecRecordName:
-        default: Record name of main 3decision page
-      EtlRecordName:
-        default: Record name of etl page
       LoadBalancerType:
         default: Type of loadbalancer created
       ProvisionBastionHost:
@@ -317,7 +307,6 @@ Parameters:
     MaxLength: '41'
   DBInstanceClass:
     AllowedValues:
-      - db.t3.micro
       - db.t3.small
       - db.t3.medium
       - db.t3.large
@@ -362,14 +351,6 @@ Parameters:
                   You need to disable wrapping and paste the base64 encoded string that you can retrieve by running 'base64 -w0 id_rsa.pub'.
                   If JWTKeysSecretName is set, this variable is not used"
     Type: String
-  EtlUser:
-    Default: "3decision"
-    Description: "Required: The username that will allow you to connect to the platform"
-    Type: String
-  EtlPassword:
-    Description: "Required: The password that will allow you to connect to the platform"
-    Type: String
-    NoEcho: true
   AdditionalEKSAdminUserArn:
     Default: ""
     Description: "Optional: IAM user Amazon Resource Name (ARN) to be granted administrative access to the EKS cluster."
@@ -389,14 +370,6 @@ Parameters:
   CertificateArn:
     Default: ""
     Description: "Optional: Arn of a certificate of the associated domain you want added to the load balancer"
-    Type: String
-  TdecRecordName:
-    Default: "3decision"
-    Description: "Subpath of the main 3decision page. Will add route to hostedZone if given as recordName.domainName"
-    Type: String
-  EtlRecordName:
-    Default: "3decision-etl"
-    Description: "Subpath of the 3decision etl page. Will add route to hostedZone if given as recordName.domainName"
     Type: String
   LoadBalancerType:
     AllowedValues:
@@ -491,9 +464,5 @@ Resources:
         AdditionalEKSAdminUserArn: !Ref AdditionalEKSAdminUserArn
         AdditionalEKSAdminRoleArn: !Ref AdditionalEKSAdminRoleArn
         NodeVolumeSize: !Ref NodeVolumeSize
-        EtlUser: !Ref EtlUser
-        EtlPassword: !Ref EtlPassword
-        TdecRecordName: !Ref TdecRecordName
-        EtlRecordName: !Ref EtlRecordName
         LoadBalancerType: !Ref LoadBalancerType
         ProvisionBastionHost: !Ref ProvisionBastionHost
