@@ -36,7 +36,42 @@ Parameters:
     Type: String
   LoadBalancerType:
     Type: String
+  AzureClientId:
+    Type: String
+  AzureTenant: 
+    Type: String
+  AzureSecret: 
+    Type: String
+  AzureRedirectUri:
+    Type: String
+  OktaClientId:
+    Type: String
+  OktaSecret:
+    Type: String
+  OktaDomain:
+    Type: String
+  OktaServerId:
+    Type: String
+  OktaRedirectUri:
+    Type: String
 Resources:
+  EncryptedStorageClass:
+    Type: "AWSQS::Kubernetes::Resource"
+    Properties:
+      ClusterName: !Ref EKSClusterName
+      Namespace: 'default'
+      Manifest: !Sub |
+        apiVersion: storage.k8s.io/v1
+        kind: StorageClass
+        metadata:
+          name: gp2-encrypted
+        parameters:
+          fsType: ext4
+          type: gp2
+          encrypted: "true"
+        provisioner: kubernetes.io/aws-ebs
+        reclaimPolicy: Delete
+        volumeBindingMode: WaitForFirstConsumer
   TDecisionNamespace:
     Type: "AWSQS::Kubernetes::Resource"
     DeletionPolicy: Retain
@@ -51,6 +86,7 @@ Resources:
   RabbitMQChart:
     Type: "AWSQS::Kubernetes::Helm"
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
+    DependsOn: EncryptedStorageClass
     Properties:
       ClusterID: !Ref EKSClusterName
       Name: rabbitmq
@@ -62,6 +98,7 @@ Resources:
         image.tag: 3.8.19-debian-10-r30
         rabbitmq.username: discngine
         rabbitmq.password: lapin79
+        global.storageClass: gp2-encrypted
   CertManager:
     Type: "AWSQS::Kubernetes::Helm"
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
@@ -86,17 +123,14 @@ Resources:
   RedisChart:
     Type: "AWSQS::Kubernetes::Helm"
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
+    DependsOn: EncryptedStorageClass
     Properties:
       ClusterID: !Ref EKSClusterName
-      Name: redis-cluster
+      Name: sentinel
       Namespace: redis-cluster
-      Repository: https://charts.bitnami.com/bitnami
-      Chart: redis-cluster
-      Version: 6.2.6
+      Chart: oci://fra.ocir.io/discngine1/3decision_kube/redis-sentinel:16.3.1
       Values:
-        auth.password: "lapin80"
-        sentinel.image.tag: "6.2.6-debian-10-r120"
-        sentinel.enabled: true
+        global.storageClass: gp2-encrypted
   JWTSecret:
     Type: "AWSQS::Kubernetes::Resource"
     DependsOn: TDecisionNamespace
@@ -133,9 +167,9 @@ Resources:
             args:
             - echo -ne '
               alter user ADMIN identified by "${DBPassword}";
-              alter user PD_T1_DNG_THREEDECISION identified by "${DBPassword}";
-              alter user PD_T1_DNG_CORE identified by "${DBPassword}";
-              alter user CHEMBL_29 identified by "${DBPassword}";' > changepwd.sql;
+              alter user PD_T1_DNG_THREEDECISION identified by "${DBPassword}" ACCOUNT UNLOCK;
+              alter user PD_T1_DNG_CORE identified by "${DBPassword}" ACCOUNT UNLOCK;
+              alter user CHEMBL_29 identified by "${DBPassword}" ACCOUNT UNLOCK;' > changepwd.sql;
               /root/sqlcl/bin/sql admin/Ch4ng3m3f0rs3cur3p4ss@${DBConnectionString} @changepwd.sql
             resources:
               limits:
@@ -146,21 +180,22 @@ Resources:
                 memory: 250Mi
   TdecisionChart:
     Type: "AWSQS::Kubernetes::Helm"
-    DependsOn: [ TDecisionNamespace, JWTSecret, RabbitMQChart ]
+    DependsOn: [ TDecisionNamespace, JWTSecret, RabbitMQChart, EncryptedStorageClass ]
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
     Properties:
       ClusterID: !Ref EKSClusterName
       Name: tdecision
       Namespace: !Ref TNamespace
-      Chart: oci://fra.ocir.io/discngine1/3decision_kube/3decision-helm:1.0.0
+      Chart: oci://fra.ocir.io/discngine1/3decision_kube/3decision-helm:1.0.1
       Values:
         nodeCloud.volumes.jwtSecret.name: 3decision-jwt-secret
         oracle.password: !Ref DBPassword
         oracle.connectionString: !Ref DBConnectionString
         oracle.hostString: !Ref HostString
         oracle.pdbString: !Ref DBName
-        choral.oracle.password: !Ref DBPassword
-        global.choral.enabled: false
+        oracle.choral.password: !Ref DBPassword
+        volumes.storageClassName: gp2-encrypted
+        wikijs.pvc.storageClassName: gp2-encrypted
         volumes.claimPods.backend.publicdata.awsElasticBlockStore.fsType: "ext4"
         volumes.claimPods.backend.publicdata.awsElasticBlockStore.volumeID: !Ref DataPubVolumeID
         volumes.claimPods.backend.publicdata.awsElasticBlockStore.availabilityZone: !Select [ 0, Fn::GetAZs: !Ref 'AWS::Region' ]
@@ -169,9 +204,15 @@ Resources:
         ingress.visibility: !Ref LoadBalancerType
         nest.env.internal_api_key.value: !Select [2, !Split ['/', !Ref AWS::StackId]]
         ingress.class: alb
-        nest.env.azure_tenant.value: ""
-        nest.env.azure_client_id.value: ""
-        nest.env.azure_secret.value: ""
+        nest.env.azure_tenant.value: !Ref AzureTenant
+        nest.env.azure_client_id.value: !Ref AzureClientId
+        nest.env.azure_secret.value: !Ref AzureSecret
+        nest.env.azure_redirect_uri.value: !Ref AzureRedirectUri
+        nest.env.okta_domain.value: !Ref OktaDomain
+        nest.env.okta_server_id.value: !Ref OktaServerId
+        nest.env.okta_client_id.value: !Ref OktaClientId
+        nest.env.okta_secret.value: !Ref OktaSecret
+        nest.env.okta_redirect_uri.value: !Ref OktaRedirectUri
   ChoralChart:
     Type: "AWSQS::Kubernetes::Helm"
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
@@ -201,7 +242,8 @@ Resources:
             image: fra.ocir.io/discngine1/3decision_kube/sqlcl
             command: ["/bin/bash", "-c"]
             args:
-            - echo -ne '
+            - sleep 5m;
+              echo -ne '
               WHENEVER SQLERROR EXIT SQL.SQLCODE;\n
               CREATE INDEX IDX_CHOR_STR_SMALL_MOL_SMILES ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.STRICT_IDXTYPE;\n
               CREATE INDEX IDX_CHOR_TAU_SMALL_MOL_SMILES ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_IDXTYPE;\n

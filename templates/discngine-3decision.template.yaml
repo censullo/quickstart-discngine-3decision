@@ -25,6 +25,7 @@ Metadata:
       - Label:
           default : Discngine 3decision database configuration
         Parameters:
+          - DBSnapshotIdentifier
           - DBInstanceIdentifier
           - DBName
           - DBPassword
@@ -38,6 +39,18 @@ Metadata:
           - JWTPrivateKey
           - JWTPublicKey
           - JWTKeysSecretName
+      - Label:
+          default: Discngine 3decision authentication configuration
+        Parameters:
+          - AzureClientId
+          - AzureTenant
+          - AzureSecret
+          - AzureRedirectUri
+          - OktaClientId
+          - OktaSecret
+          - OktaDomain
+          - OktaServerId
+          - OktaRedirectUri
       - Label:
           default: AWS Quick Start configuration
         Parameters:
@@ -55,6 +68,8 @@ Metadata:
         default: Quick Start S3 bucket region
       QSS3KeyPrefix:
         default: Quick Start S3 key prefix
+      DBSnapshotIdentifier:
+        default: Identifier of the database snapshot
       DBInstanceIdentifier:
         default: Identifier of the database
       DBName:
@@ -114,6 +129,12 @@ Parameters:
     Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
       can include numbers, lowercase letters, uppercase letters, hyphens (-), and
       forward slash (/).
+    Type: String
+  DBSnapshotIdentifier:
+    Default: ''
+    Description: "Optionnal: the snapshot arn used for the database.
+                  If left empty, the default snapshot will be used. 
+                  But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
     Type: String
   DBInstanceIdentifier:
     Default: db3dec
@@ -219,6 +240,51 @@ Parameters:
     Description: "Type of loadbalancer created.
                   This can either be equal to internet-facing for public loadbalancer or internal for private loadbalancers"
     Type: String
+  AzureClientId:
+    Type: String
+    Default: ""
+    Description: "Optional: Will enable azure authentication if set.
+                  Client id of azure app"
+  AzureTenant:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if azure client id variable is set.
+                  Tenant id of the azure app"
+  AzureSecret:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if azure client id variable is set.
+                  Secret of the azure app"
+  AzureRedirectUri:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if azure client id variable is set.
+                  This is the redirect_uri set in the azure app, by default should be https://api.3decision.<DomainName>/auth/azure/callback"
+  OktaClientId:
+    Type: String
+    Default: ""
+    Description: "Optional: Will enable okta authentication if set.
+                  Client ID of the okta app"
+  OktaSecret:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  Secret of the okta app"
+  OktaDomain:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  Domain of the okta environment"
+  OktaServerId:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  Server Id of the okta environment"
+  OktaRedirectUri:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  This is the redirect_uri set in the okta app, by default should be https://api.3decision.<DomainName>/auth/okta/callback"
 
 Rules:
   DiscngineSupportedRegionRule:
@@ -235,6 +301,7 @@ Conditions:
   UseJWTKeysSecret: !Not [ !Equals [ "", !Ref JWTKeysSecretName ] ]
   ConfigureEKS: !Equals ['true', !Ref ConfigureEKS]
   ConfigureDNS: !Not [ !Equals [ "", !Ref HostedZoneId ] ]
+  UseDBSnapshotArn: !Not [ !Equals ["", DBSnapshotArn ] ]
 
 Resources:
   EKSCluster:
@@ -273,6 +340,7 @@ Resources:
         VpcId: !Ref VPCID
         NodeSecurityGroupId: !Ref NodeSecurityGroup
         DBMultiZone: !Ref DBMultiZone
+        DBSnapshotIdentifier: !If [UseDBSnapshotArn, !Ref DBSnapshotArn, !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:db3dec2022-0"]
   3decisionKubeStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -293,6 +361,15 @@ Resources:
         HostString: !GetAtt RDSStack.Outputs.PrimaryHostString
         DBName: !GetAtt RDSStack.Outputs.PrimaryDBName
         LoadBalancerType: !Ref LoadBalancerType
+        AzureClientId: !Ref AzureClientId 
+        AzureTenant: !Ref AzureTenant 
+        AzureSecret: !Ref AzureSecret 
+        AzureRedirectUri: !Ref AzureRedirectUri 
+        OktaClientId: !Ref OktaClientId 
+        OktaSecret: !Ref OktaSecret 
+        OktaDomain: !Ref OktaDomain 
+        OktaServerId: !Ref OktaServerId 
+        OktaRedirectUri: !Ref OktaRedirectUri 
   3decisionDNSStack:
     Type: AWS::CloudFormation::Stack
     Condition: ConfigureDNS

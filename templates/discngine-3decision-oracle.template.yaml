@@ -54,6 +54,11 @@ Parameters:
     Description: "Optionnal: Id of the EKS SecurityGroup in which we will add the RDS ingress"
     Default: ''
     Type: String
+  DBSnapshotIdentifier:
+    Description: "Optionnal: the snapshot arn used for the database.
+                  If left empty, the default snapshot will be used. 
+                  But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
+    Type: String
 Mappings:
   OracleDetailsMap:
     Standard-Edition-Two-19.0-License-Included:
@@ -160,13 +165,15 @@ Resources:
       DBSubnetGroupName: !Ref SubnetGroup
       VPCSecurityGroups: [ !GetAtt DBSecurityGroup.GroupId ]
       StorageType: gp2
-      DBSnapshotIdentifier: !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:db3dec2022-0"
+      DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
       PubliclyAccessible: false
   DBParamGroup:
     Type: AWS::RDS::DBParameterGroup
     Properties:
       Description: Oracle Database Parameter Group
       Family: !FindInMap [OracleDetailsMap, !Ref ORAVersion, Family]
+      Parameters:
+        processes: 'GREATEST({DBInstanceClassMemory/9868951}, 1000)'
       Tags:
         - Key: Name
           Value: "DBParamGroup"

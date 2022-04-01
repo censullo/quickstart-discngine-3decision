@@ -35,6 +35,7 @@ Metadata:
           - AdditionalEKSAdminUserArn
           - AdditionalEKSAdminRoleArn
           - ProvisionBastionHost
+          - CustomAmiId
       - Label:
           default: Discngine 3decision network configuration
         Parameters:
@@ -45,6 +46,7 @@ Metadata:
       - Label:
           default : Discngine 3decision database configuration
         Parameters:
+          - DBSnapshotIdentifier
           - DBInstanceIdentifier
           - DBName
           - DBPassword
@@ -57,6 +59,18 @@ Metadata:
           - JWTPrivateKey
           - JWTPublicKey
           - JWTKeysSecretName
+      - Label:
+          default: Discngine 3decision authentication configuration
+        Parameters:
+          - AzureClientId
+          - AzureTenant
+          - AzureSecret
+          - AzureRedirectUri
+          - OktaClientId
+          - OktaSecret
+          - OktaDomain
+          - OktaServerId
+          - OktaRedirectUri
       - Label:
           default: AWS Quick Start configuration
         Parameters:
@@ -104,8 +118,12 @@ Metadata:
         default: Additional EKS admin ARN (IAM role)
       ConfigSetName:
         default: Config set name
+      CustomAmiId:
+        default: Custom AMI Id
       NodeVolumeSize:
         default: Size of worker nodes volumes
+      DBSnapshotIdentifier:
+        default: Identifier of the database snapshot
       DBInstanceIdentifier:
         default: Identifier of the database
       DBName:
@@ -248,6 +266,10 @@ Parameters:
     Default: 100
     Description: "Required: Size of EBS volumes attached to worker nodes.
                   Increase this size if your pods are getting evicted with a disk pressure annotation."
+  CustomAmiId:
+    Type: String
+    Default: ""
+    Description: "Optional: If an AMI ID is specified, it is used instead of the default EKS images for cluster nodes."
   PerAccountSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
@@ -262,6 +284,12 @@ Parameters:
     Default: 3
     Description: The number of Amazon EKS node instances. The default is one for each of the three Availability Zones.
     Type: Number
+  DBSnapshotIdentifier:
+    Default: ''
+    Description: "Optionnal: the snapshot arn used for the database.
+                  If left empty, the default snapshot will be used. 
+                  But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
+    Type: String
   DBInstanceIdentifier:
     Default: db3dec
     Description: "Required: The database instance name.
@@ -366,6 +394,51 @@ Parameters:
     AllowedValues: [ "Enabled", "Disabled" ]
     Default: "Disabled"
     Description: Choose "Enabled" to create a bastion host. This could be used to debug EKS nodes.
+  AzureClientId:
+    Type: String
+    Default: ""
+    Description: "Optional: Will enable azure authentication if set.
+                  Client id of azure app"
+  AzureTenant:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if azure client id variable is set.
+                  Tenant id of the azure app"
+  AzureSecret:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if azure client id variable is set.
+                  Secret of the azure app"
+  AzureRedirectUri:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if azure client id variable is set.
+                  This is the redirect_uri set in the azure app, by default should be https://api.3decision.<DomainName>/auth/azure/callback"
+  OktaClientId:
+    Type: String
+    Default: ""
+    Description: "Optional: Will enable okta authentication if set.
+                  Client ID of the okta app"
+  OktaSecret:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  Secret of the okta app"
+  OktaDomain:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  Domain of the okta environment"
+  OktaServerId:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  Server Id of the okta environment"
+  OktaRedirectUri:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  This is the redirect_uri set in the okta app, by default should be https://api.3decision.<DomainName>/auth/okta/callback"
 
 Rules:
   DiscngineSupportedRegionRule:
@@ -397,6 +470,7 @@ Resources:
         VaultUIAccessCIDR: !Ref RemoteAccessCIDR
         NodeVolumeSize: !Ref NodeVolumeSize
         KubernetesVersion: !Ref 'AWS::NoValue'
+        CustomAmiId: !Ref CustomAmiId
   EKSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -456,3 +530,13 @@ Resources:
         DomainName: !Ref DomainName
         CertificateArn: !Ref CertificateArn
         LoadBalancerType: !Ref LoadBalancerType
+        DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
+        AzureClientId: !Ref AzureClientId 
+        AzureTenant: !Ref AzureTenant 
+        AzureSecret: !Ref AzureSecret 
+        AzureRedirectUri: !Ref AzureRedirectUri 
+        OktaClientId: !Ref OktaClientId 
+        OktaSecret: !Ref OktaSecret 
+        OktaDomain: !Ref OktaDomain 
+        OktaServerId: !Ref OktaServerId 
+        OktaRedirectUri: !Ref OktaRedirectUri
