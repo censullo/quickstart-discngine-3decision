@@ -301,7 +301,7 @@ Conditions:
   UseJWTKeysSecret: !Not [ !Equals [ "", !Ref JWTKeysSecretName ] ]
   ConfigureEKS: !Equals ['true', !Ref ConfigureEKS]
   ConfigureDNS: !Not [ !Equals [ "", !Ref HostedZoneId ] ]
-  UseDBSnapshotArn: !Not [ !Equals ["", DBSnapshotArn ] ]
+  UseDBSnapshotIdentifier: !Not [ !Equals ["", DBSnapshotIdentifier ] ]
 
 Resources:
   EKSCluster:
@@ -340,7 +340,7 @@ Resources:
         VpcId: !Ref VPCID
         NodeSecurityGroupId: !Ref NodeSecurityGroup
         DBMultiZone: !Ref DBMultiZone
-        DBSnapshotIdentifier: !If [UseDBSnapshotArn, !Ref DBSnapshotArn, !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:db3dec2022-0"]
+        DBSnapshotIdentifier: !If [UseDBSnapshotIdentifier, !Ref DBSnapshotIdentifier, !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:db3dec2022-0"]
   3decisionKubeStack:
     Type: AWS::CloudFormation::Stack
     Properties:
