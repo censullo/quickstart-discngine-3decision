@@ -2,8 +2,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: "This template deploys A records in a given route53 hosted zone (qs-1snm79fdq)."
 Metadata:
-  QuickStartDocumentation:
-    EntrypointName: "3decision Route53 DNS creation"
   LintSpellExclude:
     - Discngine
     - 3decision
