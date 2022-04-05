@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.15">
+<meta name="generator" content="Asciidoctor 2.0.17">
 <meta name="description" content="Discngine 3decision Deployment Guide on AWS">
 <meta name="keywords" content="Quick Start, AWS, Discngine 3decision">
 <title>Discngine 3decision on the AWS Cloud</title>
@@ -838,11 +838,14 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_costs_and_licenses">Costs and licenses</a></li>
 <li><a href="#_architecture">Architecture</a></li>
 <li><a href="#_deployment_options">Deployment options</a></li>
+<li><a href="#_predeployment_steps">Predeployment steps</a></li>
 <li><a href="#_deployment_steps">Deployment steps</a></li>
 <li><a href="#_postdeployment_steps">Postdeployment steps</a>
 <ul class="sectlevel2">
-<li><a href="#_optional_add_your_ssl_certificate_to_the_application_load_balancer">[Optional] Add your SSL certificate to the application load balancer</a></li>
-<li><a href="#_optional_create_cname_record_in_your_dns_provider">[Optional] Create CNAME record in your DNS provider</a></li>
+<li><a href="#_optional_add_your_ssl_certificate_to_the_application_load_balancer">(Optional) Add your SSL certificate to the Application Load Balancer</a></li>
+<li><a href="#_optional_create_a_cname_record_in_your_dns_provider">(Optional) Create a CNAME record in your DNS provider</a></li>
+<li><a href="#_optional_create_additional_accounts">(Optional) Create additional accounts</a></li>
+<li><a href="#_additional_information">Additional information</a></li>
 </ul>
 </li>
 <li><a href="#_troubleshooting">Troubleshooting</a></li>
@@ -867,9 +870,9 @@ p.footer-text a{color:#d7d8d8}
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>February 2022</strong><br>
-<em>Jonathan Manassen, and Alexandre Gillet, Discngine S.A.S.</em><br>
-<em>Dattaprasad Sadwelkar, and Vinod Shukla, AWS Integration &amp; Automation team</em><br></p>
+<p><strong>April 2022</strong><br>
+<em>Jonathan Manassen and Alexandre Gillet, Discngine S.A.S.</em><br>
+<em>Dattaprasad Sadwelkar and Vinod Shukla, AWS Integration &amp; Automation team</em><br></p>
 </div>
 <div class="admonitionblock tip text-left">
 <table>
@@ -894,40 +897,16 @@ Visit our <a href="https://github.com/aws-quickstart/quickstart-discngine-3decis
 <div class="paragraph">
 <p>This Quick Start deploys Discngine 3decision on the AWS Cloud. If you are unfamiliar with AWS Quick Starts we recommend that you read the <a href="https://aws-ia.github.io/content/qs_info.html">AWS Quick Start General Content Guide</a>.</p>
 </div>
-<div class="paragraph">
-<p>This Quick Start is for users who want to deploy 3decision in an AWS subscription.
-This Quick Start is an alternative to 3decision SaaS version for organizations that want to keep their data in their AWS scope.</p>
-</div>
-<div class="paragraph">
-<p>3decision for AWS does not have the full flavor of 3decision vanilla SaaS version:
-It comes with a few <a href="#_product_description">Restrictions and Limitations</a>, although they will disapear in the following weeks with the release of the next major version.</p>
-</div>
-<div class="paragraph">
-<p>Other limitations exist and concern support, monitoring and maintenance:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>infrastructure monitoring is not included in this Quick Start.</p>
-</li>
-<li>
-<p>maintenance: 3decision updates are provided as helm charts updates. Although these upgrades are provided freely, the customer will need to apply helm upgrades himself to the EKS cluster.</p>
-</li>
-<li>
-<p>support: the Quick Start does not include a log collection mechanism. Support requests to Discngine might require the customer to provide logs.</p>
-</li>
-</ul>
-</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_costs_and_licenses">Costs and licenses</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Quick Start requires a license for 3decision. To use the Quick Start in your production environment, contact <a href="mailto:contact@discngine.com">contact@discngine.com</a> to acquire a license.</p>
+<p>This Quick Start requires a license for 3decision for use in a production environment. To obtain a license, contact Discngine at <a href="mailto:contact@discngine.com">contact@discngine.com</a>. A license is not required for use in development and test environments.</p>
 </div>
 <div class="paragraph">
-<p>There is no cost to use this Quick Start, however you will be billed for the resources deployed. For more information see the <a href="http://general-content-file">AWS Quick Start General Content Guide</a>.</p>
+<p>There is no cost to use this Quick Start, however you will be billed by AWS for the resources deployed. For more information see the <a href="http://general-content-file">AWS Quick Start General Content Guide</a>.</p>
 </div>
 </div>
 </div>
@@ -954,55 +933,38 @@ AWS Cloud.</p>
 <p>A highly available architecture that spans three Availability Zones.*</p>
 </li>
 <li>
-<p>A VPC configured with public and private subnets, according to AWS
-best practices, to provide you with your own virtual network on AWS.*</p>
+<p>A virtual private cloud (VPC) configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.*</p>
 </li>
 <li>
 <p>In the public subnets:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Managed network address translation (NAT) gateways to allow outbound
-internet access for resources in the private subnets.*</p>
+<p>Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.</p>
 </li>
 <li>
-<p>A Linux bastion host in an Auto Scaling group to allow inbound Secure
-Shell (SSH) access to EC2 instances in public and private subnets.*</p>
+<p>Linux bastion hosts in an Auto Scaling group to allow inbound SSH (Secure Shell) access to Amazon Elastic Compute Cloud (Amazon EC2) instances in public and private subnets.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>In the private subnets:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Kubernetes nodes. By default deploys 1 node per availability domain. Additionnal nodes can be added.</p>
+<p>In the private subnets, Kubernetes nodes in an Auto Scaling group to set up 3decision software.</p>
 </li>
 <li>
-<p>An Amazon Oracle RDS that contains 3decision data and analysis</p>
+<p>Amazon Elastic Load Balancing for the 3decision application and extract, transform, and load (ETL) configuration panel.</p>
 </li>
 <li>
-<p>An Amazon EKS cluster: 3decision will run pods on linux hosts.</p>
+<p>Amazon Elastic Kubernetes Service (Amazon EKS) for Kubernetes orchestration of the EKS cluster of 3decision nodes.</p>
 </li>
 <li>
-<p>Amazon EBS volumes: kubernetes VPC will create volumes in Amazon EBS to persist data.</p>
+<p>Amazon Elastic Block Storage (Amazon EBS) for persistent storage of Kubernetes data.</p>
 </li>
 <li>
-<p>2 Amazon ELB will be used to access 3decision:app-name:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>one for 3decision frontend</p>
+<p>Amazon Relational Database Service (Amazon RDS) for 3decision data and analysis.</p>
 </li>
 <li>
-<p>a second one for the ETL configuration panel</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
+<p>Amazon Route 53 for a Domain Name System (DNS) record.</p>
 </li>
 </ul>
 </div>
@@ -1020,18 +982,47 @@ Shell (SSH) access to EC2 instances in public and private subnets.*</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://qs_launch_permalink">Deploy 3decision into a new VPC</a>. This option builds a new AWS environment consisting of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys 3decision into this new VPC.</p>
+<p><a href="https://fwd.aws/PKJJ8?">Deploy 3decision into a new VPC</a>. This option builds a new AWS environment consisting of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys 3decision into this new VPC.</p>
 </li>
 <li>
-<p><a href="http://qs_launch_permalink">Deploy 3decision into an existing VPC</a>. This option provisions 3decision in your existing AWS infrastructure.</p>
+<p><a href="https://fwd.aws/jdzqY?">Deploy 3decision into an existing VPC</a>. This option provisions 3decision in an existing VPC.</p>
 </li>
 <li>
-<p><a href="http://qs_launch_permalink">Deploy 3decision into an existing VPC and existing EKS cluster</a>. This option provisions 3decision in your existing AWS infrastructure.</p>
+<p><a href="https://fwd.aws/37qRp?">Deploy 3decision into an existing VPC and existing EKS cluster</a>. This option provisions 3decision in your existing AWS infrastructure.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
 <p>The Quick Start provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and 3decision settings.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_predeployment_steps">Predeployment steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>During deployment, you will be asked to provide a public/private SSH key pair. This key must be provided in base64 with line wrapping disabled (<code> -w 0</code>).</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>ssh-keygen -t rsa -b 2048 -C "your_email@example.com" -q -N "" -f ./id_rsa_3decision</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Encode both keys in base64 with the following commands:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>base64 -w 0 id_rsa_3decision
+
+base64 -w 0 id_rsa_3decision.pub</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Copy the base64 string of the keys. You need it during the stack deployment.</p>
+</div>
+<div class="paragraph">
+<p>If you are deploying 3decision in an existing VPC, ensure that the private subnets have the correct tags. For more information, refer to <a href="https://aws-quickstart.github.io/quickstart-amazon-eks/#_launch_the_quick_start">Amazon EKS on the AWS Cloud</a>.</p>
 </div>
 </div>
 </div>
@@ -1078,73 +1069,113 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <h2 id="_postdeployment_steps">Postdeployment steps</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_optional_add_your_ssl_certificate_to_the_application_load_balancer">[Optional] Add your SSL certificate to the application load balancer</h3>
+<h3 id="_optional_add_your_ssl_certificate_to_the_application_load_balancer">(Optional) Add your SSL certificate to the Application Load Balancer</h3>
 <div class="paragraph">
-<p>If you did not provide an SSL certificate during the QuickStart installation, you can edit the load balancer listener in order to configure an SSL certificate:</p>
+<p>If you did not provide an SSL certificate during the Quick Start deployment, edit the listener to configure an SSL certificate.</p>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="1">
+<ol class="arabic">
 <li>
-<p>HTTPS setup</p>
+<p>Open the <a href="https://console.aws.amazon.com/ec2/">Amazon EC2</a> console.</p>
+</li>
+<li>
+<p>In the navigation pane, under <strong>Load Balancing</strong>, choose <strong>Load Balancers</strong>.</p>
+</li>
+<li>
+<p>Select the load balancer and choose <strong>Listeners</strong>.</p>
+</li>
+<li>
+<p>Select the check box for the listener and then choose <strong>Edit</strong>.</p>
+</li>
+<li>
+<p>For <strong>Protocol</strong>, choose <strong>HTTPS</strong>.</p>
+</li>
+<li>
+<p>Choose <strong>Update</strong>.</p>
+</li>
+<li>
+<p>Change the default Secure Socket Layer (SSL) certificate. For <strong>Default SSL certificate</strong>, do one of the following:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>If you created or <a href="https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html">imported</a> a certificate using AWS Certificate Manager, choose <strong>From ACM</strong> and choose the certificate.</p>
+</li>
+<li>
+<p>If you uploaded a certificate using IAM, choose <strong>From IAM</strong> and choose the certificate.</p>
+</li>
+<li>
+<p>If you have a certificate that isn&#8217;t managed by ACM or IAM, <a href="https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html">import</a> it to ACM and add it to your listener. For more information, refer to <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html">Listeners for your Network Load Balancer</a>.</p>
+</li>
+</ul>
+</div>
 </li>
 </ol>
-</div>
-<div class="paragraph">
-<p>As shown in  <a href="#postinstall1">Figure 2</a>, edit the Application Load Balancer and switch the listener protocol from http to https.</p>
-</div>
-<div id="postinstall1" class="imageblock">
-<div class="content">
-<img src="docs/deployment_guide/images/listener_https_settings.png" alt="Postinstall" width="70%" height="70%">
-</div>
-<div class="title">Figure 2. Application Load Balancer HTTP to HTTPS switch</div>
-</div>
-<div class="olist arabic">
-<ol class="arabic" start="2">
-<li>
-<p>SSL certificate setup</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>As shown in  <a href="#postinstall2">Figure 3</a>, change the default SSL certificate by either importing yours or selecting a certificate from IAM or ACM.</p>
-</div>
-<div id="postinstall2" class="imageblock">
-<div class="content">
-<img src="docs/deployment_guide/images/listener_certificate_settings.png" alt="Postinstall" width="70%" height="70%">
-</div>
-<div class="title">Figure 3. Application Load Balancer HTTP to HTTPS switch</div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_optional_create_cname_record_in_your_dns_provider">[Optional] Create CNAME record in your DNS provider</h3>
+<h3 id="_optional_create_a_cname_record_in_your_dns_provider">(Optional) Create a CNAME record in your DNS provider</h3>
 <div class="paragraph">
-<p>If you did not provide the a Route 53 Hosted Zone ARN during the QuickStart installation, you will need to create 2 DNS records into your DNS provider.</p>
-</div>
-<div class="paragraph">
-<p>Both need to target the 3decision application load balancer. The address of this load balancer is the "DNS Name" as shown in <a href="#postinstall3">Figure 4</a>.</p>
-</div>
-<div class="paragraph">
-<p>The 2 hosts you must defined are:</p>
+<p>If you did not provide a Route 53 hosted zone ID during the Quick Start installation, you must create the following two DNS records.</p>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="1">
+<ol class="arabic">
 <li>
-<p>3decision.&lt;your domain&gt; ( 3decision user UI )</p>
+<p>3decision user UI: <code>3decision.&lt;your domain&gt;</code>.</p>
+</li>
+<li>
+<p>3decision administrator UI: <code>3decision-etl.&lt;your domain&gt;</code>.</p>
 </li>
 </ol>
 </div>
+<div class="paragraph">
+<p>Both records must target the 3decision Application Load Balancer. To obtain the address of the Application Load Balancer, open the <a href="https://console.aws.amazon.com/ec2/">Amazon EC2</a> console. In the navigation pane, under <strong>Load Balancing</strong>, choose <strong>Load Balancers</strong>. The address of the Application Load Balancer is in the <strong>DNS Name</strong> column. For more information, refer to <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html">Network Load Balancers</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_optional_create_additional_accounts">(Optional) Create additional accounts</h3>
+<div class="paragraph">
+<p>The Quick Start creates a 3decision user named <code>3decision</code>. (You can change the default name during deployment.) Additional user accounts can be created in the 3decision administrator UI.</p>
+</div>
 <div class="olist arabic">
-<ol class="arabic" start="2">
+<ol class="arabic">
 <li>
-<p>3decision-etl.&lt;your domain&gt; ( 3decision admin UI )</p>
+<p>Navigate to <code>https://3decision-etl.&lt;your domain&gt;</code>.</p>
+</li>
+<li>
+<p>Log in with the account <code>3decision</code> and the password you provided during deployment.</p>
+</li>
+<li>
+<p>Under <strong>Admin Pages</strong>, <strong>Security</strong>, choose <strong>Users</strong>.</p>
+</li>
+<li>
+<p>Enter <strong>User Name</strong>, <strong>Password</strong>, and <strong>Confirm Password</strong>.</p>
+</li>
+<li>
+<p>Choose <strong>Add</strong>.</p>
 </li>
 </ol>
 </div>
-<div id="postinstall3" class="imageblock">
-<div class="content">
-<img src="docs/deployment_guide/images/lb_dns_name.png" alt="Postinstall">
 </div>
-<div class="title">Figure 4. Application Load Balancer HTTP to HTTPS switch</div>
+<div class="sect2">
+<h3 id="_additional_information">Additional information</h3>
+<div class="paragraph">
+<p>This Quick Start does not include the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Azure and Okta OpenID Connect authentication. Only local accounts are supported.</p>
+</li>
+<li>
+<p>Infrastructure monitoring.</p>
+</li>
+<li>
+<p>Log collection.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>3decision updates are provided as Helm charts updates. Although these updates are free, you must manually apply Helm upgrades to the deployed EKS cluster.</p>
 </div>
 </div>
 </div>
@@ -1199,10 +1230,17 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <footer>
     <p class="footer-text">
         <!-- We can use document attributes: -->
-        <!-- Generated with Asciidoctor v2.0.15. -->
+        <!-- Generated with Asciidoctor v2.0.17. -->
         <a href="https://aws.amazon.com/privacy/">Privacy</a> | <a href="https://aws.amazon.com/terms/">Site terms</a> |
         &copy; 2022, Amazon Web Services, Inc. or its affiliates and Discngine S.A.S.. All rights reserved.
     </p>
 </footer>
 </body>
 </html>
+<!--
+repo commit:
+6ba06d776d5fe39e490a0ee49b954b4289399c64
+
+submodule config:
+ 340aace2c14aabf8fd66ee1f49f44a017d8ddfb0 docs/boilerplate (remotes/origin/codeowners-1-g340aace)
+-->
