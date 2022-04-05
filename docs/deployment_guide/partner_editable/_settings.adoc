@@ -3,7 +3,7 @@
 :partner-product-name: Discngine 3decision
 :partner-product-short-name: 3decision
 :partner-company-name: Discngine S.A.S.
-:doc-month: March
+:doc-month: April
 :doc-year: 2022
 :partner-contributors: Jonathan Manassen and Alexandre Gillet, {partner-company-name}
 //:other-contributors: Akua Mansa, Trek10
