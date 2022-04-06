@@ -12,6 +12,12 @@ Parameters:
     Type: String
   DomainName:
     Type: String
+  MainSubdomain:
+    Type: String
+  ApiSubdomain:
+    Type: String
+  HelpSubdomain:
+    Type: String
 Mappings:
   Config:
     Prefix: { Value: 'eks-quickstart' }
@@ -32,23 +38,17 @@ Resources:
     Type: "AWS::Route53::RecordSet"
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "3decision.${DomainName}"
+      Name: !Sub "${MainSubdomain}.${DomainName}"
       Type: A
   apiRecord:
     Type: "AWS::Route53::RecordSet"
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "api.3decision.${DomainName}"
+      Name: !Sub "${ApiSubdomain}.${DomainName}"
       Type: A
   wikiRecord:
     Type: "AWS::Route53::RecordSet"
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "3decision-help.${DomainName}"
-      Type: A
-  backRecord:
-    Type: "AWS::Route53::RecordSet"
-    Properties:
-      HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "3decision-debug.${DomainName}"
+      Name: !Sub "${HelpSubdomain}.${DomainName}"
       Type: A

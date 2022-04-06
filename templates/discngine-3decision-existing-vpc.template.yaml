@@ -40,9 +40,13 @@ Metadata:
           default: Discngine 3decision network configuration
         Parameters:
           - DomainName
+          - MainSubdomain
+          - ApiSubdomain
+          - HelpSubdomain
           - HostedZoneId
           - CertificateArn
           - LoadBalancerType
+          - LoadBalancerClass
       - Label:
           default : Discngine 3decision database configuration
         Parameters:
@@ -146,12 +150,38 @@ Metadata:
         default: Route 53 hosted zone Id
       DomainName:
         default: Domain name used for load balancing
+      MainSubdomain:
+        default: Subdomain name for app landing page
+      ApiSubdomain:
+        default: Subdomain of the api
+      HelpSubdomain:
+        default: Subdomain of the help page
       CertificateArn:
         default: Arn of a certificate
       LoadBalancerType:
         default: Type of loadbalancer created
+      LoadBalancerClass:
+        default: Loadbalancer class
       ProvisionBastionHost:
         default: Whether to provision a bastion host
+      AzureClientId:
+        default: Azure app client id
+      AzureSecret:
+        default: Azure app secret
+      AzureTenant:
+        default: Azure tenant
+      AzureRedirectUri:
+        default: Azure app redirect uri
+      OktaClientId:
+        default: Okta app client id
+      OktaSecret:
+        default: Okta app secret
+      OktaDomain:
+        default: Okta domain
+      OktaServerId:
+        default: Okta server id
+      OktaRedirectUri:
+        default: Okta app redirect uri
 Parameters:
   KeyPairName:
     Description: A public/private key pair, which allows you to connect securely to your instance after it launches.
@@ -285,7 +315,7 @@ Parameters:
     Description: The number of Amazon EKS node instances. The default is one for each of the three Availability Zones.
     Type: Number
   DBSnapshotIdentifier:
-    Default: ''
+    Default: ""
     Description: "Optionnal: the snapshot arn used for the database.
                   If left empty, the default snapshot will be used. 
                   But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
@@ -377,6 +407,18 @@ Parameters:
     Description: "Required: Root domain name used for load balancer rules
                   This is only the root domain name not the fqdn, eg: example.com"
     Type: String
+  MainSubdomain:
+    Default: "3decision"
+    Description: "Required: Name used for the main app subdomain"
+    Type: String
+  ApiSubdomain:
+    Default: "api.3decision"
+    Description: "Required: Name used for the api subdomain"
+    Type: String
+  HelpSubdomain:
+    Default: "3decision-help"
+    Description: "Required: Name used for the help subdomain"
+    Type: String
   CertificateArn:
     Default: ""
     Description: "Optional: Arn of a certificate of the associated domain you want added to the load balancer"
@@ -413,7 +455,7 @@ Parameters:
     Type: String
     Default: ""
     Description: "Conditional: Should be given if azure client id variable is set.
-                  This is the redirect_uri set in the azure app, by default should be https://api.3decision.<DomainName>/auth/azure/callback"
+                  This is the redirect_uri set in the azure app, by default should be https://<ApiSubdomain>.<DomainName>/auth/azure/callback"
   OktaClientId:
     Type: String
     Default: ""
@@ -438,7 +480,7 @@ Parameters:
     Type: String
     Default: ""
     Description: "Conditional: Should be given if okta client id variable is set.
-                  This is the redirect_uri set in the okta app, by default should be https://api.3decision.<DomainName>/auth/okta/callback"
+                  This is the redirect_uri set in the okta app, by default should be https://<ApiSubdomain>.<DomainName>/auth/okta/callback"
 
 Rules:
   DiscngineSupportedRegionRule:
@@ -530,6 +572,7 @@ Resources:
         DomainName: !Ref DomainName
         CertificateArn: !Ref CertificateArn
         LoadBalancerType: !Ref LoadBalancerType
+        LoadBalancerClass: !Ref LoadBalancerClass
         DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
         AzureClientId: !Ref AzureClientId 
         AzureTenant: !Ref AzureTenant 
@@ -540,3 +583,6 @@ Resources:
         OktaDomain: !Ref OktaDomain 
         OktaServerId: !Ref OktaServerId 
         OktaRedirectUri: !Ref OktaRedirectUri
+        MainSubdomain: !Ref MainSubdomain
+        ApiSubdomain: !Ref ApiSubdomain
+        HelpSubdomain: !Ref HelpSubdomain

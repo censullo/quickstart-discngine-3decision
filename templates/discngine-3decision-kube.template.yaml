@@ -54,6 +54,20 @@ Parameters:
     Type: String
   OktaRedirectUri:
     Type: String
+  MainSubdomain:
+    Type: String
+  ApiSubdomain:
+    Type: String
+  HelpSubdomain:
+    Type: String
+  LoadBalancerClass:
+    Type: String
+
+Conditions:
+  AzureUnused: !Equals [!Ref AzureClientId, ""]
+  OktaUnused: !Equals [!Ref OktaClientId, ""]
+  NginxLB: !Equals [!Ref LoadBalancerClass, "nginx"]
+
 Resources:
   EncryptedStorageClass:
     Type: "AWSQS::Kubernetes::Resource"
@@ -108,11 +122,12 @@ Resources:
       Namespace: cert-manager
       Repository: https://charts.jetstack.io
       Chart: cert-manager
-      Version: 1.4.0
+      Version: 1.8.0
       Values:
         installCRDs: true
   IngressNginx:
     Type: "AWSQS::Kubernetes::Helm"
+    Condition: NginxLB
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
     Properties:
       ClusterID: !Ref EKSClusterName
@@ -196,23 +211,26 @@ Resources:
         oracle.choral.password: !Ref DBPassword
         volumes.storageClassName: gp2-encrypted
         wikijs.pvc.storageClassName: gp2-encrypted
-        volumes.claimPods.backend.publicdata.awsElasticBlockStore.fsType: "ext4"
+        volumes.claimPods.backend.publicdata.awsElasticBlockStore.fsType: ext4
         volumes.claimPods.backend.publicdata.awsElasticBlockStore.volumeID: !Ref DataPubVolumeID
         volumes.claimPods.backend.publicdata.awsElasticBlockStore.availabilityZone: !Select [ 0, Fn::GetAZs: !Ref 'AWS::Region' ]
         ingress.host: !Ref DomainName
         ingress.certificateArn: !Ref CertificateArn
         ingress.visibility: !Ref LoadBalancerType
         nest.env.internal_api_key.value: !Select [2, !Split ['/', !Ref AWS::StackId]]
-        ingress.class: alb
+        ingress.class: !Ref LoadBalancerClass
         nest.env.azure_tenant.value: !Ref AzureTenant
-        nest.env.azure_client_id.value: !Ref AzureClientId
+        nest.env.azure_client_id.value: !If [ AzureUnused, "none", !Ref AzureClientId ]
         nest.env.azure_secret.value: !Ref AzureSecret
         nest.env.azure_redirect_uri.value: !Ref AzureRedirectUri
         nest.env.okta_domain.value: !Ref OktaDomain
         nest.env.okta_server_id.value: !Ref OktaServerId
-        nest.env.okta_client_id.value: !Ref OktaClientId
+        nest.env.okta_client_id.value: !If [ OktaUnused, "none", !Ref OktaClientId ]
         nest.env.okta_secret.value: !Ref OktaSecret
         nest.env.okta_redirect_uri.value: !Ref OktaRedirectUri
+        ingress.ui.host: !Ref MainSubdomain
+        ingress.api.host: !Ref ApiSubdomain
+        ingress.wikijs.host: !Ref HelpSubdomain
   ChoralChart:
     Type: "AWSQS::Kubernetes::Helm"
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
@@ -224,6 +242,7 @@ Resources:
       Values:
         oracle.password: !Ref DBPassword
         oracle.connectionString: !Ref DBConnectionString
+        pvc.storageClassName: gp2-encrypted
   CreateIndexes:
     Type: "AWSQS::Kubernetes::Resource"
     DependsOn: ChoralChart

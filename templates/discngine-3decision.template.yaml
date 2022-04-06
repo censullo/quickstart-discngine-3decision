@@ -19,9 +19,13 @@ Metadata:
           default: Discngine 3decision network configuration
         Parameters:
           - DomainName
+          - MainSubdomain
+          - ApiSubdomain
+          - HelpSubdomain
           - HostedZoneId
           - CertificateArn
           - LoadBalancerType
+          - LoadBalancerClass
       - Label:
           default : Discngine 3decision database configuration
         Parameters:
@@ -96,10 +100,36 @@ Metadata:
         default: Route 53 hosted zone Id
       DomainName:
         default: Domain name used for load balancing
+      MainSubdomain:
+        default: Subdomain name for app landing page
+      ApiSubdomain:
+        default: Subdomain of the api
+      HelpSubdomain:
+        default: Subdomain of the help page
       CertificateArn:
         default: Arn of a certificate
       LoadBalancerType:
         default: Type of loadbalancer created
+      LoadBalancerClass:
+        default: Loadbalancer class
+      AzureClientId:
+        default: Azure app client id
+      AzureSecret:
+        default: Azure app secret
+      AzureTenant:
+        default: Azure tenant
+      AzureRedirectUri:
+        default: Azure app redirect uri
+      OktaClientId:
+        default: Okta app client id
+      OktaSecret:
+        default: Okta app secret
+      OktaDomain:
+        default: Okta domain
+      OktaServerId:
+        default: Okta server id
+      OktaRedirectUri:
+        default: Okta app redirect uri
 Parameters:
   EKSClusterName:
     Description: "Required: The name of the EKS cluster in which the stacks will be deployed"
@@ -131,7 +161,7 @@ Parameters:
       forward slash (/).
     Type: String
   DBSnapshotIdentifier:
-    Default: ''
+    Default: ""
     Description: "Optionnal: the snapshot arn used for the database.
                   If left empty, the default snapshot will be used. 
                   But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
@@ -228,6 +258,18 @@ Parameters:
     Description: "Required: Root domain name used for load balancer rules
                   This is only the root domain name not the fqdn, eg: example.com"
     Type: String
+  MainSubdomain:
+    Default: "3decision"
+    Description: "Required: Name used for the main app subdomain"
+    Type: String
+  ApiSubdomain:
+    Default: "api.3decision"
+    Description: "Required: Name used for the api subdomain"
+    Type: String
+  HelpSubdomain:
+    Default: "3decision-help"
+    Description: "Required: Name used for the help subdomain"
+    Type: String
   CertificateArn:
     Default: ""
     Description: "Optional: Arn of a certificate of the associated domain you want added to the load balancer"
@@ -259,7 +301,7 @@ Parameters:
     Type: String
     Default: ""
     Description: "Conditional: Should be given if azure client id variable is set.
-                  This is the redirect_uri set in the azure app, by default should be https://api.3decision.<DomainName>/auth/azure/callback"
+                  This is the redirect_uri set in the azure app, by default should be https://<ApiSubdomain>.<DomainName>/auth/azure/callback"
   OktaClientId:
     Type: String
     Default: ""
@@ -284,7 +326,7 @@ Parameters:
     Type: String
     Default: ""
     Description: "Conditional: Should be given if okta client id variable is set.
-                  This is the redirect_uri set in the okta app, by default should be https://api.3decision.<DomainName>/auth/okta/callback"
+                  This is the redirect_uri set in the okta app, by default should be https://<ApiSubdomain>.<DomainName>/auth/okta/callback"
 
 Rules:
   DiscngineSupportedRegionRule:
@@ -301,7 +343,7 @@ Conditions:
   UseJWTKeysSecret: !Not [ !Equals [ "", !Ref JWTKeysSecretName ] ]
   ConfigureEKS: !Equals ['true', !Ref ConfigureEKS]
   ConfigureDNS: !Not [ !Equals [ "", !Ref HostedZoneId ] ]
-  UseDBSnapshotIdentifier: !Not [ !Equals ["", DBSnapshotIdentifier ] ]
+  UseDBSnapshotIdentifier: !Equals ["", !Ref DBSnapshotIdentifier ] ]
 
 Resources:
   EKSCluster:
@@ -361,15 +403,19 @@ Resources:
         HostString: !GetAtt RDSStack.Outputs.PrimaryHostString
         DBName: !GetAtt RDSStack.Outputs.PrimaryDBName
         LoadBalancerType: !Ref LoadBalancerType
-        AzureClientId: !Ref AzureClientId 
-        AzureTenant: !Ref AzureTenant 
-        AzureSecret: !Ref AzureSecret 
-        AzureRedirectUri: !Ref AzureRedirectUri 
-        OktaClientId: !Ref OktaClientId 
-        OktaSecret: !Ref OktaSecret 
-        OktaDomain: !Ref OktaDomain 
-        OktaServerId: !Ref OktaServerId 
-        OktaRedirectUri: !Ref OktaRedirectUri 
+        LoadBalancerClass: !Ref LoadBalancerClass
+        AzureClientId: !Ref AzureClientId
+        AzureTenant: !Ref AzureTenant
+        AzureSecret: !Ref AzureSecret
+        AzureRedirectUri: !Ref AzureRedirectUri
+        OktaClientId: !Ref OktaClientId
+        OktaSecret: !Ref OktaSecret
+        OktaDomain: !Ref OktaDomain
+        OktaServerId: !Ref OktaServerId
+        OktaRedirectUri: !Ref OktaRedirectUri
+        MainSubdomain: !Ref MainSubdomain
+        ApiSubdomain: !Ref ApiSubdomain
+        HelpSubdomain: !Ref HelpSubdomain
   3decisionDNSStack:
     Type: AWS::CloudFormation::Stack
     Condition: ConfigureDNS
@@ -382,3 +428,6 @@ Resources:
       Parameters:
         HostedZoneId: !Ref HostedZoneId
         DomainName: !Ref DomainName
+        MainSubdomain: !Ref MainSubdomain
+        ApiSubdomain: !Ref ApiSubdomain
+        HelpSubdomain: !Ref HelpSubdomain
