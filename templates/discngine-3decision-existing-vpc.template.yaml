@@ -431,6 +431,15 @@ Parameters:
     Description: "Type of loadbalancer created.
                   This can either be equal to internet-facing for public loadbalancer or internal for private loadbalancers"
     Type: String
+  LoadBalancerClass:
+    AllowedValues:
+      - alb
+      - nginx
+    Default: "alb"
+    Description: "Type of loadbalancer created.
+                  This will create an application loadBalancer by default and should generally not be changed.
+                  By selecting nginx you will have a classic load balancer with a self signed certificate."
+    Type: String
   ProvisionBastionHost:
     Type: String
     AllowedValues: [ "Enabled", "Disabled" ]

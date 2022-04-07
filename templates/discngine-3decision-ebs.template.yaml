@@ -10,9 +10,9 @@ Metadata:
 Mappings: 
   RegionMap: 
     us-east-1:
-      DataPub: snap-0598b8894b3a1105e
+      DataPub: snap-0be44dec29039f6e3
     eu-central-1:
-      DataPub: snap-0f6b363ebefcbbc22
+      DataPub: snap-0a671add9cea6f78e
 Resources:
   DataPub:
     Type: "AWS::EC2::Volume"
