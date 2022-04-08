@@ -62,9 +62,3 @@ Resources:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub "${HelpSubdomain}.${DomainName}"
       Type: A
-  backRecord:
-    Type: "AWS::Route53::RecordSet"
-    Properties:
-      HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "3decision-debug.${DomainName}"
-      Type: A
