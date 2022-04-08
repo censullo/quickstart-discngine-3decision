@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'This template deploys the 3decision oracle database from an existing public snapshot (qs-1snm79ff4).'
 Metadata:
   cfn-lint: { config: { ignore_checks: [W9002, W9003, W9006] } }
-  QuickStartDocumentation:
-    EntrypointName: "3decision Database Deployment"
   LintSpellExclude:
     - Discngine
     - 3decision
@@ -54,10 +52,15 @@ Parameters:
     Description: "Optionnal: Id of the EKS SecurityGroup in which we will add the RDS ingress"
     Default: ''
     Type: String
+  DBSnapshotIdentifier:
+    Description: "Optionnal: the snapshot arn used for the database.
+                  If left empty, the default snapshot will be used. 
+                  But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
+    Type: String
 Mappings:
   OracleDetailsMap:
     Standard-Edition-Two-19.0-License-Included:
-      Version: 19.0.0.0.ru-2021-10.rur-2021-10.r1
+      Version: 19.0.0.0.ru-2022-01.rur-2022-01.r1
       Engine: oracle-se2-cdb
       Family: oracle-se2-cdb-19
       License: license-included
@@ -123,6 +126,7 @@ Resources:
       SubnetIds: !Ref DBSubnets
   DBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
+    Condition: AddSecurityRule
     Properties:
       GroupDescription: "Opens incoming requests on Oracle RDS port 1521"
       VpcId: !Ref VpcId
@@ -159,13 +163,15 @@ Resources:
       DBSubnetGroupName: !Ref SubnetGroup
       VPCSecurityGroups: [ !GetAtt DBSecurityGroup.GroupId ]
       StorageType: gp2
-      DBSnapshotIdentifier: !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:dng3decpd01"
+      DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
       PubliclyAccessible: false
   DBParamGroup:
     Type: AWS::RDS::DBParameterGroup
     Properties:
       Description: Oracle Database Parameter Group
       Family: !FindInMap [OracleDetailsMap, !Ref ORAVersion, Family]
+      Parameters:
+        processes: 'GREATEST({DBInstanceClassMemory/9868951}, 1000)'
       Tags:
         - Key: Name
           Value: "DBParamGroup"
@@ -189,3 +195,18 @@ Outputs:
           - Endpoint.Port
         - '/'
         - !Ref DBName
+  PrimaryHostString:
+    Description: JDBC Host string for the primary database
+    Value: !Join
+      - ''
+      - - !GetAtt
+          - PrimaryDBInstance
+          - Endpoint.Address
+        - ':'
+        - !GetAtt
+          - PrimaryDBInstance
+          - Endpoint.Port
+        - '/'
+  PrimaryDBName:
+    Description: JDBC Service Name for the primary database
+    Value: !Ref DBName

@@ -2,8 +2,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: "This template deploys A records in a given route53 hosted zone (qs-1snm79fdq)."
 Metadata:
-  QuickStartDocumentation:
-    EntrypointName: "3decision Route53 DNS creation"
   LintSpellExclude:
     - Discngine
     - 3decision
@@ -12,9 +10,11 @@ Parameters:
     Type: String
   DomainName:
     Type: String
-  TdecRecordName:
+  MainSubdomain:
     Type: String
-  EtlRecordName:
+  ApiSubdomain:
+    Type: String
+  HelpSubdomain:
     Type: String
 Mappings:
   Config:
@@ -40,9 +40,9 @@ Resources:
         EvaluateTargetHealth: true
         HostedZoneId: !Ref CanonicalHostedZoneId
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "${TdecRecordName}.${DomainName}"
+      Name: !Sub "${MainSubdomain}.${DomainName}"
       Type: A
-  tdecEtlRecord:
+  apiRecord:
     Type: "AWS::Route53::RecordSet"
     Properties:
       AliasTarget:
@@ -50,5 +50,15 @@ Resources:
         EvaluateTargetHealth: true
         HostedZoneId: !Ref CanonicalHostedZoneId
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "${EtlRecordName}.${DomainName}"
+      Name: !Sub "${ApiSubdomain}.${DomainName}"
+      Type: A
+  wikiRecord:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      AliasTarget:
+        DNSName: !Ref DNSName
+        EvaluateTargetHealth: true
+        HostedZoneId: !Ref CanonicalHostedZoneId
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "${HelpSubdomain}.${DomainName}"
       Type: A
