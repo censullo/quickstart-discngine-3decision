@@ -62,7 +62,7 @@ Parameters:
 Mappings:
   OracleDetailsMap:
     Standard-Edition-Two-19.0-License-Included:
-      Version: 19.0.0.0.ru-2021-10.rur-2021-10.r1
+      Version: 19.0.0.0.ru-2022-01.rur-2022-01.r1
       Engine: oracle-se2-cdb
       Family: oracle-se2-cdb-19
       License: license-included

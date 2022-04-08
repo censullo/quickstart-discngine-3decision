@@ -60,9 +60,7 @@ Metadata:
           default: Discngine 3decision kube configuration
         Parameters:
           - TNamespace
-          - JWTPrivateKey
-          - JWTPublicKey
-          - JWTKeysSecretName
+          - JWTSecretName
       - Label:
           default: Discngine 3decision authentication configuration
         Parameters:
@@ -140,12 +138,8 @@ Metadata:
         default: Whether the DB is highly available
       TNamespace:
         default: 3decision Helm chart namespace
-      JWTKeysSecretName:
-        default: Secret Manager name containing ssh keys
-      JWTPrivateKey:
-        default: Private SSH key in base 64 used for JWT
-      JWTPublicKey:
-        default: Public SSH key in base 64 used for JWT
+      JWTSecretName:
+        default: Secret Name
       HostedZoneId:
         default: Route 53 hosted zone Id
       DomainName:
@@ -390,24 +384,9 @@ Parameters:
                   This will default to tdecision if not given.
                   The namespace will be created if it doesn't already exists."
     Type: String
-  JWTKeysSecretName:
-    Default: ""
-    Description: "Conditional: The name of a secret in SecretsManager containing base64 keys in fields private_key and public_key.
-                  If used, you need to disable wrapping and paste the base64 encoded strings that you can retrieve by running 'base64 -w0 id_rsa' and 'base64 -w0 id_rsa.pub'.
-                  By default, this will have no value, in which case the variables JWTPrivateKey and JWTPublicKey will be used."
-    Type: String
-  JWTPrivateKey:
-    Default: ""
-    Description: "Conditional: An SSH private key in base64 format.
-                  You need to disable wrapping and paste the base64 encoded string that you can retrieve by running 'base64 -w0 id_rsa'.
-                  If JWTKeysSecretName is set, this variable is not used"
-    Type: String
-    NoEcho: true
-  JWTPublicKey:
-    Default: ""
-    Description: "Conditional: An SSH public key in base64 format.
-                  You need to disable wrapping and paste the base64 encoded string that you can retrieve by running 'base64 -w0 id_rsa.pub'.
-                  If JWTKeysSecretName is set, this variable is not used"
+  JWTSecretName:
+    Default: "3dec-JWT-ssh"
+    Description: "Name of the secret created in secrets manager that will contain an ssh key fed to the application."
     Type: String
   AdditionalEKSAdminUserArn:
     Default: ""
@@ -571,9 +550,7 @@ Resources:
         DBInstanceClass: !Ref DBInstanceClass
         DBMultiZone: !Ref DBMultiZone
         TNamespace: !Ref TNamespace
-        JWTKeysSecretName: !Ref JWTKeysSecretName
-        JWTPrivateKey: !Ref JWTPrivateKey
-        JWTPublicKey: !Ref JWTPublicKey
+        JWTSecretName: !Ref JWTSecretName
         HostedZoneId: !Ref HostedZoneId
         DomainName: !Ref DomainName
         CertificateArn: !Ref CertificateArn
@@ -592,14 +569,14 @@ Resources:
         ProvisionBastionHost: !Ref ProvisionBastionHost
         DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
         CustomAmiId: !Ref CustomAmiId
-        AzureClientId: !Ref AzureClientId 
-        AzureTenant: !Ref AzureTenant 
-        AzureSecret: !Ref AzureSecret 
-        AzureRedirectUri: !Ref AzureRedirectUri 
-        OktaClientId: !Ref OktaClientId 
-        OktaSecret: !Ref OktaSecret 
-        OktaDomain: !Ref OktaDomain 
-        OktaServerId: !Ref OktaServerId 
+        AzureClientId: !Ref AzureClientId
+        AzureTenant: !Ref AzureTenant
+        AzureSecret: !Ref AzureSecret
+        AzureRedirectUri: !Ref AzureRedirectUri
+        OktaClientId: !Ref OktaClientId
+        OktaSecret: !Ref OktaSecret
+        OktaDomain: !Ref OktaDomain
+        OktaServerId: !Ref OktaServerId
         OktaRedirectUri: !Ref OktaRedirectUri
         MainSubdomain: !Ref MainSubdomain
         ApiSubdomain: !Ref ApiSubdomain
