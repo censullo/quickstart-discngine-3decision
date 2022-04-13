@@ -19,12 +19,17 @@ Metadata:
           default: Discngine 3decision network configuration
         Parameters:
           - DomainName
+          - MainSubdomain
+          - ApiSubdomain
+          - HelpSubdomain
           - HostedZoneId
           - CertificateArn
           - LoadBalancerType
+          - LoadBalancerClass
       - Label:
           default : Discngine 3decision database configuration
         Parameters:
+          - DBSnapshotIdentifier
           - DBInstanceIdentifier
           - DBName
           - DBPassword
@@ -35,9 +40,19 @@ Metadata:
           default: Discngine 3decision kube configuration
         Parameters:
           - TNamespace
-          - JWTPrivateKey
-          - JWTPublicKey
-          - JWTKeysSecretName
+          - JWTSecretName
+      - Label:
+          default: Discngine 3decision authentication configuration
+        Parameters:
+          - AzureClientId
+          - AzureTenant
+          - AzureSecret
+          - AzureRedirectUri
+          - OktaClientId
+          - OktaSecret
+          - OktaDomain
+          - OktaServerId
+          - OktaRedirectUri
       - Label:
           default: AWS Quick Start configuration
         Parameters:
@@ -55,6 +70,8 @@ Metadata:
         default: Quick Start S3 bucket region
       QSS3KeyPrefix:
         default: Quick Start S3 key prefix
+      DBSnapshotIdentifier:
+        default: Identifier of the database snapshot
       DBInstanceIdentifier:
         default: Identifier of the database
       DBName:
@@ -69,22 +86,44 @@ Metadata:
         default: Whether the DB is highly available
       TNamespace:
         default: 3decision Helm chart namespace
-      JWTKeysSecretName:
-        default: Secret Manager name containing ssh keys
-      JWTPrivateKey:
-        default: Private SSH key in base 64 used for JWT
-      JWTPublicKey:
-        default: Public SSH key in base 64 used for JWT
+      JWTSecretName:
+        default: Secret Name
       ConfigureEKS:
         default: Boolean determining whether to configure EKS
       HostedZoneId:
         default: Route 53 hosted zone Id
       DomainName:
         default: Domain name used for load balancing
+      MainSubdomain:
+        default: Subdomain name for app landing page
+      ApiSubdomain:
+        default: Subdomain of the api
+      HelpSubdomain:
+        default: Subdomain of the help page
       CertificateArn:
         default: Arn of a certificate
       LoadBalancerType:
         default: Type of loadbalancer created
+      LoadBalancerClass:
+        default: Loadbalancer class
+      AzureClientId:
+        default: Azure app client id
+      AzureSecret:
+        default: Azure app secret
+      AzureTenant:
+        default: Azure tenant
+      AzureRedirectUri:
+        default: Azure app redirect uri
+      OktaClientId:
+        default: Okta app client id
+      OktaSecret:
+        default: Okta app secret
+      OktaDomain:
+        default: Okta domain
+      OktaServerId:
+        default: Okta server id
+      OktaRedirectUri:
+        default: Okta app redirect uri
 Parameters:
   EKSClusterName:
     Description: "Required: The name of the EKS cluster in which the stacks will be deployed"
@@ -114,6 +153,12 @@ Parameters:
     Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
       can include numbers, lowercase letters, uppercase letters, hyphens (-), and
       forward slash (/).
+    Type: String
+  DBSnapshotIdentifier:
+    Default: ""
+    Description: "Optionnal: the snapshot arn used for the database.
+                  If left empty, the default snapshot will be used. 
+                  But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
     Type: String
   DBInstanceIdentifier:
     Default: db3dec
@@ -171,24 +216,9 @@ Parameters:
                   This will default to tdecision if not given.
                   The namespace will be created if it doesn't already exists."
     Type: String
-  JWTKeysSecretName:
-    Default: ""
-    Description: "Conditional: The name of a secret in SecretsManager containing base64 keys in fields private_key and public_key.
-                  If used, you need to disable wrapping and paste the base64 encoded strings that you can retrieve by running 'base64 -w0 id_rsa' and 'base64 -w0 id_rsa.pub'.
-                  By default, this will have no value, in which case the variables JWTPrivateKey and JWTPublicKey will be used."
-    Type: String
-  JWTPrivateKey:
-    Default: ""
-    Description: "Conditional: An SSH private key in base64 format.
-                  You need to disable wrapping and paste the base64 encoded string that you can retrieve by running 'base64 -w0 id_rsa'.
-                  If JWTKeysSecretName is set, this variable is not used"
-    Type: String
-    NoEcho: true
-  JWTPublicKey:
-    Default: ""
-    Description: "Conditional: An SSH public key in base64 format.\n
-                  You need to disable wrapping and paste the base64 encoded string that you can retrieve by running 'base64 -w0 id_rsa.pub'.\n
-                  If JWTKeysSecretName is set, this variable is not used"
+  JWTSecretName:
+    Default: "3dec-JWT-ssh"
+    Description: "Name of the secret created in secrets manager that will contain an ssh key fed to the application."
     Type: String
   ConfigureEKS:
     Description: "Optionnal: Set to true to create EKS quickstart specific resources for your EKS cluster"
@@ -207,6 +237,18 @@ Parameters:
     Description: "Required: Root domain name used for load balancer rules
                   This is only the root domain name not the fqdn, eg: example.com"
     Type: String
+  MainSubdomain:
+    Default: "3decision"
+    Description: "Required: Name used for the main app subdomain"
+    Type: String
+  ApiSubdomain:
+    Default: "api.3decision"
+    Description: "Required: Name used for the api subdomain"
+    Type: String
+  HelpSubdomain:
+    Default: "3decision-help"
+    Description: "Required: Name used for the help subdomain"
+    Type: String
   CertificateArn:
     Default: ""
     Description: "Optional: Arn of a certificate of the associated domain you want added to the load balancer"
@@ -219,6 +261,60 @@ Parameters:
     Description: "Type of loadbalancer created.
                   This can either be equal to internet-facing for public loadbalancer or internal for private loadbalancers"
     Type: String
+  LoadBalancerClass:
+    AllowedValues:
+      - alb
+      - nginx
+    Default: "alb"
+    Description: "Type of loadbalancer created.
+                  This will create an application loadBalancer by default and should generally not be changed.
+                  By selecting nginx you will have a classic load balancer with a self signed certificate."
+    Type: String
+  AzureClientId:
+    Type: String
+    Default: ""
+    Description: "Optional: Will enable azure authentication if set.
+                  Client id of azure app"
+  AzureTenant:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if azure client id variable is set.
+                  Tenant id of the azure app"
+  AzureSecret:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if azure client id variable is set.
+                  Secret of the azure app"
+  AzureRedirectUri:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if azure client id variable is set.
+                  This is the redirect_uri set in the azure app, by default should be https://<ApiSubdomain>.<DomainName>/auth/azure/callback"
+  OktaClientId:
+    Type: String
+    Default: ""
+    Description: "Optional: Will enable okta authentication if set.
+                  Client ID of the okta app"
+  OktaSecret:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  Secret of the okta app"
+  OktaDomain:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  Domain of the okta environment"
+  OktaServerId:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  Server Id of the okta environment"
+  OktaRedirectUri:
+    Type: String
+    Default: ""
+    Description: "Conditional: Should be given if okta client id variable is set.
+                  This is the redirect_uri set in the okta app, by default should be https://<ApiSubdomain>.<DomainName>/auth/okta/callback"
 
 Rules:
   DiscngineSupportedRegionRule:
@@ -232,9 +328,9 @@ Rules:
 
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
-  UseJWTKeysSecret: !Not [ !Equals [ "", !Ref JWTKeysSecretName ] ]
   ConfigureEKS: !Equals ['true', !Ref ConfigureEKS]
   ConfigureDNS: !Not [ !Equals [ "", !Ref HostedZoneId ] ]
+  UseDBSnapshotIdentifier: !Not [ !Equals ["", !Ref DBSnapshotIdentifier ] ]
 
 Resources:
   EKSCluster:
@@ -251,6 +347,17 @@ Resources:
         QSS3BucketName: !Ref QSS3BucketName
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
+  JWTStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-jwt.template.yaml'
+        - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+          S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
+        SecretName: !Ref JWTSecretName
   EBSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -273,8 +380,10 @@ Resources:
         VpcId: !Ref VPCID
         NodeSecurityGroupId: !Ref NodeSecurityGroup
         DBMultiZone: !Ref DBMultiZone
+        DBSnapshotIdentifier: !If [UseDBSnapshotIdentifier, !Ref DBSnapshotIdentifier, !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:db3dec2022-0"]
   3decisionKubeStack:
     Type: AWS::CloudFormation::Stack
+    DependsOn: JWTStack
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-kube.template.yaml'
@@ -282,8 +391,8 @@ Resources:
           S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
         TNamespace: !Ref TNamespace
-        JWTPrivateKey: !If [UseJWTKeysSecret, !Sub '{{resolve:secretsmanager:${JWTKeysSecretName}:SecretString:private_key}}', !Ref JWTPrivateKey]
-        JWTPublicKey: !If [UseJWTKeysSecret, !Sub '{{resolve:secretsmanager:${JWTKeysSecretName}:SecretString:public_key}}', !Ref JWTPublicKey]
+        JWTPrivateKey: !Sub '{{resolve:secretsmanager:${JWTSecretName}:SecretString:private_key}}'
+        JWTPublicKey: !Sub '{{resolve:secretsmanager:${JWTSecretName}:SecretString:public_key}}'
         EKSClusterName: !Ref EKSClusterName
         DataPubVolumeID: !GetAtt EBSStack.Outputs.DataPubVolumeID
         DBConnectionString: !GetAtt RDSStack.Outputs.PrimaryConnectionString
@@ -293,6 +402,19 @@ Resources:
         HostString: !GetAtt RDSStack.Outputs.PrimaryHostString
         DBName: !GetAtt RDSStack.Outputs.PrimaryDBName
         LoadBalancerType: !Ref LoadBalancerType
+        LoadBalancerClass: !Ref LoadBalancerClass
+        AzureClientId: !Ref AzureClientId
+        AzureTenant: !Ref AzureTenant
+        AzureSecret: !Ref AzureSecret
+        AzureRedirectUri: !Ref AzureRedirectUri
+        OktaClientId: !Ref OktaClientId
+        OktaSecret: !Ref OktaSecret
+        OktaDomain: !Ref OktaDomain
+        OktaServerId: !Ref OktaServerId
+        OktaRedirectUri: !Ref OktaRedirectUri
+        MainSubdomain: !Ref MainSubdomain
+        ApiSubdomain: !Ref ApiSubdomain
+        HelpSubdomain: !Ref HelpSubdomain
   3decisionDNSStack:
     Type: AWS::CloudFormation::Stack
     Condition: ConfigureDNS
@@ -305,3 +427,6 @@ Resources:
       Parameters:
         HostedZoneId: !Ref HostedZoneId
         DomainName: !Ref DomainName
+        MainSubdomain: !Ref MainSubdomain
+        ApiSubdomain: !Ref ApiSubdomain
+        HelpSubdomain: !Ref HelpSubdomain

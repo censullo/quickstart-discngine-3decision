@@ -20,9 +20,6 @@ tests:
     parameters:
       AvailabilityZones: $[taskcat_genaz_3]
       KeyPairName: $[taskcat_getkeypair]
-      JWTPrivateKey: override
-      JWTPublicKey: override
-      EtlPassword: override
       DBPassword: override
       DomainName: example.com
     template: templates/discngine-3decision-main.template.yaml

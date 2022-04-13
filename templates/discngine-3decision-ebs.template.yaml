@@ -2,17 +2,15 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: "This template deploys a Volume based on a public snapshot (qs-1snm79fe6)."
 Metadata:
-  QuickStartDocumentation:
-    EntrypointName: "3decision EBS volume creation"
   LintSpellExclude:
     - Discngine
     - 3decision
 Mappings: 
   RegionMap: 
     us-east-1:
-      DataPub: snap-061bd58995aaeb78a
+      DataPub: snap-0be44dec29039f6e3
     eu-central-1:
-      DataPub: snap-0ab16ade3a8e61ec5
+      DataPub: snap-0a671add9cea6f78e
 Resources:
   DataPub:
     Type: "AWS::EC2::Volume"
