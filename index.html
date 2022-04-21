@@ -838,13 +838,17 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_costs_and_licenses">Costs and licenses</a></li>
 <li><a href="#_architecture">Architecture</a></li>
 <li><a href="#_deployment_options">Deployment options</a></li>
-<li><a href="#_predeployment_steps">Predeployment steps</a></li>
+<li><a href="#_predeployment_steps">Predeployment steps</a>
+<ul class="sectlevel2">
+<li><a href="#_authentication">Authentication</a></li>
+<li><a href="#_vpc_tagging">VPC Tagging</a></li>
+</ul>
+</li>
 <li><a href="#_deployment_steps">Deployment steps</a></li>
 <li><a href="#_postdeployment_steps">Postdeployment steps</a>
 <ul class="sectlevel2">
 <li><a href="#_optional_add_your_ssl_certificate_to_the_application_load_balancer">(Optional) Add your SSL certificate to the Application Load Balancer</a></li>
 <li><a href="#_optional_create_a_cname_record_in_your_dns_provider">(Optional) Create a CNAME record in your DNS provider</a></li>
-<li><a href="#_optional_create_additional_accounts">(Optional) Create additional accounts</a></li>
 <li><a href="#_additional_information">Additional information</a></li>
 </ul>
 </li>
@@ -1000,29 +1004,24 @@ AWS Cloud.</p>
 <div class="sect1">
 <h2 id="_predeployment_steps">Predeployment steps</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_authentication">Authentication</h3>
 <div class="paragraph">
-<p>During deployment, you will be asked to provide a public/private SSH key pair. This key must be provided in base64 with line wrapping disabled (<code> -w 0</code>).</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>ssh-keygen -t rsa -b 2048 -C "your_email@example.com" -q -N "" -f ./id_rsa_3decision</pre>
-</div>
+<p>During deployment, you will be asked to provide information about your authentication provider.</p>
 </div>
 <div class="paragraph">
-<p>Encode both keys in base64 with the following commands:</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>base64 -w 0 id_rsa_3decision
-
-base64 -w 0 id_rsa_3decision.pub</pre>
-</div>
+<p>3decision supports both Azure and Okta.
+You will need to give information about the tenancy or account and app client and secret.</p>
 </div>
 <div class="paragraph">
-<p>Copy the base64 string of the keys. You need it during the stack deployment.</p>
+<p>Thus, you will first need to create an app in either of these as you will need to insert that information when creating the stack.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_vpc_tagging">VPC Tagging</h3>
 <div class="paragraph">
 <p>If you are deploying 3decision in an existing VPC, ensure that the private subnets have the correct tags. For more information, refer to <a href="https://aws-quickstart.github.io/quickstart-amazon-eks/#_launch_the_quick_start">Amazon EKS on the AWS Cloud</a>.</p>
+</div>
 </div>
 </div>
 </div>
@@ -1120,40 +1119,18 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>3decision user UI: <code>3decision.&lt;your domain&gt;</code>.</p>
+<p>3decision user URI: <code>3decision.&lt;your domain&gt;</code>.</p>
 </li>
 <li>
-<p>3decision administrator UI: <code>3decision-etl.&lt;your domain&gt;</code>.</p>
+<p>3decision API URI: <code>api.3decision.&lt;your domain&gt;</code>.</p>
+</li>
+<li>
+<p>3decision help URI: <code>3decision-help.&lt;your domain&gt;</code>.</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
 <p>Both records must target the 3decision Application Load Balancer. To obtain the address of the Application Load Balancer, open the <a href="https://console.aws.amazon.com/ec2/">Amazon EC2</a> console. In the navigation pane, under <strong>Load Balancing</strong>, choose <strong>Load Balancers</strong>. The address of the Application Load Balancer is in the <strong>DNS Name</strong> column. For more information, refer to <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html">Network Load Balancers</a>.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_optional_create_additional_accounts">(Optional) Create additional accounts</h3>
-<div class="paragraph">
-<p>The Quick Start creates a 3decision user named <code>3decision</code>. (You can change the default name during deployment.) Additional user accounts can be created in the 3decision administrator UI.</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Navigate to <code>https://3decision-etl.&lt;your domain&gt;</code>.</p>
-</li>
-<li>
-<p>Log in with the account <code>3decision</code> and the password you provided during deployment.</p>
-</li>
-<li>
-<p>Under <strong>Admin Pages</strong>, <strong>Security</strong>, choose <strong>Users</strong>.</p>
-</li>
-<li>
-<p>Enter <strong>User Name</strong>, <strong>Password</strong>, and <strong>Confirm Password</strong>.</p>
-</li>
-<li>
-<p>Choose <strong>Add</strong>.</p>
-</li>
-</ol>
 </div>
 </div>
 <div class="sect2">
@@ -1163,9 +1140,6 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </div>
 <div class="ulist">
 <ul>
-<li>
-<p>Azure and Okta OpenID Connect authentication. Only local accounts are supported.</p>
-</li>
 <li>
 <p>Infrastructure monitoring.</p>
 </li>
@@ -1239,8 +1213,8 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </html>
 <!--
 repo commit:
-6ba06d776d5fe39e490a0ee49b954b4289399c64
+7545fe2805e78031565376db624634846f126b77
 
 submodule config:
- 340aace2c14aabf8fd66ee1f49f44a017d8ddfb0 docs/boilerplate (remotes/origin/codeowners-1-g340aace)
+ 340aace2c14aabf8fd66ee1f49f44a017d8ddfb0 docs/boilerplate (340aace)
 -->
