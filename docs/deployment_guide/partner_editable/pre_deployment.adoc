@@ -2,20 +2,15 @@
 
 == Predeployment steps
 
-During deployment, you will be asked to provide a public/private SSH key pair. This key must be provided in base64 with line wrapping disabled (`` -w 0``).
+=== Authentication
 
-....
-ssh-keygen -t rsa -b 2048 -C "your_email@example.com" -q -N "" -f ./id_rsa_3decision
-....
+During deployment, you will be asked to provide information about your authentication provider.
 
-Encode both keys in base64 with the following commands:
+3decision supports both Azure and Okta.
+You will need to give information about the tenancy or account and app client and secret.
 
-....
-base64 -w 0 id_rsa_3decision
+Thus, you will first need to create an app in either of these as you will need to insert that information when creating the stack.
 
-base64 -w 0 id_rsa_3decision.pub
-....
-
-Copy the base64 string of the keys. You need it during the stack deployment.
+=== VPC Tagging
 
 If you are deploying 3decision in an existing VPC, ensure that the private subnets have the correct tags. For more information, refer to https://aws-quickstart.github.io/quickstart-amazon-eks/#_launch_the_quick_start[Amazon EKS on the AWS Cloud].

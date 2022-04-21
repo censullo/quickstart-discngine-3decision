@@ -31,31 +31,17 @@ If you did not provide an SSL certificate during the Quick Start deployment, edi
 
 If you did not provide a Route 53 hosted zone ID during the Quick Start installation, you must create the following two DNS records.
 
-. 3decision user UI: `3decision.<your domain>`.
+. 3decision user URI: `3decision.<your domain>`.
 
-. 3decision administrator UI: `3decision-etl.<your domain>`.
+. 3decision API URI: `api.3decision.<your domain>`.
+
+. 3decision help URI: `3decision-help.<your domain>`.
 
 Both records must target the 3decision Application Load Balancer. To obtain the address of the Application Load Balancer, open the https://console.aws.amazon.com/ec2/[Amazon EC2] console. In the navigation pane, under *Load Balancing*, choose *Load Balancers*. The address of the Application Load Balancer is in the *DNS Name* column. For more information, refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html[Network Load Balancers].
-
-=== (Optional) Create additional accounts
-
-The Quick Start creates a 3decision user named `3decision`. (You can change the default name during deployment.) Additional user accounts can be created in the 3decision administrator UI. 
-
-. Navigate to `\https://3decision-etl.<your domain>`.
-
-. Log in with the account `3decision` and the password you provided during deployment.
-
-. Under *Admin Pages*, *Security*, choose *Users*.
-
-. Enter *User Name*, *Password*, and *Confirm Password*.
-
-. Choose *Add*.
 
 === Additional information
 
 This Quick Start does not include the following:
-
-* Azure and Okta OpenID Connect authentication. Only local accounts are supported.
 
 * Infrastructure monitoring.
 
