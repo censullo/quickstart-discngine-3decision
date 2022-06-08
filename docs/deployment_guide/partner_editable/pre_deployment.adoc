@@ -52,8 +52,9 @@ If you are deploying 3decision in an existing VPC, ensure that the private subne
 
 === FAQ before deployment
 
-Q: Will 3decision make http call to internet websites ?
-A: Yes, 3decision synchronizes will public structures made available by the rcsb.
+*Q*: Will 3decision make http call to internet websites ?
+
+*A*: Yes, 3decision synchronizes will public structures made available by the rcsb.
 The sync uses `rsync`.
 Domains that are called are
 - rsync.ebi.ac.uk on port 873
