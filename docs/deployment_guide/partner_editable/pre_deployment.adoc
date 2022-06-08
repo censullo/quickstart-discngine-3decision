@@ -45,6 +45,8 @@ Here are the steps to create an Okta OpenID Connect application
 . Look for the Okta domain in the global header located in the upper-right corner of the dashboard and copy it (eg: example.okta-emea.com)
 . You can choose "default" as your okta server id during the Quick Start deployment.
 
+3decision will use the scopes `email, profile, openid, offline_access` and the claims `email` and `name` from the ID Token.
+
 === VPC Tagging
 
 If you are deploying 3decision in an existing VPC, ensure that the private subnets have the correct tags. For more information, refer to https://aws-quickstart.github.io/quickstart-amazon-eks/#_launch_the_quick_start[Amazon EKS on the AWS Cloud].
@@ -54,8 +56,15 @@ If you are deploying 3decision in an existing VPC, ensure that the private subne
 
 *Q*: Will 3decision make http call to internet websites ?
 
-*A*: Yes, 3decision synchronizes will public structures made available by the rcsb.
-The sync uses `rsync`.
-Domains that are called are
-- rsync.ebi.ac.uk on port 873
-- rsync.wwpdb.org on port 873 and 33444
+*A*: Yes, 3decision synchronizes will public structures made available by the rcsb. The data synchronization uses `rsync` protocol. 
+Domains that are called are:
+
+  * rsync.ebi.ac.uk on port 873
+  * rsync.wwpdb.org on port 873 and 33444
+
+
+
+
+*Q*: Why does Azure require additional claims and not Okta ?
+
+*A*: Default Okta ID Token claims are enough. Azure require extra claims for 3decision to work.
