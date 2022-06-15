@@ -183,7 +183,7 @@ Parameters:
     Description: "Required: The database admin account password."
     Type: String
     MinLength: '8'
-    MaxLength: '41'
+    MaxLength: '30'
   DBSubnets:
     Description: 'Required: Subnets to use for the creation of the db subnet group.
                   These need to be the same subnets as the ones containing your eks nodes'
@@ -242,7 +242,7 @@ Parameters:
     Description: "Required: Name used for the main app subdomain"
     Type: String
   ApiSubdomain:
-    Default: "api.3decision"
+    Default: "3decision-api"
     Description: "Required: Name used for the api subdomain"
     Type: String
   HelpSubdomain:
@@ -380,7 +380,7 @@ Resources:
         VpcId: !Ref VPCID
         NodeSecurityGroupId: !Ref NodeSecurityGroup
         DBMultiZone: !Ref DBMultiZone
-        DBSnapshotIdentifier: !If [UseDBSnapshotIdentifier, !Ref DBSnapshotIdentifier, !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:db3dec2022-0"]
+        DBSnapshotIdentifier: !If [UseDBSnapshotIdentifier, !Ref DBSnapshotIdentifier, !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:db3dec2022-1"]
   3decisionKubeStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: JWTStack
