@@ -65,6 +65,6 @@ If you are deploying 3decision in an existing VPC, ensure that the private subne
   * `rsync.ebi.ac.uk` on port 873
   * `rsync.wwpdb.org` on porst 873 and 33444
 
-*Q*: Why does Azure require additional claims and not Okta ?
+*Q*: Why does Azure require additional claims and not Okta?
 
-*A*: Default Okta ID Token claims are enough. Azure require extra claims for 3decision to work.
+*A*: For 3decision to work with Azure, the default Okta ID token claims are not enough.
