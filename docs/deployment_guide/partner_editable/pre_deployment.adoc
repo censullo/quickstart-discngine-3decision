@@ -4,67 +4,70 @@
 
 === Authentication
 
-During deployment, you will be asked to provide information about your authentication provider.
+During deployment, you are prompted to provide information about your authentication provider. 3decision supports OpenID Connect for both Azure and Okta.
 
-3decision supports OpenID Connect for both Azure and Okta.
+==== Creating an Azure OpenID Connect application
 
-==== Azure OpenID Connect Application
+. Sign in to the Azure portal using an account with administrator permissions.
+. Choose *Azure Active Directory*.
+. Under *App registrations*, choose *New registration*.
+. Enter a name for your application (for example, `Discngine 3decision prod`).
+. For *Redirect URI*, enter the following. Replace `<your domain>` and `<your_top_level_domain>` in the URI shown with your information (for example, `discngine.com`).
 
-Creating an Azure OpenID Connect application
++
+`\https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
 
-. Open Connect to your Azure portal (you need permissions to create an App)
-. Navigate to "App registrations"
-. Click on "New registration"
-. Give your application a name, for eg: "Discngine 3decision prod"
-. Redirect URI: https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback
-Replace <your_domain> with your domain: eg: discngine and replace <your_top_level_domain> with your top level domain, eg: com
-. Click Register
-. Then in the Authentication section of your application, scroll down to "Implicit grant and hybrid flows" check the box "ID Token" to enable ID Tokens.
-. In the "Token configuration" section, add the following optional claims to the ID Token:
-- email
-- prefered_username
-- family_name
-- given_name
-. In the "Certificates & secrets", generate a new secret and copy it for later use during the Quick Start deployment.
-. In the "Overview" section, go to the "Endpoints" tab and copy the "OpenID Connect metadata document" for later use during the Quick Start deployment.
+[start=5]
+. Choose *Register*.
+. In the *Authentication* section of your application, under *Implicit grant and hybrid flows*, select *ID Token* to enable ID tokens.
+. In the *Token configuration* section, add the following optional claims to the ID token:
+- `email`
+- `prefered_username`
+- `family_name`
+- `given_name`
 
-==== Okta OpenID Connect Application
+. On the *Certificates & secrets* page, generate a new secret and copy it. You'll use it during the Quick Start deployment.
+. On the *Overview* page, choose the *Endpoints* tab.
+. Copy the URL in *OpenID Connect metadata document*. You'll use it during the Quick Start deployment.
 
-Here are the steps to create an Okta OpenID Connect application
+==== Creating an Okta OpenID Connect application
 
-. In the Applications/Applications section, create a new Application.
-. Sign In method is "OIDC"
-. Application type is "Web Application"
-. Name the application "3decision prod"
-. Check the "Client Credentials" grant type
-. Check the "Refresh Token" box
-. Sign-in redirect URI: https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback
-. Choose group assignements to manage who will be able to access the app
-. Hit save
-. Copy the secret
-. Look for the Okta domain in the global header located in the upper-right corner of the dashboard and copy it (eg: example.okta-emea.com)
-. You can choose "default" as your okta server id during the Quick Start deployment.
+. In the Okta Admin Console, under *Applications*, choose *Applications*.
+. Choose *Create app integration*.
+. For *Sign In* method, choose *OIDC - OpenID Connect*.
+. For the application type, choose *Web Application*.
+. Choose *Next*.
+. Name the application `3decision prod`.
+. For *Grant type*, choose *Client Credentials*.
+. Select *Refresh Token*.
+. For *Sign-in redirect URI*, enter the following. Replace `<your domain>` and `<your_top_level_domain>` in the URI shown with your information (for example, `discngine.com`).
 
-3decision will use the scopes `email, profile, openid, offline_access` and the claims `email` and `name` from the ID Token.
++
+`\https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
+
+[start=8]
+. On the *Assignments* tab, under *Assign*, choose *Assign to Groups*. Choose group assignments to manage who will be able to access the application.
+. Choose *Save*.
+. Copy the secret, as you'll use it during the Quick Start deployment.
+. In the upper-right corner of the Okta dashboard, copy the Okta domain in the global header (for example, `example.okta-emea.com`). You'll use it during the Quick Start deployment.
+
+During Quick Start deployment, you can choose `default` as your Okta server ID. 3decision will use the scopes `email`, `profile`, `openid`, and `offline_access` and the claims `email` and `name` from the ID token. For more information, refer to https://help.okta.com/en/prod/Content/Topics/Apps/Apps_App_Integration_Wizard_OIDC.htm[Create OIDC app integrations using AIW].
 
 === VPC Tagging
 
 If you are deploying 3decision in an existing VPC, ensure that the private subnets have the correct tags. For more information, refer to https://aws-quickstart.github.io/quickstart-amazon-eks/#_launch_the_quick_start[Amazon EKS on the AWS Cloud].
 
-
 === FAQ before deployment
 
-*Q*: Will 3decision make http call to internet websites ?
+*Q*: Will 3decision make HTTP calls to internet websites?
 
-*A*: Yes, 3decision synchronizes will public structures made available by the rcsb. The data synchronization uses `rsync` protocol. 
-Domains that are called are:
+*A*: Yes, 3decision synchronizes with public structures made available by the RCSB PDB (Research Collaboratory for Structural Bioinformatics PDB). The data synchronization uses the Rsync protocol. 
 
-  * rsync.ebi.ac.uk on port 873
-  * rsync.wwpdb.org on port 873 and 33444
+3decision calls the following domains:
 
+  * `rsync.ebi.ac.uk` on port 873
+  * `rsync.wwpdb.org` on ports 873 and 33444
 
+*Q*: Why does Azure require additional claims and not Okta?
 
-
-*Q*: Why does Azure require additional claims and not Okta ?
-
-*A*: Default Okta ID Token claims are enough. Azure require extra claims for 3decision to work.
+*A*: For 3decision to work with Azure, the default Okta ID token claims are not enough.
