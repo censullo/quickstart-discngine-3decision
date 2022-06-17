@@ -8,16 +8,17 @@ During deployment, you will be asked to provide information about your authentic
 
 3decision supports OpenID Connect for both Azure and Okta.
 
-==== Azure OpenID Connect Application
+==== Creating an Azure OpenID Connect application
 
-Creating an Azure OpenID Connect application
+. Use Open Connect to connect to your Azure portal (you need permissions to create an App)
+. Under *App registrations*, choose *New registration*.
+. Enter a name for your application (for example, `Discngine 3decision prod`).
+. For *Redirect URL*, enter the following URL. Replace <your domain> and <your_top_level_domain> with your information (for example, `discngine.com`).
 
-. Open Connect to your Azure portal (you need permissions to create an App)
-. Navigate to "App registrations"
-. Click on "New registration"
-. Give your application a name, for eg: "Discngine 3decision prod"
-. Redirect URI: https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback
-Replace <your_domain> with your domain: eg: discngine and replace <your_top_level_domain> with your top level domain, eg: com
++
+`\https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
+
+[start=5]
 . Click Register
 . Then in the Authentication section of your application, scroll down to "Implicit grant and hybrid flows" check the box "ID Token" to enable ID Tokens.
 . In the "Token configuration" section, add the following optional claims to the ID Token:
