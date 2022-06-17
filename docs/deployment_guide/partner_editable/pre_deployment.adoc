@@ -10,7 +10,7 @@ During deployment, you will be asked to provide information about your authentic
 
 ==== Azure OpenID Connect Application
 
-Here are the steps to create an Azure OpenID Connect application
+Creating an Azure OpenID Connect application
 
 . Open Connect to your Azure portal (you need permissions to create an App)
 . Navigate to "App registrations"
