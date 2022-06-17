@@ -58,14 +58,12 @@ If you are deploying 3decision in an existing VPC, ensure that the private subne
 
 *Q*: Will 3decision make HTTP calls to internet websites?
 
-*A*: Yes, 3decision synchronizes with public structures made available by the RCSB. The data synchronization uses the Rsync protocol. 
-Domains that are called are:
+*A*: Yes, 3decision synchronizes with public structures made available by the RCSB PDB (Research Collaboratory for Structural Bioinformatics PDB). The data synchronization uses the Rsync protocol. 
 
-  * rsync.ebi.ac.uk on port 873
-  * rsync.wwpdb.org on port 873 and 33444
+3decision calls the following domains:
 
-
-
+  * `rsync.ebi.ac.uk` on port 873
+  * `rsync.wwpdb.org` on porst 873 and 33444
 
 *Q*: Why does Azure require additional claims and not Okta ?
 
