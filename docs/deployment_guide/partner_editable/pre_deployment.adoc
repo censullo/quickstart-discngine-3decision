@@ -8,8 +8,6 @@ During deployment, you are prompted to provide information about your authentica
 
 ==== Creating an Azure OpenID Connect application
 
-NOTE: You must have permissions in Azure to create an application.
-
 . Sign in to the Azure portal using an account with administrator permissions.
 . Choose *Azure Active Directory*.
 . Under *App registrations*, choose *New registration*.
