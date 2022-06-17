@@ -43,7 +43,7 @@ During deployment, you are prompted to provide information about your authentica
 `\https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
 
 [start=8]
-. Choose group assignements to manage who will be able to access the app.
+. Choose group assignments to manage who will be able to access the app.
 . Choose *Save*.
 . Copy the secret, as you'll use it during the Quick Start deployment.
 . In the upper-right corner of the Okta dashboard, copy the Okta domain in the global header (for example, `example.okta-emea.com`).
@@ -63,7 +63,7 @@ If you are deploying 3decision in an existing VPC, ensure that the private subne
 3decision calls the following domains:
 
   * `rsync.ebi.ac.uk` on port 873
-  * `rsync.wwpdb.org` on porst 873 and 33444
+  * `rsync.wwpdb.org` on ports 873 and 33444
 
 *Q*: Why does Azure require additional claims and not Okta?
 
