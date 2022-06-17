@@ -32,9 +32,11 @@ During deployment, you are prompted to provide information about your authentica
 
 ==== Creating an Okta OpenID Connect application
 
-. In the *Applications/Applications* section, create a new application.
-. For *Sign In* method, choose *OIDC*.
-. For *Application type*, choose *Web Application*.
+. In the Okta Admin Console, under *Applications*, choose *Applications*.
+. Choose *Create app integration*.
+. For *Sign In* method, choose *OIDC - OpenID Connect*.
+. For the application type, choose *Web Application*.
+. Choose *Next*.
 . Name the application `3decision prod`.
 . For grant type, select *Client Credentials*.
 . Select *Refresh Token*.
