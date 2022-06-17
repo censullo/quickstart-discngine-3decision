@@ -12,7 +12,7 @@ During deployment, you are prompted to provide information about your authentica
 . Choose *Azure Active Directory*.
 . Under *App registrations*, choose *New registration*.
 . Enter a name for your application (for example, `Discngine 3decision prod`).
-. For *Redirect URI*, enter the following. Replace <your domain> and <your_top_level_domain> with your information (for example, `discngine.com`).
+. For *Redirect URI*, enter the following. Replace `<your domain>` and `<your_top_level_domain>` in the URI shown with your information (for example, `discngine.com`).
 
 +
 `\https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
@@ -40,7 +40,7 @@ During deployment, you are prompted to provide information about your authentica
 . Name the application `3decision prod`.
 . For *Grant type*, choose *Client Credentials*.
 . Select *Refresh Token*.
-. For *Sign-in redirect URI*, enter the following. Replace <your domain> and <your_top_level_domain> with your information (for example, `discngine.com`).
+. For *Sign-in redirect URI*, enter the following. Replace `<your domain>` and `<your_top_level_domain>` in the URI shown with your information (for example, `discngine.com`).
 
 +
 `\https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
