@@ -70,4 +70,4 @@ If you are deploying 3decision in an existing VPC, ensure that the private subne
 
 *Q*: Why does Azure require additional claims and not Okta?
 
-*A*: For 3decision to work with Azure, the default Okta ID token claims are not enough.
+*A*: Azure requires additional claims for 3decision to work with Azure. The default Okta ID token claims are not enough.
