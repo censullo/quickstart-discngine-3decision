@@ -27,9 +27,9 @@ During deployment, you will be asked to provide information about your authentic
 - `family_name`
 - `given_name`
 
-. In the *Certificates & secrets* section, generate a new secret and copy it. You'll need it during Quick Start deployment.
+. In the *Certificates & secrets* section, generate a new secret and copy it. You'll need it during the Quick Start deployment.
 . In the *Overview* section, choose the *Endpoints* tab.
-. Copy the *OpenID Connect metadata document* for later use during the Quick Start deployment.
+. Copy the URL in *OpenID Connect metadata document* for later use during the Quick Start deployment.
 
 ==== Okta OpenID Connect Application
 
