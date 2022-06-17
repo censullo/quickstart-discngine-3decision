@@ -33,7 +33,7 @@ During deployment, you will be asked to provide information about your authentic
 
 ==== Creating an Okta OpenID Connect application
 
-. In the *Applications/Applications* section, create a new Application.
+. In the *Applications/Applications* section, create a new application.
 . For *Sign In* method, choose *OIDC*.
 . For *Application type*, choose *Web Application*.
 . Name the application `3decision prod`.
@@ -42,13 +42,13 @@ During deployment, you will be asked to provide information about your authentic
 . For *Sign-in redirect URI*, enter the following. Replace <your domain> and <your_top_level_domain> with your information (for example, `discngine.com`).
 
 +
-`https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
+`\https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
 
 [start=8]
-. Choose group assignements to manage who will be able to access the app
-. Hit save
-. Copy the secret
-. Look for the Okta domain in the global header located in the upper-right corner of the dashboard and copy it (eg: example.okta-emea.com)
+. Choose group assignements to manage who will be able to access the app.
+. Choose *Save*.
+. Copy the secret, as you'll use it during the Quick Start deployment.
+. In the upper-right corner of the Okta dashboard, copy the Okta domain in the global header (for example, `example.okta-emea.com`).
 . You can choose "default" as your okta server id during the Quick Start deployment.
 
 3decision will use the scopes `email, profile, openid, offline_access` and the claims `email` and `name` from the ID Token.
