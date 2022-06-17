@@ -8,10 +8,13 @@ During deployment, you are prompted to provide information about your authentica
 
 ==== Creating an Azure OpenID Connect application
 
-. Use Open Connect to connect to your Azure portal (you need permissions to create an App)
+NOTE: You must have permissions in Azure to create an application.
+
+. Sign in to the Azure portal using an account with administrator permissions.
+. Choose *Azure Active Directory*.
 . Under *App registrations*, choose *New registration*.
 . Enter a name for your application (for example, `Discngine 3decision prod`).
-. For *Redirect URL*, enter the following URL. Replace <your domain> and <your_top_level_domain> with your information (for example, `discngine.com`).
+. For *Redirect URI*, enter the following. Replace <your domain> and <your_top_level_domain> with your information (for example, `discngine.com`).
 
 +
 `\https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
