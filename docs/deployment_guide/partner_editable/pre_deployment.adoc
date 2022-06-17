@@ -19,15 +19,17 @@ During deployment, you will be asked to provide information about your authentic
 `\https://api.3decision.<you_domain>.<your_top_level_domain>/auth/azure/callback`
 
 [start=5]
-. Click Register
-. Then in the Authentication section of your application, scroll down to "Implicit grant and hybrid flows" check the box "ID Token" to enable ID Tokens.
-. In the "Token configuration" section, add the following optional claims to the ID Token:
-- email
-- prefered_username
-- family_name
-- given_name
-. In the "Certificates & secrets", generate a new secret and copy it for later use during the Quick Start deployment.
-. In the "Overview" section, go to the "Endpoints" tab and copy the "OpenID Connect metadata document" for later use during the Quick Start deployment.
+. Choose *Register*.
+. In the *Authentication* section of your application, under *Implicit grant and hybrid flows*, select *ID Token* to enable ID tokens.
+. In the *Token configuration* section, add the following optional claims to the ID token:
+- `email`
+- `prefered_username`
+- `family_name`
+- `given_name`
+
+. In the *Certificates & secrets* section, generate a new secret and copy it. You'll need it during Quick Start deployment.
+. In the *Overview* section, choose the *Endpoints* tab.
+. Copy the *OpenID Connect metadata document* for later use during the Quick Start deployment.
 
 ==== Okta OpenID Connect Application
 
