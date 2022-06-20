@@ -33,7 +33,7 @@ If you did not provide a Route 53 hosted zone ID during the Quick Start installa
 
 . 3decision user URI: `3decision.<your domain>`.
 
-. 3decision API URI: `api.3decision.<your domain>`.
+. 3decision API URI: `3decision-api.<your domain>`.
 
 . 3decision help URI: `3decision-help.<your domain>`.
 
