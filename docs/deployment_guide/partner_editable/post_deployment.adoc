@@ -29,7 +29,7 @@ If you did not provide an SSL certificate during the Quick Start deployment, edi
 
 === (Optional) Create a CNAME record in your DNS provider
 
-If you did not provide a Route 53 hosted zone ID during the Quick Start installation, you must create the following two DNS records.
+If you did not provide a Route 53 hosted zone ID during the Quick Start installation, you must create the following three DNS records.
 
 . 3decision user URI: `3decision.<your domain>`.
 
