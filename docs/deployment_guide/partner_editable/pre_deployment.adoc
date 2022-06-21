@@ -71,7 +71,7 @@ The value of the tags should remain empty.
 The RDS Database created during the deployment is based on a snapshot.
 In order to make this snapshot public, the snapshot is not encrypted.
 
-If however you would like for your database to be encrypted you will have to copy this snapshot into your AWS subscription first.
+If you would like your database to be encrypted you will have to copy this snapshot into your AWS account first.
 
 This can be done by going to the public tab in the RDS snapshot sections, and searching for **db3dec<version>** and grabbing the latest version.
 
