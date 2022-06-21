@@ -77,7 +77,7 @@ This can be done by going to the public tab in the RDS snapshot sections, and se
 
 You can then select it, choose copy in actions, and select the encrypt option.
 
-You will then be able to enter the arn of your copied snapshot in the cloudformation parameters. If field is left blank, the unencrypted latest snapshot will be used.
+You will then be able to enter the ARN of your copied snapshot in the CloudFormation parameters. If field is left blank, the unencrypted latest snapshot will be used.
 
 === FAQ before deployment
 
