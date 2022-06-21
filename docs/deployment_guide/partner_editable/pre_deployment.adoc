@@ -30,6 +30,11 @@ During deployment, you are prompted to provide information about your authentica
 . On the *Overview* page, choose the *Endpoints* tab.
 . Copy the URL in *OpenID Connect metadata document*. You'll use it during the Quick Start deployment.
 
+. In the Azure portal, navigate to *Enterprise Applications*
+. Choose your 3decision application and open it
+. Navigate to *Properties* 
+. Set * Assignment required?* to Yes if you want to filter out users that are not a member of this application.
+
 ==== Creating an Okta OpenID Connect application
 
 . In the Okta Admin Console, under *Applications*, choose *Applications*.
