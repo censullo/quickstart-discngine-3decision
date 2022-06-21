@@ -842,6 +842,7 @@ p.footer-text a{color:#d7d8d8}
 <ul class="sectlevel2">
 <li><a href="#_authentication">Authentication</a></li>
 <li><a href="#_vpc_tagging">VPC Tagging</a></li>
+<li><a href="#_encrypting_the_database">Encrypting the Database</a></li>
 <li><a href="#_faq_before_deployment">FAQ before deployment</a></li>
 </ul>
 </li>
@@ -1029,7 +1030,7 @@ AWS Cloud.</p>
 <li>
 <p>For <strong>Redirect URI</strong>, enter the following. Replace <code>&lt;your domain&gt;</code> and <code>&lt;your_top_level_domain&gt;</code> in the URI shown with your information (for example, <code>discngine.com</code>).</p>
 <div class="paragraph">
-<p><code>https://api.3decision.&lt;you_domain&gt;.&lt;your_top_level_domain&gt;/auth/azure/callback</code></p>
+<p><code>https://3decision-api.&lt;you_domain&gt;.&lt;your_top_level_domain&gt;/auth/azure/callback</code></p>
 </div>
 </li>
 </ol>
@@ -1070,6 +1071,18 @@ AWS Cloud.</p>
 <li>
 <p>Copy the URL in <strong>OpenID Connect metadata document</strong>. You&#8217;ll use it during the Quick Start deployment.</p>
 </li>
+<li>
+<p>In the Azure portal, navigate to <strong>Enterprise Applications</strong></p>
+</li>
+<li>
+<p>Choose your 3decision application and open it</p>
+</li>
+<li>
+<p>Navigate to <strong>Properties</strong></p>
+</li>
+<li>
+<p>Set * Assignment required?* to Yes if you want to filter out users that are not a member of this application.</p>
+</li>
 </ol>
 </div>
 </div>
@@ -1104,7 +1117,7 @@ AWS Cloud.</p>
 <li>
 <p>For <strong>Sign-in redirect URI</strong>, enter the following. Replace <code>&lt;your domain&gt;</code> and <code>&lt;your_top_level_domain&gt;</code> in the URI shown with your information (for example, <code>discngine.com</code>).</p>
 <div class="paragraph">
-<p><code>https://api.3decision.&lt;you_domain&gt;.&lt;your_top_level_domain&gt;/auth/azure/callback</code></p>
+<p><code>https://3decision-api.&lt;you_domain&gt;.&lt;your_top_level_domain&gt;/auth/azure/callback</code></p>
 </div>
 </li>
 </ol>
@@ -1133,7 +1146,32 @@ AWS Cloud.</p>
 <div class="sect2">
 <h3 id="_vpc_tagging">VPC Tagging</h3>
 <div class="paragraph">
-<p>If you are deploying 3decision in an existing VPC, ensure that the private subnets have the correct tags. For more information, refer to <a href="https://aws-quickstart.github.io/quickstart-amazon-eks/#_launch_the_quick_start">Amazon EKS on the AWS Cloud</a>.</p>
+<p>If you are deploying 3decision in an existing VPC, ensure that the private subnets have the correct tags.</p>
+</div>
+<div class="paragraph">
+<p>The tag <strong>kubernetes.io/role/elb</strong> needs to be added on each public subnet and the tag <strong>kubernetes.io/role/internal-elb</strong> on each private subnet.</p>
+</div>
+<div class="paragraph">
+<p>The value of the tags should remain empty.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_encrypting_the_database">Encrypting the Database</h3>
+<div class="paragraph">
+<p>The RDS Database created during the deployment is based on a snapshot.
+In order to make this snapshot public, the snapshot is not encrypted.</p>
+</div>
+<div class="paragraph">
+<p>If you would like your database to be encrypted you will have to copy this snapshot into your AWS account first.</p>
+</div>
+<div class="paragraph">
+<p>This can be done by going to the public tab in the RDS snapshot sections, and searching for <strong>db3dec&lt;version&gt;</strong> and grabbing the latest version.</p>
+</div>
+<div class="paragraph">
+<p>You can then select it, choose copy in actions, and select the encrypt option.</p>
+</div>
+<div class="paragraph">
+<p>You will then be able to enter the ARN of your copied snapshot in the CloudFormation parameters. If field is left blank, the unencrypted latest snapshot will be used.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1255,7 +1293,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <div class="sect2">
 <h3 id="_optional_create_a_cname_record_in_your_dns_provider">(Optional) Create a CNAME record in your DNS provider</h3>
 <div class="paragraph">
-<p>If you did not provide a Route 53 hosted zone ID during the Quick Start installation, you must create the following two DNS records.</p>
+<p>If you did not provide a Route 53 hosted zone ID during the Quick Start installation, you must create the following three DNS records.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -1263,7 +1301,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <p>3decision user URI: <code>3decision.&lt;your domain&gt;</code>.</p>
 </li>
 <li>
-<p>3decision API URI: <code>api.3decision.&lt;your domain&gt;</code>.</p>
+<p>3decision API URI: <code>3decision-api.&lt;your domain&gt;</code>.</p>
 </li>
 <li>
 <p>3decision help URI: <code>3decision-help.&lt;your domain&gt;</code>.</p>
@@ -1354,7 +1392,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </html>
 <!--
 repo commit:
-c8d15fb563bb3980b6e0b598ad10abfbc66c4606
+3c0260ef623a111ce4f210fa8ba4d1697a0eecf0
 
 submodule config:
  340aace2c14aabf8fd66ee1f49f44a017d8ddfb0 docs/boilerplate (340aace)
