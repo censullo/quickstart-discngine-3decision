@@ -326,6 +326,10 @@ Rules:
             - !Ref AWS::Region
         AssertDescription: The Quick Start is supported only in us-east-1 and eu-central-1 AWS Regions. Please contact Discngine to request support for other Regions.
 
+Mappings:
+  Config:
+    Prefix: { Value: 'eks-quickstart' }
+
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   ConfigureEKS: !Equals ['true', !Ref ConfigureEKS]
@@ -381,9 +385,15 @@ Resources:
         NodeSecurityGroupId: !Ref NodeSecurityGroup
         DBMultiZone: !Ref DBMultiZone
         DBSnapshotIdentifier: !If [UseDBSnapshotIdentifier, !Ref DBSnapshotIdentifier, !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:db3dec2022-1"]
+  EKSServiceCidr:
+    Type: Custom::CliQuery
+    Properties:
+      ServiceToken: !Sub ['arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Prefix}-ResourceReader', {Prefix: !FindInMap [Config, Prefix, Value]}]
+      AwsCliCommand: !Sub "eks describe-cluster --name ${EKSClusterName} --query 'cluster.kubernetesNetworkConfig.{serviceIpv4Cidr: serviceIpv4Cidr}'"
+      IdField: 'serviceIpv4Cidr'
   3decisionKubeStack:
     Type: AWS::CloudFormation::Stack
-    DependsOn: JWTStack
+    DependsOn: [ JWTStack, EKSServiceCidr ]
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-kube.template.yaml'
@@ -415,6 +425,7 @@ Resources:
         MainSubdomain: !Ref MainSubdomain
         ApiSubdomain: !Ref ApiSubdomain
         HelpSubdomain: !Ref HelpSubdomain
+        EKSServiceCidr: !Ref EKSServiceCidr
   3decisionDNSStack:
     Type: AWS::CloudFormation::Stack
     Condition: ConfigureDNS

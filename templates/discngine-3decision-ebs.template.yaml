@@ -14,13 +14,14 @@ Mappings:
 Resources:
   DataPub:
     Type: "AWS::EC2::Volume"
+    DeletionPolicy: Retain
     Properties:
       AvailabilityZone: !Select 
         - 0
         - !GetAZs 
           Ref: 'AWS::Region'
       SnapshotId: !FindInMap [RegionMap, !Ref "AWS::Region", DataPub]
-      Encrypted: false
+      Encrypted: true
 Outputs:
   DataPubVolumeID:
     Description: ID of the collection volume
