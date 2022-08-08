@@ -338,7 +338,7 @@ Resources:
             image: fra.ocir.io/discngine1/3decision_kube/sqlcl
             envFrom:
             - secretRef:
-              name: database-secrets
+                name: database-secrets
             command: ["/bin/bash", "-c"]
             args:
             - sleep 5m;
@@ -349,8 +349,7 @@ Resources:
               CREATE INDEX IDX_CHOR_TAUISO_SMS ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_ISOMER_IDXTYPE;\n
               CREATE INDEX IDX_CHOR_STRISO_SMS ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.STRICT_ISOMER_IDXTYPE;\n' > pd_t1_index.sql;
               exit | /root/sqlcl/bin/sql PD_T1_DNG_THREEDECISION/${!DB_PASSWD}@${DBConnectionString} @pd_t1_index.sql;
-              ret=$?;
-              if [ $ret -ne 0 ]; then
+              if [ $? -ne 0 ]; then
                 echo -ne '
                 DROP INDEX IDX_CHOR_STR_SMALL_MOL_SMILES;\n
                 DROP INDEX IDX_CHOR_TAU_SMALL_MOL_SMILES;\n
@@ -366,8 +365,7 @@ Resources:
               CREATE INDEX IDX_CHOR_TAUISO_CMP_STRUC ON COMPOUND_STRUCTURES(CANONICAL_SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_ISOMER_IDXTYPE;\n
               CREATE INDEX IDX_CHOR_STRICT_CMP_STRUC ON COMPOUND_STRUCTURES(CANONICAL_SMILES) INDEXTYPE IS CHORAL_OWNER.STRICT_ISOMER_IDXTYPE;\n' > chembl_29_index.sql;
               exit | /root/sqlcl/bin/sql CHEMBL_29/${!CHEMBL_DB_PASSWD}@${DBConnectionString} @chembl_29_index.sql;
-              ret=$?;
-              if [ $ret -ne 0 ]; then
+              if [ $? -ne 0 ]; then
                 echo -ne '
                 DROP INDEX IDX_CHOR_STR_CMP_STRUC;\n
                 DROP INDEX IDX_CHOR_TAU_CMP_STRUC;\n
