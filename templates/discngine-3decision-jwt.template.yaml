@@ -66,7 +66,6 @@ Resources:
         S3Key: !Sub '${QSS3KeyPrefix}functions/packages/createKey/lambda.zip'
   InvokeCreateKey:
     Type: Custom::CreateKey
-    DeletionPolicy: Retain
     DependsOn: CreateKey
     Properties:
       ServiceToken: !Sub ['arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:3dec-CreateKey-${id}', {id: !Select [2, !Split ['/', !Ref AWS::StackId]]}]
