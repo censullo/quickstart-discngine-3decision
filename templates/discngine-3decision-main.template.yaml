@@ -53,7 +53,6 @@ Metadata:
           - DBSnapshotIdentifier
           - DBInstanceIdentifier
           - DBName
-          - DBPassword
           - DBInstanceClass
           - DBMultiZone
       - Label:
@@ -130,8 +129,6 @@ Metadata:
         default: Identifier of the database
       DBName:
         default: Name of the database
-      DBPassword:
-        default: Password of the database
       DBInstanceClass:
         default: Instance type of the database
       DBMultiZone:
@@ -274,7 +271,7 @@ Parameters:
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
       letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
       (-).
-    Default: aws-quickstart
+    Default: 3decision-eu-central-1
     Description: S3 bucket name for the Quick Start assets. This string can include
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
@@ -351,15 +348,8 @@ Parameters:
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-  DBPassword:
-    NoEcho: true
-    Description: "Required: The database admin account password."
-    Type: String
-    MinLength: '8'
-    MaxLength: '30'
   DBInstanceClass:
     AllowedValues:
-      - db.t3.small
       - db.t3.medium
       - db.t3.large
       - db.t3.xlarge
@@ -502,6 +492,8 @@ Conditions:
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL:
         Fn::Sub:
@@ -528,6 +520,8 @@ Resources:
         PublicSubnetTag2: "kubernetes.io/role/elb="
   3decisionEKSStack:
     Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-existing-vpc.template.yaml'
@@ -546,7 +540,6 @@ Resources:
         PrivateSubnet3ID: !GetAtt VPCStack.Outputs.PrivateSubnet3AID
         DBInstanceIdentifier: !Ref DBInstanceIdentifier
         DBName: !Ref DBName
-        DBPassword: !Ref DBPassword
         DBInstanceClass: !Ref DBInstanceClass
         DBMultiZone: !Ref DBMultiZone
         TNamespace: !Ref TNamespace

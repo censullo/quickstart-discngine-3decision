@@ -65,8 +65,6 @@ Mappings:
       Family: oracle-se2-cdb-19
       License: license-included
       Option: default:oracle-se2-cdb-19
-Conditions:
-  AddSecurityRule: !Not [ !Equals [ '', !Ref NodeSecurityGroupId ] ]
 Resources:
   EncryptionKey:
     Metadata:
@@ -77,6 +75,7 @@ Resources:
           ignore_reasons:
             EIAMPolicyActionWildcard: The first statement is the default key policy allowing administrators to administer the CMK. See https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html#key-policy-default-allow-root-enable-iam.
     UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
     Type: AWS::KMS::Key
     Properties:
       EnableKeyRotation: true
@@ -125,7 +124,6 @@ Resources:
       SubnetIds: !Ref DBSubnets
   DBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
-    Condition: AddSecurityRule
     Properties:
       GroupDescription: "Opens incoming requests on Oracle RDS port 1521"
       VpcId: !Ref VpcId
@@ -136,7 +134,6 @@ Resources:
         ToPort: 1521
   AddDBToSecurityEKS:
     Type: AWS::EC2::SecurityGroupIngress
-    Condition: AddSecurityRule
     Properties:
       IpProtocol: "-1"
       SourceSecurityGroupId: !GetAtt DBSecurityGroup.GroupId
@@ -175,6 +172,9 @@ Resources:
         - Key: Name
           Value: "DBParamGroup"
 Outputs:
+  DbInstanceName:
+    Description: Identifier of the db instance
+    Value: !Ref PrimaryDBInstance
   PrimaryEndpointAddress:
     Description: Endpoint address for the primary database
     Value: !GetAtt 'PrimaryDBInstance.Endpoint.Address'
@@ -209,3 +209,6 @@ Outputs:
   PrimaryDBName:
     Description: JDBC Service Name for the primary database
     Value: !Ref DBName
+  DBSecurityGroup:
+    Description: DB Security Group id
+    Value: !Ref DBSecurityGroup

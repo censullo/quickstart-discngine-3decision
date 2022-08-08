@@ -53,7 +53,6 @@ Metadata:
           - DBSnapshotIdentifier
           - DBInstanceIdentifier
           - DBName
-          - DBPassword
           - DBInstanceClass
           - DBMultiZone
       - Label:
@@ -130,8 +129,6 @@ Metadata:
         default: Identifier of the database
       DBName:
         default: Name of the database
-      DBPassword:
-        default: Password of the database
       DBInstanceClass:
         default: Instance type of the database
       DBMultiZone:
@@ -256,7 +253,7 @@ Parameters:
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
       letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
       (-).
-    Default: aws-quickstart
+    Default: 3decision-eu-central-1
     Description: S3 bucket name for the Quick Start assets. This string can include
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
@@ -333,16 +330,8 @@ Parameters:
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-  DBPassword:
-    NoEcho: true
-    Description: "Required: The database admin account password."
-    Type: String
-    MinLength: '8'
-    MaxLength: '30'
   DBInstanceClass:
     AllowedValues:
-      - db.t3.micro
-      - db.t3.small
       - db.t3.medium
       - db.t3.large
       - db.t3.xlarge
@@ -490,6 +479,8 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateAdvancedConfigWithDefaults
     Metadata: { cfn-lint: { config: { ignore_checks: [E9902, W9901] } } }
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-advanced-configuration.template.yaml'
@@ -504,6 +495,8 @@ Resources:
         CustomAmiId: !Ref CustomAmiId
   EKSStack:
     Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml'
@@ -535,6 +528,8 @@ Resources:
         ProvisionBastionHost: !Ref ProvisionBastionHost
   3decisionStack:
     Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision.template.yaml'
@@ -548,7 +543,6 @@ Resources:
         EKSClusterName: !GetAtt EKSStack.Outputs.EKSClusterName
         DBInstanceIdentifier: !Ref DBInstanceIdentifier
         DBName: !Ref DBName
-        DBPassword: !Ref DBPassword
         DBInstanceClass: !Ref DBInstanceClass
         DBMultiZone: !Ref DBMultiZone
         DBSubnets: !Join [ ",", [ !Ref PrivateSubnet1ID, !Ref PrivateSubnet2ID, !Ref PrivateSubnet3ID ] ]
