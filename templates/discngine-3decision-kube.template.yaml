@@ -162,7 +162,7 @@ Resources:
       Name: reloader
       Namespace: reloader
       Repository: https://stakater.github.io/stakater-charts
-      Chart: stakater/reloader
+      Chart: reloader
   JWTSecret:
     Type: "AWSQS::Kubernetes::Resource"
     DependsOn: TDecisionNamespace
@@ -220,7 +220,7 @@ Resources:
         apiVersion: external-secrets.io/v1beta1
         kind: ClusterSecretStore
         metadata:
-          name: secretstore-sample
+          name: aws-secret-store
         spec:
           provider:
             aws:
@@ -240,7 +240,7 @@ Resources:
         apiVersion: external-secrets.io/v1beta1
         kind: ClusterExternalSecret
         metadata:
-          name: example
+          name: database-secrets
         spec:
           externalSecretName: database-secrets
           namespaceSelector:
@@ -250,7 +250,7 @@ Resources:
           externalSecretSpec:
             refreshInterval: 1m
             secretStoreRef:
-              name: secretstore-sample
+              name: aws-secret-store
               kind: ClusterSecretStore
             target:
               name: database-secrets
