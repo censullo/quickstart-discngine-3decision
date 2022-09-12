@@ -2,6 +2,10 @@
 
 == Predeployment steps
 
+=== Administrator Privileges
+
+This Quickstart deploys many resources, including IAM roles and an IAM user for automated access to a limited number of resources (a number of secrets and an s3 bucket created by the quickstart). The rights on these roles and users are limited, but the person deploying the quickstart needs to have an administrator account capable of deploying these resources.
+
 === Authentication
 
 During deployment, you are prompted to provide information about your authentication provider. 3decision supports OpenID Connect for both Azure and Okta.
