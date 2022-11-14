@@ -29,6 +29,7 @@ Resources:
         - functions/packages/createKey/lambda.zip
   CreateKeyRole:
     Type: AWS::IAM::Role
+    Metadata: { cfn-lint: { config: { ignore_checks: [ EIAMPolicyWildcardResource ] } } }
     Properties:
       RoleName: !Sub ['3dec-CreateKeyProfile-${id}', {id: !Select [2, !Split ['/', !Ref AWS::StackId]]}]
       AssumeRolePolicyDocument:
