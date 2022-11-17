@@ -32,7 +32,6 @@ Metadata:
           - DBSnapshotIdentifier
           - DBInstanceIdentifier
           - DBName
-          - DBPassword
           - DBSubnets
           - DBInstanceClass
           - DBMultiZone
@@ -76,8 +75,6 @@ Metadata:
         default: Identifier of the database
       DBName:
         default: Name of the database
-      DBPassword:
-        default: Password of the database
       DBSubnets:
         default: Subnets in the db subnet group
       DBInstanceClass:
@@ -178,20 +175,12 @@ Parameters:
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-  DBPassword:
-    NoEcho: true
-    Description: "Required: The database admin account password."
-    Type: String
-    MinLength: '8'
-    MaxLength: '30'
   DBSubnets:
     Description: 'Required: Subnets to use for the creation of the db subnet group.
                   These need to be the same subnets as the ones containing your eks nodes'
     Type: CommaDelimitedList
   DBInstanceClass:
     AllowedValues:
-      - db.t3.micro
-      - db.t3.small
       - db.t3.medium
       - db.t3.large
       - db.t3.xlarge
@@ -200,7 +189,7 @@ Parameters:
       - db.m5.xlarge
       - db.m5.2xlarge
       - db.m5.4xlarge
-    Default: db.t3.medium
+    Default: db.t3.xlarge
     Description: Amazon RDS instance type for the Oracle Database instance.
                  We recommend t3.xlarge for production use as a lower shape will be rather slow.
     Type: String
@@ -227,7 +216,6 @@ Parameters:
     AllowedValues: ['true', 'false']
   NodeSecurityGroup:
     Description: "Optionnal: Id of the EKS SecurityGroup in which we will add the RDS ingress"
-    Default: ''
     Type: String
   HostedZoneId:
     Default: ""
@@ -326,6 +314,10 @@ Rules:
             - !Ref AWS::Region
         AssertDescription: The Quick Start is supported only in us-east-1 and eu-central-1 AWS Regions. Please contact Discngine to request support for other Regions.
 
+Mappings:
+  Config:
+    Prefix: { Value: 'eks-quickstart' }
+
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   ConfigureEKS: !Equals ['true', !Ref ConfigureEKS]
@@ -336,6 +328,8 @@ Resources:
   EKSCluster:
     Type: AWS::CloudFormation::Stack
     Condition: ConfigureEKS
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-cluster.template.yaml'
@@ -349,6 +343,8 @@ Resources:
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
   JWTStack:
     Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-jwt.template.yaml'
@@ -360,6 +356,8 @@ Resources:
         SecretName: !Ref JWTSecretName
   EBSStack:
     Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-ebs.template.yaml'
@@ -367,6 +365,8 @@ Resources:
           S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
   RDSStack:
     Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-oracle.template.yaml'
@@ -381,9 +381,35 @@ Resources:
         NodeSecurityGroupId: !Ref NodeSecurityGroup
         DBMultiZone: !Ref DBMultiZone
         DBSnapshotIdentifier: !If [UseDBSnapshotIdentifier, !Ref DBSnapshotIdentifier, !Sub "arn:aws:rds:${AWS::Region}:751149478800:snapshot:db3dec2022-1"]
+  EKSServiceCidr:
+    Type: Custom::CliQuery
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      ServiceToken: !Sub ['arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Prefix}-ResourceReader', {Prefix: !FindInMap [Config, Prefix, Value]}]
+      AwsCliCommand: !Sub "eks describe-cluster --name ${EKSClusterName} --query 'cluster.kubernetesNetworkConfig.{serviceIpv4Cidr: serviceIpv4Cidr}'"
+      IdField: 'serviceIpv4Cidr'
+  3decisionSecretStack:
+    Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      TemplateURL: !Sub
+        - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-secret.template.yaml'
+        - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+          S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        Subnets: !Join
+          - ','
+          - !Ref DBSubnets
+        DatabaseName: !GetAtt RDSStack.Outputs.DbInstanceName
+        VpcId: !Ref VPCID
+        DBSecurityGroup: !GetAtt RDSStack.Outputs.DBSecurityGroup
   3decisionKubeStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: JWTStack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-kube.template.yaml'
@@ -396,7 +422,6 @@ Resources:
         EKSClusterName: !Ref EKSClusterName
         DataPubVolumeID: !GetAtt EBSStack.Outputs.DataPubVolumeID
         DBConnectionString: !GetAtt RDSStack.Outputs.PrimaryConnectionString
-        DBPassword: !Ref DBPassword
         DomainName: !Ref DomainName
         CertificateArn: !Ref CertificateArn
         HostString: !GetAtt RDSStack.Outputs.PrimaryHostString
@@ -415,10 +440,15 @@ Resources:
         MainSubdomain: !Ref MainSubdomain
         ApiSubdomain: !Ref ApiSubdomain
         HelpSubdomain: !Ref HelpSubdomain
+        EKSServiceCidr: !Ref EKSServiceCidr
+        AccessKey: !GetAtt 3decisionSecretStack.Outputs.AccessKey
+        SecretAccessKey: !GetAtt 3decisionSecretStack.Outputs.SecretAccessKey
   3decisionDNSStack:
     Type: AWS::CloudFormation::Stack
     Condition: ConfigureDNS
     DependsOn: 3decisionKubeStack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-dns.template.yaml'

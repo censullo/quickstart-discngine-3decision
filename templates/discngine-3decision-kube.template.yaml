@@ -17,9 +17,6 @@ Parameters:
     Type: String
   EKSClusterName:
     Type: String
-  DBPassword:
-    Type: String
-    NoEcho: true
   DBConnectionString:
     Type: String
   DataPubVolumeID:
@@ -60,11 +57,18 @@ Parameters:
     Type: String
   LoadBalancerClass:
     Type: String
+  EKSServiceCidr:
+    Type: String
+  SecretAccessKey:
+    Type: String
+  AccessKey:
+    Type: String
 
 Conditions:
   AzureUnused: !Equals [!Ref AzureClientId, ""]
   OktaUnused: !Equals [!Ref OktaClientId, ""]
   NginxLB: !Equals [!Ref LoadBalancerClass, "nginx"]
+  ServiceCidrSecondary: !Equals [!Ref EKSServiceCidr, "10.100.0.0/16"]
 
 Resources:
   EncryptedStorageClass:
@@ -72,7 +76,7 @@ Resources:
     Properties:
       ClusterName: !Ref EKSClusterName
       Namespace: 'default'
-      Manifest: !Sub |
+      Manifest: |
         apiVersion: storage.k8s.io/v1
         kind: StorageClass
         metadata:
@@ -86,6 +90,7 @@ Resources:
         volumeBindingMode: WaitForFirstConsumer
   TDecisionNamespace:
     Type: "AWSQS::Kubernetes::Resource"
+    UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Properties:
       ClusterName: !Ref EKSClusterName
@@ -95,6 +100,18 @@ Resources:
         apiVersion: v1
         metadata:
           name: ${TNamespace}
+  ChoralNamespace:
+    Type: "AWSQS::Kubernetes::Resource"
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      ClusterName: !Ref EKSClusterName
+      Namespace: 'kube-system'
+      Manifest: |
+        kind: Namespace
+        apiVersion: v1
+        metadata:
+          name: choral
   CertManager:
     Type: "AWSQS::Kubernetes::Helm"
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
@@ -128,6 +145,24 @@ Resources:
       Chart: oci://fra.ocir.io/discngine1/3decision_kube/redis-sentinel:16.3.1
       Values:
         global.storageClass: gp2-encrypted
+  ExternalSecretsOperator:
+    Type: "AWSQS::Kubernetes::Helm"
+    Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
+    Properties:
+      ClusterID: !Ref EKSClusterName
+      Name: external-secrets
+      Namespace: external-secrets
+      Repository: https://charts.external-secrets.io
+      Chart: external-secrets
+  Reloader:
+    Type: "AWSQS::Kubernetes::Helm"
+    Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
+    Properties:
+      ClusterID: !Ref EKSClusterName
+      Name: reloader
+      Namespace: reloader
+      Repository: https://stakater.github.io/stakater-charts
+      Chart: reloader
   JWTSecret:
     Type: "AWSQS::Kubernetes::Resource"
     DependsOn: TDecisionNamespace
@@ -144,53 +179,117 @@ Resources:
         data:
           id_rsa: ${JWTPrivateKey}
           id_rsa.pub: ${JWTPublicKey}
-  ChangeDBPass:
+  NestAuthSecret:
     Type: "AWSQS::Kubernetes::Resource"
     DependsOn: TDecisionNamespace
     Properties:
       ClusterName: !Ref EKSClusterName
       Namespace: !Ref TNamespace
       Manifest: !Sub |
-        kind: Pod
+        kind: Secret
         apiVersion: v1
+        type: opaque
         metadata:
-          name: db-pass-change
+          name: nest-authentication-secrets
+          namespace: ${TNamespace}
+        stringData:
+          AZURE_TENANT: "${AzureTenant}"
+          AZURE_SECRET: "${AzureSecret}"
+          OKTA_DOMAIN: "${OktaDomain}"
+          OKTA_SERVER_ID: "${OktaServerId}"
+          OKTA_SECRET: "${OktaSecret}"
+  DatabaseSecrets:
+    Type: "AWSQS::Kubernetes::Resource"
+    DependsOn: [ TDecisionNamespace, ChoralNamespace, ExternalSecretsOperator ]
+    Properties:
+      ClusterName: !Ref EKSClusterName
+      Namespace: external-secrets
+      Manifest: !Sub |
+        ---
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: eso-secret
+          labels: 
+            type: aws
+        type: Opaque
+        stringData:
+          access-key: ${AccessKey}
+          secret-access-key: ${SecretAccessKey}
+        ---
+        apiVersion: external-secrets.io/v1beta1
+        kind: ClusterSecretStore
+        metadata:
+          name: aws-secret-store
         spec:
-          restartPolicy: OnFailure
-          containers:
-          - name: db-pass-change
-            image: fra.ocir.io/discngine1/3decision_kube/sqlcl
-            command: ["/bin/bash", "-c"]
-            args:
-            - echo -ne '
-              alter user ADMIN identified by "${DBPassword}";
-              alter user PD_T1_DNG_THREEDECISION identified by "${DBPassword}" ACCOUNT UNLOCK;
-              alter user PD_T1_DNG_CORE identified by "${DBPassword}" ACCOUNT UNLOCK;
-              alter user CHEMBL_29 identified by "${DBPassword}" ACCOUNT UNLOCK;' > changepwd.sql;
-              /root/sqlcl/bin/sql admin/Ch4ng3m3f0rs3cur3p4ss@${DBConnectionString} @changepwd.sql
-            resources:
-              limits:
-                cpu: 500m
-                memory: 500Mi
-              requests:
-                cpu: 150m
-                memory: 250Mi
+          provider:
+            aws:
+              service: SecretsManager
+              region: ${AWS::Region}
+              auth:
+                secretRef:
+                  accessKeyIDSecretRef:
+                    name: eso-secret
+                    key: access-key
+                    namespace: external-secrets
+                  secretAccessKeySecretRef:
+                    name: eso-secret
+                    key: secret-access-key
+                    namespace: external-secrets
+        ---
+        apiVersion: external-secrets.io/v1beta1
+        kind: ClusterExternalSecret
+        metadata:
+          name: database-secrets
+        spec:
+          externalSecretName: database-secrets
+          namespaceSelector:
+            matchExpressions:
+              - {key: kubernetes.io/metadata.name, operator: In, values: [${TNamespace}, choral]}
+          refreshTime: 1m
+          externalSecretSpec:
+            refreshInterval: 1m
+            secretStoreRef:
+              name: aws-secret-store
+              kind: ClusterSecretStore
+            target:
+              name: database-secrets
+              creationPolicy: Owner
+            data:
+            - secretKey: SYS_DB_PASSWD
+              remoteRef:
+                key: 3dec-admin-db
+                property: password
+            - secretKey: DB_PASSWD
+              remoteRef:
+                key: 3dec-user-db
+                property: password
+            - secretKey: ORACLE_PASSWORD
+              remoteRef:
+                key: 3dec-user-db
+                property: password
+            - secretKey: CHEMBL_DB_PASSWD
+              remoteRef:
+                key: 3dec-chembl-db
+                property: password
+            - secretKey: CHORAL_DB_PASSWD
+              remoteRef:
+                key: 3dec-choral-db
+                property: password
   TdecisionChart:
     Type: "AWSQS::Kubernetes::Helm"
-    DependsOn: [ TDecisionNamespace, JWTSecret, EncryptedStorageClass ]
+    DependsOn: [ JWTSecret, EncryptedStorageClass, NestAuthSecret, DatabaseSecrets, CertManager ]
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
     Properties:
       ClusterID: !Ref EKSClusterName
       Name: tdecision
       Namespace: !Ref TNamespace
-      Chart: oci://fra.ocir.io/discngine1/3decision_kube/3decision-helm:1.1.0-aws
+      Chart: oci://fra.ocir.io/discngine1/3decision_kube/3decision-helm:2.0.0
       Values:
         nodeCloud.volumes.jwtSecret.name: 3decision-jwt-secret
         oracle.connectionString: !Ref DBConnectionString
         oracle.hostString: !Ref HostString
         oracle.pdbString: !Ref DBName
-        oracle.tdecision.password: !Ref DBPassword
-        oracle.chembl.password: !Ref DBPassword
         volumes.storageClassName: gp2-encrypted
         wikijs.pvc.storageClassName: gp2-encrypted
         volumes.claimPods.backend.publicdata.awsElasticBlockStore.fsType: ext4
@@ -203,25 +302,26 @@ Resources:
         ingress.api.host: !Ref ApiSubdomain
         ingress.wikijs.host: !Ref HelpSubdomain
         ingress.class: !Ref LoadBalancerClass
-        nest.env.azure_tenant.value: !Ref AzureTenant
+        nest.env.azure_client_id.name: "AZURE_CLIENT_ID"
         nest.env.azure_client_id.value: !If [ AzureUnused, "none", !Ref AzureClientId ]
-        nest.env.azure_secret.value: !Ref AzureSecret
+        nest.env.azure_redirect_uri.name: "AZURE_REDIRECT_URI"
         nest.env.azure_redirect_uri.value: !Ref AzureRedirectUri
-        nest.env.okta_domain.value: !Ref OktaDomain
-        nest.env.okta_server_id.value: !Ref OktaServerId
+        nest.env.okta_client_id.name: "OKTA_CLIENT_ID"
         nest.env.okta_client_id.value: !If [ OktaUnused, "none", !Ref OktaClientId ]
-        nest.env.okta_secret.value: !Ref OktaSecret
+        nest.env.okta_redirect_uri.name: "OKTA_REDIRECT_URI"
         nest.env.okta_redirect_uri.value: !Ref OktaRedirectUri
+        nfs.public.serviceIP: !If [ ServiceCidrSecondary, "10.100.10.10", "172.20.10.10" ]
+        nfs.private.serviceIP: !If [ ServiceCidrSecondary, "10.100.10.11", "172.20.10.11" ]
   ChoralChart:
     Type: "AWSQS::Kubernetes::Helm"
+    DependsOn: DatabaseSecrets
     Metadata: { cfn-lint: { config: { ignore_checks: [ E3012 ] } } }
     Properties:
       ClusterID: !Ref EKSClusterName
       Name: choral
       Namespace: choral
-      Chart: oci://fra.ocir.io/discngine1/3decision_kube/choral-helm:1.0.1
+      Chart: oci://fra.ocir.io/discngine1/3decision_kube/choral-helm:1.0.4
       Values:
-        oracle.password: !Ref DBPassword
         oracle.connectionString: !Ref DBConnectionString
         pvc.storageClassName: gp2-encrypted
   CreateIndexes:
@@ -240,6 +340,9 @@ Resources:
           containers:
           - name: index-change
             image: fra.ocir.io/discngine1/3decision_kube/sqlcl
+            envFrom:
+            - secretRef:
+                name: database-secrets
             command: ["/bin/bash", "-c"]
             args:
             - sleep 5m;
@@ -249,15 +352,14 @@ Resources:
               CREATE INDEX IDX_CHOR_TAU_SMALL_MOL_SMILES ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_IDXTYPE;\n
               CREATE INDEX IDX_CHOR_TAUISO_SMS ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_ISOMER_IDXTYPE;\n
               CREATE INDEX IDX_CHOR_STRISO_SMS ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.STRICT_ISOMER_IDXTYPE;\n' > pd_t1_index.sql;
-              exit | /root/sqlcl/bin/sql PD_T1_DNG_THREEDECISION/${DBPassword}@${DBConnectionString} @pd_t1_index.sql;
-              ret=$?;
-              if [ $ret -ne 0 ]; then
+              exit | /root/sqlcl/bin/sql PD_T1_DNG_THREEDECISION/${!DB_PASSWD}@${DBConnectionString} @pd_t1_index.sql;
+              if [ $? -ne 0 ]; then
                 echo -ne '
                 DROP INDEX IDX_CHOR_STR_SMALL_MOL_SMILES;\n
                 DROP INDEX IDX_CHOR_TAU_SMALL_MOL_SMILES;\n
                 DROP INDEX IDX_CHOR_TAUISO_SMS;\n
                 DROP INDEX IDX_CHOR_STRISO_SMS;\n' > delete_pd_t1_index.sql;
-                exit | /root/sqlcl/bin/sql PD_T1_DNG_THREEDECISION/${DBPassword}@${DBConnectionString} @delete_pd_t1_index.sql;        
+                exit | /root/sqlcl/bin/sql PD_T1_DNG_THREEDECISION/${!DB_PASSWD}@${DBConnectionString} @delete_pd_t1_index.sql;        
               exit 1;
               fi;
               echo -ne '
@@ -266,15 +368,14 @@ Resources:
               CREATE INDEX IDX_CHOR_TAU_CMP_STRUC ON COMPOUND_STRUCTURES(CANONICAL_SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_IDXTYPE;\n
               CREATE INDEX IDX_CHOR_TAUISO_CMP_STRUC ON COMPOUND_STRUCTURES(CANONICAL_SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_ISOMER_IDXTYPE;\n
               CREATE INDEX IDX_CHOR_STRICT_CMP_STRUC ON COMPOUND_STRUCTURES(CANONICAL_SMILES) INDEXTYPE IS CHORAL_OWNER.STRICT_ISOMER_IDXTYPE;\n' > chembl_29_index.sql;
-              exit | /root/sqlcl/bin/sql CHEMBL_29/${DBPassword}@${DBConnectionString} @chembl_29_index.sql;
-              ret=$?;
-              if [ $ret -ne 0 ]; then
+              exit | /root/sqlcl/bin/sql CHEMBL_29/${!CHEMBL_DB_PASSWD}@${DBConnectionString} @chembl_29_index.sql;
+              if [ $? -ne 0 ]; then
                 echo -ne '
                 DROP INDEX IDX_CHOR_STR_CMP_STRUC;\n
                 DROP INDEX IDX_CHOR_TAU_CMP_STRUC;\n
                 DROP INDEX IDX_CHOR_TAUISO_CMP_STRUC;\n
                 DROP INDEX IDX_CHOR_STRICT_CMP_STRUC;\n' > delete_chembl_29_index.sql;
-                exit | /root/sqlcl/bin/sql CHEMBL_29/${DBPassword}@${DBConnectionString} @delete_chembl_29_index.sql;        
+                exit | /root/sqlcl/bin/sql CHEMBL_29/${!CHEMBL_DB_PASSWD}@${DBConnectionString} @delete_chembl_29_index.sql;        
                 exit 1;
               fi;
             resources:

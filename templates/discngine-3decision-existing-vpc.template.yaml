@@ -53,7 +53,6 @@ Metadata:
           - DBSnapshotIdentifier
           - DBInstanceIdentifier
           - DBName
-          - DBPassword
           - DBInstanceClass
           - DBMultiZone
       - Label:
@@ -130,8 +129,6 @@ Metadata:
         default: Identifier of the database
       DBName:
         default: Name of the database
-      DBPassword:
-        default: Password of the database
       DBInstanceClass:
         default: Instance type of the database
       DBMultiZone:
@@ -228,27 +225,28 @@ Parameters:
       - z1d.6xlarge
       - z1d.12xlarge
   VPCID:
-    Description: The ID of the VPC.
+    Description: "Required: The ID of the VPC."
     Type: String
   PublicSubnet1ID:
-    Description: The ID of the public subnet located in Availability Zone 1.
+    Default: ""
+    Description: "Optional: The ID of the public subnet located in Availability Zone 1."
     Type: String
   PublicSubnet2ID:
-    Description: The ID of the public subnet located in Availability Zone 2.
+    Default: ""
+    Description: "Optional: The ID of the public subnet located in Availability Zone 2."
     Type: String
   PublicSubnet3ID:
     Default: ""
-    Description: The ID of the public subnet 3 located in Availability Zone 3.
+    Description: "Optional: The ID of the public subnet 3 located in Availability Zone 3."
     Type: String
   PrivateSubnet1ID:
-    Description: The ID of the private subnet located in Availability Zone 1.
+    Description: "Required: The ID of the private subnet located in Availability Zone 1."
     Type: String
   PrivateSubnet2ID:
-    Description: The ID of the private subnet located in Availability Zone 2.
+    Description: "Required: The ID of the private subnet located in Availability Zone 2."
     Type: String
   PrivateSubnet3ID:
-    Default: ""
-    Description: The ID of the private subnet 3 located in Availability Zone 3.
+    Description: "Optional: The ID of the private subnet 3 located in Availability Zone 3."
     Type: String
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
@@ -310,7 +308,7 @@ Parameters:
     Type: Number
   DBSnapshotIdentifier:
     Default: ""
-    Description: "Optionnal: the snapshot arn used for the database.
+    Description: "Optional: the snapshot arn used for the database.
                   If left empty, the default snapshot will be used. 
                   But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
     Type: String
@@ -332,16 +330,8 @@ Parameters:
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-  DBPassword:
-    NoEcho: true
-    Description: "Required: The database admin account password."
-    Type: String
-    MinLength: '8'
-    MaxLength: '30'
   DBInstanceClass:
     AllowedValues:
-      - db.t3.micro
-      - db.t3.small
       - db.t3.medium
       - db.t3.large
       - db.t3.xlarge
@@ -489,6 +479,8 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateAdvancedConfigWithDefaults
     Metadata: { cfn-lint: { config: { ignore_checks: [E9902, W9901] } } }
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-advanced-configuration.template.yaml'
@@ -503,6 +495,8 @@ Resources:
         CustomAmiId: !Ref CustomAmiId
   EKSStack:
     Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml'
@@ -534,6 +528,8 @@ Resources:
         ProvisionBastionHost: !Ref ProvisionBastionHost
   3decisionStack:
     Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision.template.yaml'
@@ -547,7 +543,6 @@ Resources:
         EKSClusterName: !GetAtt EKSStack.Outputs.EKSClusterName
         DBInstanceIdentifier: !Ref DBInstanceIdentifier
         DBName: !Ref DBName
-        DBPassword: !Ref DBPassword
         DBInstanceClass: !Ref DBInstanceClass
         DBMultiZone: !Ref DBMultiZone
         DBSubnets: !Join [ ",", [ !Ref PrivateSubnet1ID, !Ref PrivateSubnet2ID, !Ref PrivateSubnet3ID ] ]
