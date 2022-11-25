@@ -97,3 +97,158 @@ You will then be able to enter the ARN of your copied snapshot in the CloudForma
 *Q*: Why does Azure require additional claims and not Okta?
 
 *A*: Azure requires additional claims for 3decision to work with Azure. The default Okta ID token claims are not enough.
+
+==== Automation
+Q. Concerning EC2 management, will there be any residual work needed for preparing the environment after the quickstart templates has been executed during deployment?
+A. Only EKS managed nodes are deployed, and as such no further work is needed.
+ 
+==== Authentication & Authorization:
+Q. We would like to use AzureAD as cloud-identity-provider. How is this done?  
+Please refer to the 3decision AWS Quick-Start documentation that describes the authentication app setup for both Azure and Okta in the "Predeployment steps" section: https://aws-quickstart.github.io/quickstart-discngine-3decision/
+Note there is a difference on step 5:
+for 3decision SaaS, the reply URL you must setup will be as follows:
+https://3decision-<company>-api.discngine.cloud/auth/azure/callback
+- <company> will usually be provided by your Discngine sale contact. This value will usually be your company name or your company name abreviation.
+
+Q. Any options for other (future) cloud-directories ? 
+A. Okta is also supported. The 3decision AWS Quickstart version also supports LDAP.
+
+Q. Which authentication protocols are supported by 3Decision Application platform?
+A. Open ID Connect and LDAP.
+
+Q: Why does Azure require additional claims and not Okta?
+A: Azure requires additional claims for 3decision to work with Azure. The default Okta ID token claims are not enough.
+
+Q. How many types of users/roles do we have?  (i.e. User vs. priviliged admin users)?
+A. Only 1 ("user" type). The notion of user role in 3decision (3 roles exists) is business oriented and only affect the layout of the application.
+The notion of "administrator" does not exist.
+Administration of the data is managed by a very granular grant management of projects and structure access within the app by the owner of the data.
+The owner of the data is the user that uploaded the structures in 3decision or a user that was granted the ownership.
+This aspect is part of the training/onboarding.
+
+Q. How do we manage access control and User Management within application!
+A. User access management is performed at the level of the identity provicer (Azure, Okta) by granting/revoking acces to the Open ID connect application.
+Access to the data to users is managed in the application by a data owners (people that uploaded the data or that are made owners).
+Data access policy within the app is deny-by-default for private data.
+Users can only public data by default.
+
+==== AWS platform overview
+
+Q. Walkthrough of System landscape ?
+A. Please check the architecture schema here: https://aws-quickstart.github.io/quickstart-discngine-3decision/
+
+Q. Examples of use (spin up /shut down)
+A. Spinning up 3decision Quickstart consists in executing a cloudformation script. You can launch it by clicking one of the 3 deployments options: "Deployment options" section here: https://aws-quickstart.github.io/quickstart-discngine-3decision/
+Clicking on one of the 3 links will open your AWS console, you will need to fill 2 or 3 configuration details and hit the create button.
+
+Q. Any persistent nodes?
+A. Yes the minimal shape of the kubernetes cluster is 3 nodes.
+
+Q. Is all critical data located in the RDS ?
+A. No, analysed data and metadata is stored in an Oracle RDS database. Your RAW data (uploaded structures and files) is also persisted on EBS volumes as a "datasafe".
+
+Q. Loadbalancing / failover ?
+A. The quickstart deploys an application load balancer (flexibility over network configuration is included in the cloudformation options, especially for Route53).
+We highly recommend enabling RDS backups and EBS volumes backups for failover/BCP: creating a new 3decision environement from backups using the cloudformation template is easy.
+
+
+==== Operations & security:
+Q. Backup options?
+A. We highly recommend enabling RDS backups and EBS volumes backups for failover/BCP: creating a new 3decision environement from backups using the cloudformation template is easy.
+
+Q. Patch management (who and how is this handled?)
+A. 3decision quickstat only use AWS managed services: EC2 nodes are managed by AWS. RDS database is AWS managed. No patching management is required.
+ 
+Q. Security patching of Bastion host ?
+A. By default, the bastion is not deployed. If you do chosse to deploy it, you will need to handle the patching.
+
+Q. Deployment & maintenance as a service ?
+A. If Discngine technical staff can be provided with sufficiant AWS privileges (AWS administration privileges), deployment and maintenance can be provided as extra.
+
+Q. Review of cloud infrastructure after UAT/deployment and before PROD deployment ?
+A. The customer can deploy as many test/dev/UAT environments as required, only production environements require a contractual licence.
+
+Q. Is there a licence file required ?
+A. No. The licence and user web seats are contractual.
+
+Q. Staff will be needing access to cluster, should we pay for additionnal web seats ?
+A. No. Admin access are free, even in production.
+
+Q. How about structure upload documentation/requirement ?
+A. A full requirement list and documentation exists, please ask your 3decision sale to provide it.
+
+Q. Can continuous deployment can be configured ?
+A. No, CD only concerns the 3decision SaaS version. Updates will be deployed by the customer cluster manager. Update commands and instructions will be provided out of the box. Discngine will provide support for the updates too.
+
+Q: Will 3decision make HTTP calls to internet websites?
+A: Yes, 3decision synchronizes with public structures made available by the RCSB PDB (Research Collaboratory for Structural Bioinformatics PDB). The data synchronization uses the Rsync protocol.
+3decision calls the following domains:
+rsync.ebi.ac.uk on port 873
+rsync.wwpdb.org on ports 873 and 33444
+
+==== Data Encryption
+Q. How is data encrypted ?
+A. The RDS Database created during the deployment is based on a snapshot. In order to make this snapshot public, the snapshot is not encrypted.
+If you would like your database to be encrypted you will have to copy this snapshot into your AWS account first.
+This can be done by going to the public tab in the RDS snapshot sections, and searching for db3dec<version> and grabbing the latest version.
+You can then select it, choose copy in actions, and select the encrypt option.
+You will then be able to enter the ARN of your copied snapshot in the CloudFormation parameters. If field is left blank, the unencrypted latest snapshot will be used.
+
+
+==== Testing/verification
+Q. Support of Automated System Verification test cases?	 
+A. Currently no automated testing available for now. Smoke tests will arrive later in 2023.
+
+Q. Automated health checks ?
+A. Each 3decision microservice provides a livelyness and readyness endpoint by no canary monitoring is provided out of the box. Monitoring probes must be configured by the customer.
+
+
+==== Sizing and shapes
+Q. What are sizing specs for the database ?
+A. Database shape for up to 20 users (concurrent) t3.xlarge is recommended. This can be increased during the deployment.
+Oracle RDS storage is 1Tb (extensible to 3Tb, some customers use up to 2Tb). 
+
+Q. Sizing of storage: 
+A. EBS: overall storage is ~1.2Tb.
+EBS volumes : 8 * 50Go + 1 * 8 Go + 1 * 512 Go
+ 
+Q. what is the minimal kubernetes nodes specs  ?
+A. Customers are using application in different ways, and config may differ.
+The minimal configuration is 3 nodes. Shape size should be kept as 3 * t3.xlarge.
+
+Q. DB is Amazon ORACLE RDS?	
+A. Yes, ORACLE RDS Standard edition 
+License is included in the shape AWS (license included, and is charged over AWS consumption)
+
+Q. Sizing for cost estimates approach?
+A. With default sizing, the 3decision environement should cost below 1000euros per month.
+The best estimate is done by deploying a temporary 3decision environnement in an AWS sandbox and use AWS finops tools to track the costs for a sort period of time.
+	 
+ 
+
+==== Technical AWS infrastructure: 
+Q. In more detail, what is this “AWS Quick Starts process”?  s it Cloud formation templates, CDK scripts or something third?
+AWS Biotech Blueprint Quick Starts are a set of cloud formation templates. 3decision is a AWS Biotech Blueprint Quick Start. Launching the 3decision quickstart link will open your AWS Cloudformation console.
+
+Q. Is there an OS requirement ?
+A. 3decision uses Amazon EKS cluster with Linux nodes. EC2 instance management is automated by Amazon EKS.  Some customers use their own hardened node images.
+
+Q. Is 3decision using ”just” EC3 T3 nodes or is it EKS nodes? 
+A. EKS nodes. 
+
+Q. Same for the database – which one? 
+A. Oracle RDS Database Shape can be changed during the Cloud formation deployment (or afterwards). The default and recommended shape is db.t3.xlarge. 
+ 
+==== Storage capacity specifications 
+Q. How much  storage space does a typical (3 Å resolution) CryoEM entry require- including meta data and the corresponding mrc file ?
+A. This is variable and highly dependent on your data. The mrc files can be over GB if the the system includs many protein chains but for typical drug discovery projectsn the CryoEM structure entries are 1-2 Mb and their associated mrc file 30-150 Mb.
+
+Q. How much does an Xray based structure, including all data, fill ?
+A. A typical X-Ray file is between 100Ko and 1Mb. Associated data depends on customer data: Pdf files are within the same range, density maps are a bit larger (1Mb to 10Mb), word documents also within the range of 1Mb,  etc.
+
+Q.	Has Discngine any average figures to draw on, from existing customers, in regards to amount of cloud storage that will be needed (i.e. in best, worst and most likely scenarios). These figures will be used to calculate expected storage usage, also for inputs to cost drivers and budgeting.
+A. EBS: overall storage is ~1.2Tb. RDS Oracle: 1Tb (extensible to 3Tb, some customers use up to 2Tb). You can roughly consider that uploading large scale datasets like Alphafold will require 1 additionnal Tb for EBS and 1 additionnal Tb for RDS.
+ 
+==== Planning the deployment
+Q. Is there a documentation explaining how to plan the deployment ?
+A. Yes: https://aws-ia.github.io/content/qs_info.html and https://aws-quickstart.github.io/quickstart-discngine-3decision/
