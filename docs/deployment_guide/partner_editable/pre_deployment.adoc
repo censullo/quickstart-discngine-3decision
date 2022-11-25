@@ -257,7 +257,7 @@ Oracle RDS storage is 1Tb (extensible to 3Tb, some customers use up to 2Tb).
 
 EBS volumes : 8 * 50Go + 1 * 8 Go + 1 * 512 Go
  
-*Q*: what is the minimal kubernetes nodes specs  ?
+*Q*: what is the minimal kubernetes nodes specs ?
 
 *A*: Customers are using application in different ways, and config may differ.
 
