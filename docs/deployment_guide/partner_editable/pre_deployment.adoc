@@ -187,7 +187,7 @@ We highly recommend enabling RDS backups and EBS volumes backups for failover/BC
 
 *Q*: Deployment & maintenance as a service ?
 
-*A*: If Discngine technical staff can be provided with sufficiant AWS privileges (AWS administration privileges), deployment and maintenance can be provided as extr*A*:
+*A*: If Discngine technical staff can be provided with sufficiant AWS privileges (AWS administration privileges), deployment and maintenance can be provided as extra.
 
 *Q*: Review of cloud infrastructure after UAT/deployment and before PROD deployment ?
 
@@ -280,7 +280,7 @@ The best estimate is done by deploying a temporary 3decision environnement in an
 
 ==== Technical AWS infrastructure: 
 
-*Q*: In more detail, what is this “AWS Quick Starts process”?  s it Cloud formation templates, CDK scripts or something third?
+*Q*: In more detail, what is this “AWS Quick Starts process”? Is it Cloud formation templates, CDK scripts or something third?
 
 AWS Biotech Blueprint Quick Starts are a set of cloud formation templates. 3decision is a AWS Biotech Blueprint Quick Start. Launching the 3decision quickstart link will open your AWS Cloudformation console.
 
