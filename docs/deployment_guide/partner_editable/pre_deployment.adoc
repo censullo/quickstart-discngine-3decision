@@ -154,6 +154,7 @@ Users can only public data by default.
 *Q*: Examples of use (spin up /shut down)
 
 *A*: Spinning up 3decision Quickstart consists in executing a cloudformation script. You can launch it by clicking one of the 3 deployments options: "Deployment options" section here: https://aws-quickstart.github.io/quickstart-discngine-3decision/
+
 Clicking on one of the 3 links will open your AWS console, you will need to fill 2 or 3 configuration details and hit the create button.
 
 *Q*: Any persistent nodes?
