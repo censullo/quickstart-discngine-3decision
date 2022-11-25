@@ -130,7 +130,7 @@ A: Azure requires additional claims for 3decision to work with Azure. The defaul
 
 The notion of "administrator" does not exist.
 
-Administration of the data is managed by a very granular grant management of projects and structure access within the app by the owner of the dat*A*:
+Administration of the data is managed by a very granular grant management of projects and structure access within the app by the owner of the data.
 The owner of the data is the user that uploaded the structures in 3decision or a user that was granted the ownership.
 
 This aspect is part of the training/onboarding.
@@ -141,7 +141,7 @@ This aspect is part of the training/onboarding.
 
 Access to the data to users is managed in the application by a data owners (people that uploaded the data or that are made owners).
 
-Data access policy within the app is deny-by-default for private dat*A*:
+Data access policy within the app is deny-by-default for private data.
 
 Users can only public data by default.
 
