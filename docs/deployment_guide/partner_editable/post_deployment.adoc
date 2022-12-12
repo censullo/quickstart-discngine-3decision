@@ -4,7 +4,7 @@
 
 === (Optional) Add your SSL certificate to the Application Load Balancer
 
-If you did not provide an SSL certificate during the Quick Start deployment, edit the listener to configure an SSL certificate.
+If you did not provide an SSL certificate during the Partner Solution deployment, edit the listener to configure an SSL certificate.
 
 . Open the https://console.aws.amazon.com/ec2/[Amazon EC2] console.
 
@@ -29,7 +29,7 @@ If you did not provide an SSL certificate during the Quick Start deployment, edi
 
 === (Optional) Create a CNAME record in your DNS provider
 
-If you did not provide a Route 53 hosted zone ID during the Quick Start installation, you must create the following three DNS records.
+If you did not provide a Route 53 hosted zone ID during the Partner Solution installation, you must create the following three DNS records.
 
 . 3decision user URI: `3decision.<your domain>`.
 
@@ -41,7 +41,7 @@ Both records must target the 3decision Application Load Balancer. To obtain the 
 
 === Additional information
 
-This Quick Start does not include the following:
+This Partner Solution does not include the following:
 
 * Infrastructure monitoring.
 

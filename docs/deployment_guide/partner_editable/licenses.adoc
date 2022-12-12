@@ -1,5 +1,5 @@
 // Include details about any licenses and how to sign up. Provide links as appropriate.
 
-This Quick Start requires a license for {partner-product-short-name} for use in a production environment. To obtain a license, contact Discngine at contact@discngine.com. A license is not required for use in development and test environments.
+This Partner Solution requires a license for {partner-product-short-name} for use in a production environment. To obtain a license, contact Discngine at contact@discngine.com. A license is not required for use in development and test environments.
 
-There is no cost to use this Quick Start, however you will be billed by AWS for the resources deployed. For more information see the http://general-content-file[AWS Quick Start General Content Guide].
+There is no cost to use this Partner Solution, however you will be billed by AWS for the resources deployed. For more information see the http://general-content-file[AWS Partner Solution General Content Guide].
