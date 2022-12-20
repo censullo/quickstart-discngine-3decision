@@ -253,7 +253,7 @@ Parameters:
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
       letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
       (-).
-    Default: aws-quickstart
+    Default: 3decision-eu-central-1
     Description: S3 bucket name for the Quick Start assets. This string can include
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
@@ -567,3 +567,4 @@ Resources:
         MainSubdomain: !Ref MainSubdomain
         ApiSubdomain: !Ref ApiSubdomain
         HelpSubdomain: !Ref HelpSubdomain
+        ConfigSetName: !Ref ConfigSetName
