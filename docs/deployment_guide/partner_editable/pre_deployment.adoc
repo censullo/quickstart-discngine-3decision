@@ -8,7 +8,7 @@ This Quickstart deploys many resources, including IAM roles and an IAM user for 
 
 === Authentication
 
-During deployment, you are prompted to provide information about your authentication provider. 3decision supports OpenID Connect for both Azure and Okt*A*:
+During deployment, you are prompted to provide information about your authentication provider. 3decision supports OpenID Connect for both Azure and Okta:
 
 ==== Creating an Azure OpenID Connect application
 
