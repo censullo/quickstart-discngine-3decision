@@ -85,5 +85,5 @@ Outputs:
     Value: !GetAtt RedisAccessPoint.Alias
     Description: Alias for the redis access point
   RedisRoleArn:
-    Value: !GetAtt Role.Arn
+    Value: !GetAtt RedisRole.Arn
     Description: Arn of the Role made to access the redis access point
