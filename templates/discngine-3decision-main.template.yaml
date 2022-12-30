@@ -36,6 +36,7 @@ Metadata:
           - AdditionalEKSAdminRoleArn
           - ProvisionBastionHost
           - CustomAmiId
+          - NodeGroupName
       - Label:
           default: Discngine 3decision network configuration
         Parameters:
@@ -123,6 +124,8 @@ Metadata:
         default: Custom AMI Id
       NodeVolumeSize:
         default: Size of worker nodes volumes
+      NodeGroupName:
+        default: Name of the node group
       DBSnapshotIdentifier:
         default: Identifier of the database snapshot
       DBInstanceIdentifier:
@@ -310,6 +313,11 @@ Parameters:
     Type: String
     Default: ""
     Description: "Optional: If an AMI ID is specified, it is used instead of the default EKS images for cluster nodes."
+  NodeGroupName:
+    Type: String
+    Default: "Default"
+    Description: "Optional: Name of the NodeGroup created in EKS.
+                  This should usually not be changed"
   PerAccountSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
@@ -562,6 +570,7 @@ Resources:
         ProvisionBastionHost: !Ref ProvisionBastionHost
         DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
         CustomAmiId: !Ref CustomAmiId
+        NodeGroupName: !Ref NodeGroupName
         AzureClientId: !Ref AzureClientId
         AzureTenant: !Ref AzureTenant
         AzureSecret: !Ref AzureSecret
