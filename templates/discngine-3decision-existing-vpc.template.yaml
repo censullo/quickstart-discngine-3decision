@@ -36,6 +36,7 @@ Metadata:
           - AdditionalEKSAdminRoleArn
           - ProvisionBastionHost
           - CustomAmiId
+          - NodeGroupName
       - Label:
           default: Discngine 3decision network configuration
         Parameters:
@@ -123,6 +124,8 @@ Metadata:
         default: Custom AMI Id
       NodeVolumeSize:
         default: Size of worker nodes volumes
+      NodeGroupName:
+        default: Name of the node group
       DBSnapshotIdentifier:
         default: Identifier of the database snapshot
       DBInstanceIdentifier:
@@ -292,6 +295,11 @@ Parameters:
     Type: String
     Default: ""
     Description: "Optional: If an AMI ID is specified, it is used instead of the default EKS images for cluster nodes."
+  NodeGroupName:
+    Type: String
+    Default: "Default"
+    Description: "Optional: Name of the NodeGroup created in EKS.
+                  This should usually not be changed"
   PerAccountSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
@@ -470,6 +478,10 @@ Rules:
             - !Ref AWS::Region
         AssertDescription: The Quick Start is supported only in us-east-1 and eu-central-1 AWS Regions. Please contact Discngine to request support for other Regions.
 
+Mappings:
+  Config:
+    Prefix: { Value: 'eks-quickstart' }
+
 Conditions:
   ConfiSetNameSet: !Equals [!Ref ConfigSetName, '']
   CreateAdvancedConfigWithDefaults: !Not [Condition: ConfiSetNameSet]
@@ -493,10 +505,12 @@ Resources:
         NodeVolumeSize: !Ref NodeVolumeSize
         KubernetesVersion: !Ref 'AWS::NoValue'
         CustomAmiId: !Ref CustomAmiId
+        NodeGroupName: !Ref NodeGroupName
   EKSStack:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
+    DependsOn: AdvancedConfigDefaultsStack
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml'
@@ -526,6 +540,13 @@ Resources:
         AdditionalEKSAdminUserArn: !Ref AdditionalEKSAdminUserArn
         AdditionalEKSAdminRoleArn: !Ref AdditionalEKSAdminRoleArn
         ProvisionBastionHost: !Ref ProvisionBastionHost
+  NodeGroupArn:
+    Type: Custom::CliQuery
+    DependsOn: [ AdvancedConfigDefaultsStack, EKSStack ]
+    Properties:
+      ServiceToken: !Sub ['arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Prefix}-ResourceReader', {Prefix: !FindInMap [Config, Prefix, Value]}]
+      AwsCliCommand: !Sub "eks describe-nodegroup --cluster-name ${EKSStack.Outputs.EKSClusterName} --nodegroup-name ${NodeGroupName} --query 'nodegroup.{nodeRole: nodeRole}'"
+      IdField: 'nodeRole'
   3decisionStack:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Delete
@@ -567,3 +588,4 @@ Resources:
         MainSubdomain: !Ref MainSubdomain
         ApiSubdomain: !Ref ApiSubdomain
         HelpSubdomain: !Ref HelpSubdomain
+        NodeGroupArn: !Ref NodeGroupArn

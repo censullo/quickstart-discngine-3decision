@@ -59,9 +59,7 @@ Parameters:
     Type: String
   EKSServiceCidr:
     Type: String
-  SecretAccessKey:
-    Type: String
-  AccessKey:
+  SecretRoleArn:
     Type: String
 
 Conditions:
@@ -206,17 +204,6 @@ Resources:
       Namespace: external-secrets
       Manifest: !Sub |
         ---
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: eso-secret
-          labels: 
-            type: aws
-        type: Opaque
-        stringData:
-          access-key: ${AccessKey}
-          secret-access-key: ${SecretAccessKey}
-        ---
         apiVersion: external-secrets.io/v1beta1
         kind: ClusterSecretStore
         metadata:
@@ -226,16 +213,7 @@ Resources:
             aws:
               service: SecretsManager
               region: ${AWS::Region}
-              auth:
-                secretRef:
-                  accessKeyIDSecretRef:
-                    name: eso-secret
-                    key: access-key
-                    namespace: external-secrets
-                  secretAccessKeySecretRef:
-                    name: eso-secret
-                    key: secret-access-key
-                    namespace: external-secrets
+              role: ${SecretRoleArn}
         ---
         apiVersion: external-secrets.io/v1beta1
         kind: ClusterExternalSecret
