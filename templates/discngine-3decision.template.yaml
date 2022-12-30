@@ -414,7 +414,7 @@ Resources:
         DatabaseName: !GetAtt RDSStack.Outputs.DbInstanceName
         VpcId: !Ref VPCID
         DBSecurityGroup: !GetAtt RDSStack.Outputs.DBSecurityGroup
-        NodegroupArn: !Ref NodegroupArn
+        NodeGroupArn: !Ref NodeGroupArn
   3decisionBucketStack:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Delete
@@ -426,7 +426,7 @@ Resources:
           S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
         VPCID: !Ref VPCID
-        NodegroupArn: !Ref NodegroupArn
+        NodeGroupArn: !Ref NodeGroupArn
   3decisionKubeStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: JWTStack
