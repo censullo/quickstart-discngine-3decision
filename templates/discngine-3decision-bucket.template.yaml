@@ -8,7 +8,7 @@ Metadata:
 Parameters:
   VPCID:
     Type: String
-  NodegroupArn:
+  NodeGroupArn:
     Type: String
 Resources:
   Bucket:
@@ -50,7 +50,7 @@ Resources:
         IgnorePublicAcls: true
         BlockPublicPolicy: true
         RestrictPublicBuckets: true
-  Role:
+  RedisRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -59,17 +59,17 @@ Resources:
           - Effect: Allow
             Principal:
               AWS:
-                - !Ref NodegroupArn
+                - !Ref NodeGroupArn
             Action:
               - 'sts:AssumeRole'
-      Description: 'Role designed to create kubernetes secrets from secrets manager for 3decision quickstart'
+      Description: 'Role designed to access the redis access point inside EKS pods'
       RoleName: !Sub '3decision-redis-s3-${AWS::Region}'
-  Policy:
+  RedisPolicy:
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: !Sub '3decision-redis-s3-${AWS::Region}'
       Roles:
-        - !Ref Role
+        - !Ref RedisRole
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -84,3 +84,6 @@ Outputs:
   RedisAccessPointAlias:
     Value: !GetAtt RedisAccessPoint.Alias
     Description: Alias for the redis access point
+  RedisRoleArn:
+    Value: !GetAtt Role.Arn
+    Description: Arn of the Role made to access the redis access point
