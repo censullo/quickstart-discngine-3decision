@@ -415,6 +415,18 @@ Resources:
         VpcId: !Ref VPCID
         DBSecurityGroup: !GetAtt RDSStack.Outputs.DBSecurityGroup
         NodegroupArn: !Ref NodegroupArn
+  3decisionBucketStack:
+    Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      TemplateURL: !Sub
+        - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/discngine-3decision-bucket.template.yaml'
+        - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+          S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        VPCID: !Ref VPCID
+        NodegroupArn: !Ref NodegroupArn
   3decisionKubeStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: JWTStack
