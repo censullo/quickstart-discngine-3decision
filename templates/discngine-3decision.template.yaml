@@ -15,6 +15,8 @@ Metadata:
           - EKSClusterName
           - VPCID
           - ConfigureEKS
+          - NodeGroupName
+          - NodeSecurityGroup
       - Label:
           default: Discngine 3decision network configuration
         Parameters:
@@ -121,6 +123,10 @@ Metadata:
         default: Okta server id
       OktaRedirectUri:
         default: Okta app redirect uri
+      NodeGroupName:
+        default: Name of the default node group
+      NodeSecurityGroup:
+        default: Security group of the default node group
 Parameters:
   EKSClusterName:
     Description: "Required: The name of the EKS cluster in which the stacks will be deployed"
@@ -214,8 +220,11 @@ Parameters:
     Default: 'false'
     Type: String
     AllowedValues: ['true', 'false']
+  NodeGroupName:
+    Type: String
+    Description: "Required: Name of the default Nodegroup used"
   NodeSecurityGroup:
-    Description: "Optionnal: Id of the EKS SecurityGroup in which we will add the RDS ingress"
+    Description: "Required: Id of the EKS SecurityGroup in which we will add the RDS ingress"
     Type: String
   HostedZoneId:
     Default: ""
@@ -304,11 +313,6 @@ Parameters:
     Description: "Conditional: Should be given if okta client id variable is set.
                   This is the redirect_uri set in the okta app, by default should be https://<ApiSubdomain>.<DomainName>/auth/okta/callback"
 
-  ConfigSetName:
-    Type: String
-    Default: ""
-    Description: ""
-
 Rules:
   DiscngineSupportedRegionRule:
     Assertions:
@@ -394,6 +398,12 @@ Resources:
       ServiceToken: !Sub ['arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Prefix}-ResourceReader', {Prefix: !FindInMap [Config, Prefix, Value]}]
       AwsCliCommand: !Sub "eks describe-cluster --name ${EKSClusterName} --query 'cluster.kubernetesNetworkConfig.{serviceIpv4Cidr: serviceIpv4Cidr}'"
       IdField: 'serviceIpv4Cidr'
+  NodegroupArn:
+    Type: Custom::CliQuery
+    Properties:
+      ServiceToken: !Sub ['arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Prefix}-ResourceReader', {Prefix: !FindInMap [Config, Prefix, Value]}]
+      AwsCliCommand: !Sub ["eks describe-nodegroup --cluster-name ${EKSClusterName} --nodegroup-name ${NodegroupName} --query 'nodegroup.{nodeRole: nodeRole}'", {NodegroupName: !Select [0, !Split ['}', !Select [1, !Split [':', !Sub '${NodeGroupName}']]]]}]
+      IdField: 'nodeRole'
   3decisionSecretStack:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Delete
@@ -410,7 +420,7 @@ Resources:
         DatabaseName: !GetAtt RDSStack.Outputs.DbInstanceName
         VpcId: !Ref VPCID
         DBSecurityGroup: !GetAtt RDSStack.Outputs.DBSecurityGroup
-        EKSClusterName: !Ref EKSClusterName
+        NodegroupArn: !Ref NodegroupArn
   3decisionKubeStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: JWTStack

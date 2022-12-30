@@ -567,4 +567,4 @@ Resources:
         MainSubdomain: !Ref MainSubdomain
         ApiSubdomain: !Ref ApiSubdomain
         HelpSubdomain: !Ref HelpSubdomain
-        ConfigSetName: !Ref ConfigSetName
+        NodeGroupName: !Sub '{{resolve:ssm:/quickstart/amazon-eks/${ConfigSetName}/default-nodegroup/NodeGroupName}}'
