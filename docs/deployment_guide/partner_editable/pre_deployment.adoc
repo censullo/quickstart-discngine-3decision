@@ -4,7 +4,7 @@
 
 === Administrator Privileges
 
-This Quickstart deploys many resources, including IAM roles and an IAM user for automated access to a limited number of resources (a number of secrets and an s3 bucket created by the quickstart). The rights on these roles and users are limited, but the person deploying the quickstart needs to have an administrator account capable of deploying these resources.
+This Quickstart deploys many resources, including IAM roles. The rights on these roles follow the principle of least privilege, but the person deploying the quickstart needs to have an administrator account capable of deploying these resources.
 
 === Authentication
 
