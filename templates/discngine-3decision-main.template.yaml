@@ -302,7 +302,12 @@ Parameters:
     Type: String
     Default: "dng-3decision"
     Description: "Required: SSM Name used to map advanced parameters to an EKS cluster."
-
+  KubernetesVersion:
+  # https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-release-calendar
+    Type: String
+    Description: Kubernetes control plane version.
+    AllowedValues: ['1.23', '1.22', '1.21', '1.20']
+    Default: '1.23'
   NodeVolumeSize:
     Type: String
     Default: 100
@@ -560,6 +565,7 @@ Resources:
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         ConfigSetName: !Ref ConfigSetName
+        KubernetesVersion: !Ref KubernetesVersion
         NodeInstanceType: !Ref NodeInstanceType
         RemoteAccessCIDR: !Ref RemoteAccessCIDR
         PerAccountSharedResources: !Ref PerAccountSharedResources

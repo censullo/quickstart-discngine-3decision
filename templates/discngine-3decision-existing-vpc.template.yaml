@@ -284,6 +284,12 @@ Parameters:
     Type: String
     Default: "dng-3decision"
     Description: "Required: SSM Name used to map advanced parameters to an EKS cluster."
+  KubernetesVersion:
+  # https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-release-calendar
+    Type: String
+    Description: Kubernetes control plane version.
+    AllowedValues: ['1.23', '1.22', '1.21', '1.20']
+    Default: '1.23'
   NodeVolumeSize:
     Type: String
     Default: 100
@@ -498,10 +504,8 @@ Resources:
           S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
         ConfigSetName: !Ref ConfigSetName
-        ConsulUIAccessCIDR: !Ref RemoteAccessCIDR
-        VaultUIAccessCIDR: !Ref RemoteAccessCIDR
+        KubernetesVersion: !Ref KubernetesVersion
         NodeVolumeSize: !Ref NodeVolumeSize
-        KubernetesVersion: !Ref 'AWS::NoValue'
         CustomAmiId: !Ref CustomAmiId
         NodeGroupName: !Ref NodeGroupName
   EKSStack:
