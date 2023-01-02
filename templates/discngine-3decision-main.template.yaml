@@ -295,15 +295,14 @@ Parameters:
   RemoteAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access the instances. We recommend
-      that you set this value to a trusted IP range.
+    Description: The CIDR IP range that is permitted to access the bastion instance. This will have no effect if the bastion creation is set to false.
     Default: "127.0.0.1/32"
     Type: String
   ConfigSetName:
     Type: String
     Default: "dng-3decision"
-    Description: "Required: Name used to map advanced parameters to an EKS cluster.
-                  Change to blank to create eks default parameters."
+    Description: "Required: SSM Name used to map advanced parameters to an EKS cluster."
+
   NodeVolumeSize:
     Type: String
     Default: 100
