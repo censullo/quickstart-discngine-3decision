@@ -364,7 +364,7 @@ Parameters:
     Type: String
   DBMultiZone:
     Description: High Availability (Multi-AZ) for Oracle RDS.
-        More informtion is available here - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html
+        More information is available here - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html.
     Type: String
     AllowedValues: [ 'true', 'false' ]
     Default: 'false'
@@ -507,7 +507,6 @@ Resources:
           S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
         ConfigSetName: !Ref ConfigSetName
-        KubernetesVersion: !Ref KubernetesVersion
         KubernetesVersion: !Ref KubernetesVersion
         NodeVolumeSize: !Ref NodeVolumeSize
         CustomAmiId: !Ref CustomAmiId

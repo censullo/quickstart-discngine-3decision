@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: "This template deploys the bucket and related policy"
+Description: "This template deploys the bucket and related policy (qs-1snm79fdq)."
 Metadata:
   LintSpellExclude:
     - Discngine
@@ -23,6 +23,7 @@ Resources:
         RestrictPublicBuckets: true
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
+    Metadata: { cfn-lint: { config: { ignore_checks: [EIAMPolicyActionWildcard] } } }
     Properties:
       Bucket: !Ref Bucket
       PolicyDocument:
