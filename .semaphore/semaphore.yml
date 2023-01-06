@@ -1,13 +1,20 @@
 version: v1.0
-name: Initial Pipeline
+version: v1.0
+name: 3decision Quickstart templates upload
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu2004
 blocks:
-  - name: 'Block #1'
+  - name: 3decision templates upload
     task:
       jobs:
-        - name: 'Job #1'
+        - name: 3decision templates upload
           commands:
-            - checkout
+            - export ROLE_ARN="arn:aws:iam::751149478800:role/3dec-Quickstart-CD" # the AWS Role ARN you want to assume
+            - export SESSION_NAME="semaphore-job-${SEMAPHORE_JOB_ID}"
+            - export CREDENTIALS=$(aws sts assume-role-with-web-identity --role-arn $ROLE_ARN --role-session-name $SESSION_NAME --web-identity-token $SEMAPHORE_OIDC_TOKEN)
+            - export AWS_ACCESS_KEY_ID=$(echo $CREDENTIALS | jq -r '.Credentials.AccessKeyId')
+            - export AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r '.Credentials.SessionToken')
+            - export AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | jq -r '.Credentials.SecretAccessKey')
+            - aws s3 cp templates/ s3://3decision-eu-central-1/quickstart-discngine-3decision-test/
