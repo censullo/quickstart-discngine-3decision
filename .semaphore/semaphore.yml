@@ -25,7 +25,7 @@ blocks:
             - cfn-lint ~/quickstart-discngine-3decision/templates/* -a ~/qs-cfn-lint-rules/qs_cfn_lint_rules/ -i E3001 W9001 W9002 W9003 W9004 W9005 W9006
   - name: Test templates upload
     skip:
-      when: "branch = 'main'"
+      when: "branch = 'main' or pull_request =~ '.*'"
     task:
       jobs:
         - name: templates upload
@@ -38,6 +38,8 @@ blocks:
   - name: Templates upload
     run:
       when: "branch = 'main'"
+    skip:
+      when: "pull_request =~ '.*'"
     task:
       jobs:
         - name: templates upload
