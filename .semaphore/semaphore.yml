@@ -40,8 +40,6 @@ blocks:
   # Run on commit on main branch
     run:
       when: "branch = 'main' AND pull_request !~ '.*'"
-    skip:
-      when: ""
     task:
       jobs:
         - name: templates upload
