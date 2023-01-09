@@ -10,8 +10,8 @@ global_job_config:
     - name: 3dec-quickstart
 blocks:
   - name: Cloudformation linting
-#    run:
-#      when: "pull_request =~ '.*'"
+    run:
+      when: "pull_request =~ '.*'"
     task:
       jobs:
         - name: linting
