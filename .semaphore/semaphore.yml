@@ -10,7 +10,7 @@ global_job_config:
     - name: 3dec-quickstart
 blocks:
   - name: 3decision test templates upload
-    run:
+    skip:
       when: "branch = 'main'"
     task:
       jobs:
@@ -22,7 +22,7 @@ blocks:
             - sh ~/quickstart-discngine-3decision/.semaphore/bin/rewrite_qss.sh quickstart-discngine-3decision-test/
             - aws s3 sync ~/quickstart-discngine-3decision/templates s3://3decision-eu-central-1/quickstart-discngine-3decision-test/templates
   - name: 3decision templates upload
-    skip:
+    run:
       when: "branch = 'main'"
     task:
       jobs:
@@ -33,3 +33,17 @@ blocks:
             - export AWS_SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY}
             - sh ~/quickstart-discngine-3decision/.semaphore/bin/rewrite_qss.sh quickstart-discngine-3decision/
             - aws s3 sync ~/quickstart-discngine-3decision/templates s3://3decision-eu-central-1/quickstart-discngine-3decision/templates
+  - name: 3decision templates upload
+#    run:
+#      when: "pull_request =~ '.*'"
+    task:
+      jobs:
+        - name: 3decision templates upload
+          commands:
+            - checkout
+            - pip install cfn-lint
+            - cd ~/
+            - git clone https://github.com/aws-quickstart/qs-cfn-lint-rules.git
+            - cd qs-cfn-lint-rules
+            - pip install -e .
+            - cfn-lint ~/quickstart-discngine-3decision/templates/* -a ~/qs-cfn-lint-rules/qs_cfn_lint_rules/ -i E3001 W9001 W9002 W9003 W9004 W9005 W9006
