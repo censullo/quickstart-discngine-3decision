@@ -18,7 +18,6 @@ blocks:
           commands:
             - checkout
             - export PATH=$PATH:~/.local/bin
-            - pip install --user cfn-lint
             - cd ~/
             - git clone https://github.com/aws-quickstart/qs-cfn-lint-rules.git
             - cd qs-cfn-lint-rules
