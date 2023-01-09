@@ -1,5 +1,5 @@
 version: v1.0
-name: 3decision Quickstart templates upload
+name: 3decision Quickstart CI
 agent:
   machine:
     type: e1-standard-2
