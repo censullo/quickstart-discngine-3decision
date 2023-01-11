@@ -52,7 +52,7 @@ During deployment, you are prompted to provide information about your authentica
 . For *Sign-in redirect URI*, enter the following. Replace `<your domain>` and `<your_top_level_domain>` in the URI shown with your information (for example, `discngine.com`).
 
 +
-`\https://3decision-api.<you_domain>.<your_top_level_domain>/auth/azure/callback`
+`\https://3decision-api.<you_domain>.<your_top_level_domain>/auth/okta/callback`
 
 [start=8]
 . On the *Assignments* tab, under *Assign*, choose *Assign to Groups*. Choose group assignments to manage who will be able to access the application.
