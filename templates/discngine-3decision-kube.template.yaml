@@ -59,9 +59,7 @@ Parameters:
     Type: String
   EKSServiceCidr:
     Type: String
-  SecretAccessKey:
-    Type: String
-  AccessKey:
+  SecretRoleArn:
     Type: String
 
 Conditions:
@@ -206,17 +204,6 @@ Resources:
       Namespace: external-secrets
       Manifest: !Sub |
         ---
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: eso-secret
-          labels: 
-            type: aws
-        type: Opaque
-        stringData:
-          access-key: ${AccessKey}
-          secret-access-key: ${SecretAccessKey}
-        ---
         apiVersion: external-secrets.io/v1beta1
         kind: ClusterSecretStore
         metadata:
@@ -226,16 +213,7 @@ Resources:
             aws:
               service: SecretsManager
               region: ${AWS::Region}
-              auth:
-                secretRef:
-                  accessKeyIDSecretRef:
-                    name: eso-secret
-                    key: access-key
-                    namespace: external-secrets
-                  secretAccessKeySecretRef:
-                    name: eso-secret
-                    key: secret-access-key
-                    namespace: external-secrets
+              role: ${SecretRoleArn}
         ---
         apiVersion: external-secrets.io/v1beta1
         kind: ClusterExternalSecret
@@ -284,7 +262,7 @@ Resources:
       ClusterID: !Ref EKSClusterName
       Name: tdecision
       Namespace: !Ref TNamespace
-      Chart: oci://fra.ocir.io/discngine1/3decision_kube/3decision-helm:2.0.0
+      Chart: oci://fra.ocir.io/discngine1/3decision_kube/3decision-helm:2.1.5
       Values:
         nodeCloud.volumes.jwtSecret.name: 3decision-jwt-secret
         oracle.connectionString: !Ref DBConnectionString
@@ -320,68 +298,7 @@ Resources:
       ClusterID: !Ref EKSClusterName
       Name: choral
       Namespace: choral
-      Chart: oci://fra.ocir.io/discngine1/3decision_kube/choral-helm:1.0.4
+      Chart: oci://fra.ocir.io/discngine1/3decision_kube/choral-helm:1.1.6
       Values:
         oracle.connectionString: !Ref DBConnectionString
         pvc.storageClassName: gp2-encrypted
-  CreateIndexes:
-    Type: "AWSQS::Kubernetes::Resource"
-    DependsOn: ChoralChart
-    Properties:
-      ClusterName: !Ref EKSClusterName
-      Namespace: choral
-      Manifest: !Sub |
-        kind: Pod
-        apiVersion: v1
-        metadata:
-          name: index-change
-        spec:
-          restartPolicy: OnFailure
-          containers:
-          - name: index-change
-            image: fra.ocir.io/discngine1/3decision_kube/sqlcl
-            envFrom:
-            - secretRef:
-                name: database-secrets
-            command: ["/bin/bash", "-c"]
-            args:
-            - sleep 5m;
-              echo -ne '
-              WHENEVER SQLERROR EXIT SQL.SQLCODE;\n
-              CREATE INDEX IDX_CHOR_STR_SMALL_MOL_SMILES ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.STRICT_IDXTYPE;\n
-              CREATE INDEX IDX_CHOR_TAU_SMALL_MOL_SMILES ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_IDXTYPE;\n
-              CREATE INDEX IDX_CHOR_TAUISO_SMS ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_ISOMER_IDXTYPE;\n
-              CREATE INDEX IDX_CHOR_STRISO_SMS ON STRUCTURE_SMALL_MOL(SMILES) INDEXTYPE IS CHORAL_OWNER.STRICT_ISOMER_IDXTYPE;\n' > pd_t1_index.sql;
-              exit | /root/sqlcl/bin/sql PD_T1_DNG_THREEDECISION/${!DB_PASSWD}@${DBConnectionString} @pd_t1_index.sql;
-              if [ $? -ne 0 ]; then
-                echo -ne '
-                DROP INDEX IDX_CHOR_STR_SMALL_MOL_SMILES;\n
-                DROP INDEX IDX_CHOR_TAU_SMALL_MOL_SMILES;\n
-                DROP INDEX IDX_CHOR_TAUISO_SMS;\n
-                DROP INDEX IDX_CHOR_STRISO_SMS;\n' > delete_pd_t1_index.sql;
-                exit | /root/sqlcl/bin/sql PD_T1_DNG_THREEDECISION/${!DB_PASSWD}@${DBConnectionString} @delete_pd_t1_index.sql;        
-              exit 1;
-              fi;
-              echo -ne '
-              WHENEVER SQLERROR EXIT SQL.SQLCODE;\n
-              CREATE INDEX IDX_CHOR_STR_CMP_STRUC ON COMPOUND_STRUCTURES(CANONICAL_SMILES) INDEXTYPE IS CHORAL_OWNER.STRICT_IDXTYPE;\n
-              CREATE INDEX IDX_CHOR_TAU_CMP_STRUC ON COMPOUND_STRUCTURES(CANONICAL_SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_IDXTYPE;\n
-              CREATE INDEX IDX_CHOR_TAUISO_CMP_STRUC ON COMPOUND_STRUCTURES(CANONICAL_SMILES) INDEXTYPE IS CHORAL_OWNER.TAUTOMER_ISOMER_IDXTYPE;\n
-              CREATE INDEX IDX_CHOR_STRICT_CMP_STRUC ON COMPOUND_STRUCTURES(CANONICAL_SMILES) INDEXTYPE IS CHORAL_OWNER.STRICT_ISOMER_IDXTYPE;\n' > chembl_29_index.sql;
-              exit | /root/sqlcl/bin/sql CHEMBL_29/${!CHEMBL_DB_PASSWD}@${DBConnectionString} @chembl_29_index.sql;
-              if [ $? -ne 0 ]; then
-                echo -ne '
-                DROP INDEX IDX_CHOR_STR_CMP_STRUC;\n
-                DROP INDEX IDX_CHOR_TAU_CMP_STRUC;\n
-                DROP INDEX IDX_CHOR_TAUISO_CMP_STRUC;\n
-                DROP INDEX IDX_CHOR_STRICT_CMP_STRUC;\n' > delete_chembl_29_index.sql;
-                exit | /root/sqlcl/bin/sql CHEMBL_29/${!CHEMBL_DB_PASSWD}@${DBConnectionString} @delete_chembl_29_index.sql;        
-                exit 1;
-              fi;
-            resources:
-              limits:
-                cpu: 500m
-                memory: 500Mi
-              requests:
-                cpu: 150m
-                memory: 250Mi

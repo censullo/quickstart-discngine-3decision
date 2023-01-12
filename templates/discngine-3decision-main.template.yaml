@@ -29,6 +29,7 @@ Metadata:
           default: Amazon EKS configuration
         Parameters:
           - ConfigSetName
+          - KubernetesVersion
           - NodeVolumeSize
           - NodeInstanceType
           - NumberOfNodes
@@ -36,6 +37,7 @@ Metadata:
           - AdditionalEKSAdminRoleArn
           - ProvisionBastionHost
           - CustomAmiId
+          - NodeGroupName
       - Label:
           default: Discngine 3decision network configuration
         Parameters:
@@ -119,10 +121,14 @@ Metadata:
         default: Additional EKS admin ARN (IAM role)
       ConfigSetName:
         default: Config set name
+      KubernetesVersion:
+        default: Kubernetes version
       CustomAmiId:
         default: Custom AMI Id
       NodeVolumeSize:
         default: Size of worker nodes volumes
+      NodeGroupName:
+        default: Name of the node group
       DBSnapshotIdentifier:
         default: Identifier of the database snapshot
       DBInstanceIdentifier:
@@ -292,15 +298,19 @@ Parameters:
   RemoteAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access the instances. We recommend
-      that you set this value to a trusted IP range.
+    Description: The CIDR IP range that is permitted to access the bastion instance. This will have no effect if the bastion creation is set to false.
     Default: "127.0.0.1/32"
     Type: String
   ConfigSetName:
     Type: String
     Default: "dng-3decision"
-    Description: "Required: Name used to map advanced parameters to an EKS cluster.
-                  Change to blank to create eks default parameters."
+    Description: "Required: SSM Name used to map advanced parameters to an EKS cluster."
+  KubernetesVersion:
+  # https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-release-calendar
+    Type: String
+    Description: Kubernetes control plane version.
+    AllowedValues: ['1.22']
+    Default: '1.22'
   NodeVolumeSize:
     Type: String
     Default: 100
@@ -310,16 +320,24 @@ Parameters:
     Type: String
     Default: ""
     Description: "Optional: If an AMI ID is specified, it is used instead of the default EKS images for cluster nodes."
+  NodeGroupName:
+    Type: String
+    Default: "Default"
+    Description: "Optional: Name of the NodeGroup created in EKS.
+                  This should usually not be changed"
   PerAccountSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
     Default: 'AutoDetect'
-    Description: Choose "No" if you already deployed another EKS Quick Start stack in your AWS account.
+    Description: You can set "Yes" or "No" according to whether another EKS quickstart has been deployed in your account.
+                 Setting "AutoDetect" will check that for you.
+                 However, this option should not be used if you have SCPs blocking all access in certain regions as all cloudformation stacks will be listed in all regions. 
   PerRegionSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
     Default: 'AutoDetect'
-    Description: Choose "No" if you already deployed another EKS Quick Start stack in your Region.
+    Description: You can set "Yes" or "No" according to whether another EKS quickstart has been deployed in your region.
+                 Setting "AutoDetect" will check that for you.
   NumberOfNodes:
     Default: 3
     Description: The number of Amazon EKS node instances. The default is one for each of the three Availability Zones.
@@ -550,6 +568,7 @@ Resources:
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         ConfigSetName: !Ref ConfigSetName
+        KubernetesVersion: !Ref KubernetesVersion
         NodeInstanceType: !Ref NodeInstanceType
         RemoteAccessCIDR: !Ref RemoteAccessCIDR
         PerAccountSharedResources: !Ref PerAccountSharedResources
@@ -562,6 +581,7 @@ Resources:
         ProvisionBastionHost: !Ref ProvisionBastionHost
         DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
         CustomAmiId: !Ref CustomAmiId
+        NodeGroupName: !Ref NodeGroupName
         AzureClientId: !Ref AzureClientId
         AzureTenant: !Ref AzureTenant
         AzureSecret: !Ref AzureSecret

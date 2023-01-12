@@ -29,6 +29,7 @@ Metadata:
           default: Amazon EKS configuration
         Parameters:
           - ConfigSetName
+          - KubernetesVersion
           - NodeVolumeSize
           - NodeInstanceType
           - NumberOfNodes
@@ -36,6 +37,7 @@ Metadata:
           - AdditionalEKSAdminRoleArn
           - ProvisionBastionHost
           - CustomAmiId
+          - NodeGroupName
       - Label:
           default: Discngine 3decision network configuration
         Parameters:
@@ -119,10 +121,14 @@ Metadata:
         default: Additional EKS admin ARN (IAM role)
       ConfigSetName:
         default: Config set name
+      KubernetesVersion:
+        default: Kubernetes version
       CustomAmiId:
         default: Custom AMI Id
       NodeVolumeSize:
         default: Size of worker nodes volumes
+      NodeGroupName:
+        default: Name of the node group
       DBSnapshotIdentifier:
         default: Identifier of the database snapshot
       DBInstanceIdentifier:
@@ -274,15 +280,19 @@ Parameters:
   RemoteAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access the instances. We recommend
-      that you set this value to a trusted IP range.
+    Description: The CIDR IP range that is permitted to access the bastion instance. This will have no effect if the bastion creation is set to false.
     Default: "127.0.0.1/32"
     Type: String
   ConfigSetName:
     Type: String
     Default: "dng-3decision"
-    Description: "Required: Name used to map advanced parameters to an EKS cluster.
-                  Change to blank to create eks default parameters."
+    Description: "Required: SSM Name used to map advanced parameters to an EKS cluster."
+  KubernetesVersion:
+  # https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-release-calendar
+    Type: String
+    Description: Kubernetes control plane version.
+    AllowedValues: ['1.22']
+    Default: '1.22'
   NodeVolumeSize:
     Type: String
     Default: 100
@@ -292,16 +302,24 @@ Parameters:
     Type: String
     Default: ""
     Description: "Optional: If an AMI ID is specified, it is used instead of the default EKS images for cluster nodes."
+  NodeGroupName:
+    Type: String
+    Default: "Default"
+    Description: "Optional: Name of the NodeGroup created in EKS.
+                  This should usually not be changed"
   PerAccountSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
     Default: 'AutoDetect'
-    Description: Choose "No" if you already deployed another EKS Quick Start stack in your AWS account.
+    Description: You can set "Yes" or "No" according to whether another EKS quickstart has been deployed in your account.
+                 Setting "AutoDetect" will check that for you.
+                 However, this option should not be used if you have SCPs blocking all access in certain regions as all cloudformation stacks will be listed in all regions. 
   PerRegionSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
     Default: 'AutoDetect'
-    Description: Choose "No" if you already deployed another EKS Quick Start stack in your Region.
+    Description: You can set "Yes" or "No" according to whether another EKS quickstart has been deployed in your region.
+                 Setting "AutoDetect" will check that for you.
   NumberOfNodes:
     Default: 3
     Description: The number of Amazon EKS node instances. The default is one for each of the three Availability Zones.
@@ -346,7 +364,7 @@ Parameters:
     Type: String
   DBMultiZone:
     Description: High Availability (Multi-AZ) for Oracle RDS.
-        More informtion is available here - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html
+        More information is available here - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html.
     Type: String
     AllowedValues: [ 'true', 'false' ]
     Default: 'false'
@@ -470,14 +488,15 @@ Rules:
             - !Ref AWS::Region
         AssertDescription: The Quick Start is supported only in us-east-1 and eu-central-1 AWS Regions. Please contact Discngine to request support for other Regions.
 
+Mappings:
+  Config:
+    Prefix: { Value: 'eks-quickstart' }
+
 Conditions:
-  ConfiSetNameSet: !Equals [!Ref ConfigSetName, '']
-  CreateAdvancedConfigWithDefaults: !Not [Condition: ConfiSetNameSet]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
   AdvancedConfigDefaultsStack:
     Type: AWS::CloudFormation::Stack
-    Condition: CreateAdvancedConfigWithDefaults
     Metadata: { cfn-lint: { config: { ignore_checks: [E9902, W9901] } } }
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
@@ -488,15 +507,15 @@ Resources:
           S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
         ConfigSetName: !Ref ConfigSetName
-        ConsulUIAccessCIDR: !Ref RemoteAccessCIDR
-        VaultUIAccessCIDR: !Ref RemoteAccessCIDR
+        KubernetesVersion: !Ref KubernetesVersion
         NodeVolumeSize: !Ref NodeVolumeSize
-        KubernetesVersion: !Ref 'AWS::NoValue'
         CustomAmiId: !Ref CustomAmiId
+        NodeGroupName: !Ref NodeGroupName
   EKSStack:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
+    DependsOn: AdvancedConfigDefaultsStack
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml'
@@ -520,12 +539,18 @@ Resources:
         VPCID: !Ref VPCID
         PerAccountSharedResources: !Ref PerAccountSharedResources
         PerRegionSharedResources: !Ref PerRegionSharedResources
-        EfsStorageClass: 'Enabled'
         ClusterAutoScaler: 'Enabled'
         EKSPublicAccessEndpoint: 'Enabled'
         AdditionalEKSAdminUserArn: !Ref AdditionalEKSAdminUserArn
         AdditionalEKSAdminRoleArn: !Ref AdditionalEKSAdminRoleArn
         ProvisionBastionHost: !Ref ProvisionBastionHost
+  NodeGroupArn:
+    Type: Custom::CliQuery
+    DependsOn: [ AdvancedConfigDefaultsStack, EKSStack ]
+    Properties:
+      ServiceToken: !Sub ['arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Prefix}-ResourceReader', {Prefix: !FindInMap [Config, Prefix, Value]}]
+      AwsCliCommand: !Sub "eks describe-nodegroup --cluster-name ${EKSStack.Outputs.EKSClusterName} --nodegroup-name ${NodeGroupName} --query 'nodegroup.{nodeRole: nodeRole}'"
+      IdField: 'nodeRole'
   3decisionStack:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Delete
@@ -567,3 +592,4 @@ Resources:
         MainSubdomain: !Ref MainSubdomain
         ApiSubdomain: !Ref ApiSubdomain
         HelpSubdomain: !Ref HelpSubdomain
+        NodeGroupArn: !Ref NodeGroupArn
