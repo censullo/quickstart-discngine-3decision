@@ -1,6 +1,6 @@
 // Edit this placeholder text to accurately describe your architecture.
 
-This Partner Solution provides two deployment options:
+This Partner Solution provides three deployment options:
 
 * https://fwd.aws/PKJJ8?[Deploy {partner-product-short-name} into a new VPC]. This option builds a new AWS environment consisting of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys {partner-product-short-name} into this new VPC.
 * https://fwd.aws/jdzqY?[Deploy {partner-product-short-name} into an existing VPC]. This option provisions {partner-product-short-name} in an existing VPC. This VPC does not need to have public subnets but does require internet access.
