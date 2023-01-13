@@ -1,5 +1,5 @@
-:quickstart-project-name: quickstart-discngine-3decision
-:quickstart-github-org: aws-quickstart
+:partner-solution-project-name: quickstart-discngine-3decision
+:partner-solution-github-org: aws-quickstart
 :partner-product-name: Discngine 3decision
 :partner-product-short-name: 3decision
 :partner-company-name: Discngine S.A.S.
