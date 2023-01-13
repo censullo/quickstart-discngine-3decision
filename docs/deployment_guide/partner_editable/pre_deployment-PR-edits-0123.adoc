@@ -6,9 +6,9 @@
 
 To deploy the Partner Solution, you must have an administrator account with permissions to deploy the resources the Partner Solution contains, which include IAM roles. IAM roles deployed by this Partner Solution follow the principle of least privilege.
 
-=== Authentication
+=== Authentication provider
 
-During deployment, you are prompted to provide information about your authentication provider. 3decision supports OpenID Connect for both Azure and Okta. Refer to the following instructions to create Azure and Okta OpenID Connect applications.
+During deployment, you provide information about your authentication provider. 3decision supports LDAP and OpenID Connect authentication for Azure and Okta. Azure requires additional claims for 3decision to work with Azure. Refer to the following instructions to create Azure and Okta OpenID Connect applications.
 
 ==== Creating an Azure OpenID Connect application
 
@@ -16,8 +16,17 @@ During deployment, you are prompted to provide information about your authentica
 . Choose *Azure Active Directory*.
 . Under *App registrations*, choose *New registration*.
 . Enter a name for your application (for example, `Discngine 3decision prod`).
-. For *Redirect URI*, enter the following. Replace `<your domain>` and `<your_top_level_domain>` in the URI shown with your information (for example, `discngine.com`).
+. For *Redirect URI*, use URI format 1 to configure 3decision SaaS. Use URI format 2 for self-hosted.
 
+.. URI format 1: SaaS.
++
+Replace `<company>` with the name provided by your Discngine sales representative.
++
+`\https://3decision-<company>-api.discngine.cloud/auth/azure/callback`
+
+.. URI format 2: Self-hosted.
++
+Replace `<your domain>` and `<your_top_level_domain>` in the URI shown with your information (for example, `discngine.com`).
 +
 `\https://3decision-api.<your_domain>.<your_top_level_domain>/auth/azure/callback`
 
@@ -62,6 +71,13 @@ During deployment, you are prompted to provide information about your authentica
 
 During Partner Solution deployment, you can choose `default` as your Okta server ID. 3decision will use the scopes `email`, `profile`, `openid`, and `offline_access` and the claims `email` and `name` from the ID token. For more information, refer to https://help.okta.com/en/prod/Content/Topics/Apps/Apps_App_Integration_Wizard_OIDC.htm[Create OIDC app integrations using AIW].
 
+In Only 1 ("user" type). The notion of user role in 3decision (3 roles exists) is business oriented and only affect the layout of the application.
+
+The notion of "administrator" does not exist.
+
+Administration of the data is managed by a very granular grant management of projects and structure access within the app by the owner of the data.
+The owner of the data is the user that uploaded the structures in 3decision or a user that was granted the ownership.
+
 === VPC Tagging
 
 If you are deploying 3decision in an existing VPC, ensure that the private subnets have the correct tags.
@@ -93,26 +109,6 @@ You will then be able to enter the ARN of your copied snapshot in the AWS CloudF
 
 ==== Authentication & Authorization:
 
-*Q*: We would like to use AzureAD as cloud-identity-provider. How is this done?
-
-*A*: Please refer to the 3decision AWS Quick-Start documentation that describes the authentication app setup for both Azure and Okta in the "Predeployment steps" section: https://aws-quickstart.github.io/quickstart-discngine-3decision/#_predeployment_steps
-Note there is a difference on step 5:
-for 3decision SaaS, the reply URL you must setup will be as follows:
-https://3decision-<company>-api.discngine.cloud/auth/azure/callback
-- <company> will usually be provided by your Discngine sale contact. This value will usually be your company name or your company name abreviation.
-
-*Q*: Any options for other (future) cloud-directories ?
-
-*A*: Okta is also supported. The 3decision AWS Quickstart version also supports LDAP.
-
-*Q*: Which authentication protocols are supported by 3Decision Application platform?
-
-*A*: Open ID Connect and LDAP.
-
-Q: Why does Azure require additional claims and not Okta?
-
-A: Azure requires additional claims for 3decision to work with Azure. The default Azure ID token claims are not enough.
-
 *Q*: How many types of users/roles do we have?  (i.e. User vs. priviliged admin users)?
 
 *A*: Only 1 ("user" type). The notion of user role in 3decision (3 roles exists) is business oriented and only affect the layout of the application.
@@ -135,16 +131,6 @@ Data access policy within the app is deny-by-default for private data.
 Users can only public data by default.
 
 ==== AWS platform overview
-
-*Q*: Walkthrough of System landscape ?
-
-*A*: Please check the architecture schema here: https://aws-quickstart.github.io/quickstart-discngine-3decision/#_architecture
-
-*Q*: Examples of use (spin up / shut down)
-
-*A*: Spinning up 3decision Quickstart consists in executing a cloudformation script. You can launch it by clicking one of the 3 deployments options: "Deployment options" section here: https://aws-quickstart.github.io/quickstart-discngine-3decision/#_deployment_options
-
-Clicking on one of the 3 links will open your AWS console, you will need to fill 2 or 3 configuration details and hit the create button.
 
 *Q*: Any persistent nodes?
 
@@ -176,14 +162,6 @@ Clicking on one of the 3 links will open your AWS console, you will need to fill
 
 *A*: If Discngine technical staff can be provided with sufficiant AWS privileges (AWS administration privileges), deployment and maintenance can be provided as extra support.
 
-*Q*: Review of cloud infrastructure after UAT/deployment and before PROD deployment ?
-
-*A*: The customer can deploy as many test/dev/UAT environments as required, only production environements require a contractual licence.
-
-*Q*: Is there a licence file required ?
-
-*A*: No. The licence and user web seats are contractual.
-
 *Q*: Staff will be needing access to cluster, should we pay for additionnal web seats ?
 
 *A*: No. Admin access are free, even in production.
@@ -204,15 +182,6 @@ Clicking on one of the 3 links will open your AWS console, you will need to fill
 
   * `rsync.ebi.ac.uk` on port 873
   * `rsync.wwpdb.org` on ports 873 and 33444
-
-==== Data Encryption
-
-*Q*: How is data encrypted ?
-
-*A*: The RDS Database created during the deployment is based on a snapshot. In order to make this snapshot public, the snapshot is not encrypted.
-
-If you would like your database to be encrypted you will need to follow these steps https://aws-quickstart.github.io/quickstart-discngine-3decision/#_encrypting_the_database
-
 
 ==== Testing/verification
 
@@ -290,9 +259,3 @@ The best estimate is done by deploying a temporary 3decision environnement in an
 *Q*: Does Discngine have any average figures to draw on, from existing customers, in regards to amount of cloud storage that will be needed (i.e. in best, worst and most likely scenarios). These figures will be used to calculate expected storage usage, also for inputs to cost drivers and budgeting.
 
 *A*: EBS: overall storage is ~1.2Tb. RDS Oracle: 1Tb (extensible to 3Tb, some customers use up to 2Tb). You can roughly consider that uploading large scale datasets like Alphafold will require 1 additionnal Tb for EBS and 1 additionnal Tb for RDS.
-
-==== Planning the deployment
-
-*Q*: Is there a documentation explaining how to plan the deployment ?
-
-*A*: Yes: https://aws-ia.github.io/content/qs_info.html and https://aws-quickstart.github.io/quickstart-discngine-3decision/
