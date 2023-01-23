@@ -26,7 +26,6 @@ If you did not provide an SSL certificate during the Partner Solution deployment
 
 ** If you have a certificate that isn't managed by ACM or IAM, https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html[import] it to ACM and add it to your listener. For more information, refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html[Listeners for your Network Load Balancer].
 
-
 === (Optional) Create a CNAME record in your DNS provider
 
 If you did not provide a Route 53 hosted zone ID during the Partner Solution installation, you must create the following three DNS records.

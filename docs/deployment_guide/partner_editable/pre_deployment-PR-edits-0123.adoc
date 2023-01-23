@@ -4,7 +4,7 @@
 
 === Administrator privileges
 
-To deploy the Partner Solution, you must have an administrator account with permissions to deploy the resources the Partner Solution contains, which include IAM roles. IAM roles deployed by this Partner Solution follow the principle of least privilege.
+To deploy the Partner Solution, you must have an AWS administrator account with permissions to deploy the resources the Partner Solution contains, which include IAM roles. IAM roles deployed by this Partner Solution follow the principle of least privilege. For more information about the Partner Solution architecture, refer to link:#_architecture[Architecture], earlier in this guide.
 
 === Authentication provider
 
@@ -80,24 +80,11 @@ The owner of the data is the user that uploaded the structures in 3decision or a
 
 === VPC Tagging
 
-If you are deploying 3decision in an existing VPC, ensure that the private subnets have the correct tags.
-
-The tag *kubernetes.io/role/elb* needs to be added on each public subnet and the tag *kubernetes.io/role/internal-elb* on each private subnet.
-
-The value of the tags should remain empty.
+Before deploying 3decision to an existing VPC, ensure that the public subnets have the *kubernetes.io/role/elb* tag and the private subnets have the *kubernetes.io/role/internal-elb* tag. The value of the tags should remain empty.
 
 === Encrypting the Database
 
-The RDS Database created during the deployment is based on a snapshot.
-In order to make this snapshot public, the snapshot is not encrypted.
-
-If you would like your database to be encrypted you will have to copy this snapshot into your AWS account first.
-
-This can be done by going to the public tab in the RDS snapshot sections, and searching for **db3dec<version>** and grabbing the latest version.
-
-You can then select it, choose copy in actions, and select the encrypt option.
-
-You will then be able to enter the ARN of your copied snapshot in the AWS CloudFormation parameters. If field is left blank, the unencrypted latest snapshot will be used.
+The deployment creates an RDS database based on a public unencrypted snapshot. To encrypt the snapshot, first copy the latest version of the **db3dec<version>** snapshot and add encryption to the copy. For more information, refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CopySnapshot.html#copying_a_DB_snapshot[Copying a DB snapshot].
 
 === FAQ before deployment
 
@@ -194,7 +181,7 @@ Users can only public data by default.
 *A*: Each 3decision microservice provides a liveness and readiness endpoint but no canary monitoring is provided out of the box. Monitoring probes must be configured by the customer.
 
 
-==== Sizing and shapes
+==== Database sizing and shapes
 
 *Q*: What are sizing specs for the database ?
 
@@ -226,25 +213,6 @@ License is included in the shape AWS (license included, and is charged over AWS 
 
 The best estimate is done by deploying a temporary 3decision environnement in an AWS sandbox and use AWS finops tools to track the costs for a sort period of time.
 
-
-
-==== Technical AWS infrastructure:
-
-*Q*: What is an AWS Partner Solution? In more detail, what is this “AWS Quick Starts process”? Is it Cloudformation templates, CDK scripts or something third?
-
-*A*: For information about Partner Solutions, refer to the https://aws-ia.github.io/content/qs_info.html[AWS Partner Solution General Content Guide]. 3decision is a AWS Biotech Blueprint Partner Solution that uses CloudFormation templates. When you deploy the 3decision Partner Solution, the CloudFormation console opens.
-
-*Q*: Is there an OS requirement?
-
-*A*: 3decision uses Amazon EKS cluster with Linux nodes. EC2 instance management is automated by Amazon EKS. Some customers use their own hardened node images.
-
-*Q*: Is 3decision using ”just” EC2 nodes or is it EKS nodes?
-
-*A*: EKS nodes.
-
-*Q*: Same for the database – which one?
-
-*A*: Oracle RDS Database Shape can be changed during the Cloud formation deployment (or afterwards). The default and recommended shape is db.t3.xlarge.
 
 ==== Storage capacity specifications
 
