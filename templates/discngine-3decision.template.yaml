@@ -133,7 +133,7 @@ Parameters:
     Type: String
   VPCID:
     Type: String
-    Description: (Required) ID of the VPC in which the EKS cluster is deployed.
+    Description: (Required) ID of the VPC into which the EKS cluster is deployed.
   QSS3BucketName:
     AllowedPattern: ^[0-9a-z]+([0-9a-z-\.]*[0-9a-z])*$
     ConstraintDescription: >-
@@ -171,7 +171,7 @@ Parameters:
     Type: String
   DBSnapshotIdentifier:
     Default: ""
-    Description: (Optional) To use a database snapshot other than the default, enter a snapshot ARN. To encrypt the default database, create a snapshot copy, add encryption to the copy, and use the ARN of the copy.
+    Description: (Optional) To use a database snapshot other than the default, enter a snapshot ARN. To encrypt the default public unencrypted snapshot, create a copy, add encryption to the copy, and use the ARN of the copy.
     Type: String
   DBInstanceIdentifier:
     Default: db3dec
@@ -180,16 +180,15 @@ Parameters:
     MinLength: '1'
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
   DBName:
     Default: ORCL
-    Description: "Optional: The name given to the RDS Oracle database.
-                  This defaults to ORCL."
+    Description: (Optional) Enter a name for the RDS Oracle database.
     Type: String
     MinLength: '1'
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
   DBSubnets:
     Description: 'Required: Subnets to use for the creation of the db subnet group.
                   These need to be the same subnets as the ones containing your eks nodes'

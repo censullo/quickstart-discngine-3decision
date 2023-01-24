@@ -187,7 +187,7 @@ Parameters:
   NodeInstanceType:
     Type: String
     Default: t3.xlarge
-    Description: EKS node instance type. We recommend using "t3.xlarge", the minimal required node shape. Scaling is not noticeable by scaling this up.
+    Description: EC2 instance type for EKS nodes. We recommend using the default "t3.xlarge".
     AllowedValues:
       - t3.xlarge
       - t3.2xlarge
@@ -315,7 +315,7 @@ Parameters:
   ConfigSetName:
     Type: String
     Default: "dng-3decision"
-    Description: "Required: SSM Name used to map advanced parameters to an EKS cluster."
+    Description: (Required) SSM name used to map advanced parameters to an EKS cluster.
   KubernetesVersion:
   # https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-release-calendar
     Type: String
@@ -325,17 +325,15 @@ Parameters:
   NodeVolumeSize:
     Type: String
     Default: 100
-    Description: "Required: Size of EBS volumes attached to worker nodes.
-                  Increase this size if your pods are getting evicted with a disk pressure annotation."
+    Description: (Required) Size of EBS volumes attached to worker nodes.          Increase size to remediate node-pressure pod eviction.
   CustomAmiId:
     Type: String
     Default: ""
-    Description: "Optional: If an AMI ID is specified, it is used instead of the default EKS images for cluster nodes."
+    Description: (Optional) Enter an AMI ID to use for cluster nodes instead of the default EKS images.
   NodeGroupName:
     Type: String
     Default: "Default"
-    Description: "Optional: Name of the NodeGroup created in EKS.
-                  This should usually not be changed"
+    Description: (Optional) Name of the node group created in EKS. Normally this is not changed.
   PerAccountSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
