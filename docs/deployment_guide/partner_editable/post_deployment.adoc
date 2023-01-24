@@ -40,10 +40,11 @@ Both records must target the 3decision Application Load Balancer. To obtain the 
 
 === Additional information
 
-This Partner Solution does not include the following:
+* **Infrastructure monitoring and log collection.** This Partner Solution does not include infrastructure monitoring or log collection. 3decision updates are provided as Helm charts updates. Although these updates are free, you must apply Helm upgrades manually to the deployed EKS cluster.
 
-* Infrastructure monitoring.
+* **Data administration.** Although there are three roles in 3decision, these only affect the application layout. There is only one user type; an "administrator" user does not exist. In 3decision, the data owner — the user that uploads the structure to 3decision or is granted ownership by another user — manages data administration.
 
-* Log collection.
+* **User access management.** Configure user access management in the authentication provider (Okta or Azure) by granting access to the OpenID Connect application. For more information, refer to link:#_authentication_provider[Authentication provider], earlier in this guide. By default, the data access policy in 3decision denies access to private data. Users can only access public data by default.
 
-3decision updates are provided as Helm charts updates. Although these updates are free, you must manually apply Helm upgrades to the deployed EKS cluster.
+
+

@@ -69,7 +69,7 @@ Replace `<your domain>` and `<your_top_level_domain>` in the URI shown with your
 . Copy the secret, as you'll use it during the Partner Solution deployment.
 . In the upper-right corner of the Okta dashboard, copy the Okta domain in the global header (for example, `example.okta-emea.com`). You'll use it during the Partner Solution deployment.
 
-During Partner Solution deployment, you can choose `default` as your Okta server ID. 3decision will use the scopes `email`, `profile`, `openid`, and `offline_access` and the claims `email` and `name` from the ID token. For more information, refer to https://help.okta.com/en/prod/Content/Topics/Apps/Apps_App_Integration_Wizard_OIDC.htm[Create OIDC app integrations using AIW].
+During Partner Solution deployment, you can choose `default` as your Okta server ID. 3decision will use the scopes `email`, `profile`, `openid`, and `offline_access` and the claims `email` and `name` from the ID token. For more information, refer to https://help.okta.com/en/prod/Content/Topics/Apps/Apps_App_Integration_Wizard_OIDC.htm[Create OIDC app integrations using AIW^].
 
 In Only 1 ("user" type). The notion of user role in 3decision (3 roles exists) is business oriented and only affect the layout of the application.
 
@@ -84,38 +84,14 @@ Before deploying 3decision to an existing VPC, ensure that the public subnets ha
 
 === Encrypting the Database
 
-The deployment creates an RDS database based on a public unencrypted snapshot. To encrypt the snapshot, first copy the latest version of the **db3dec<version>** snapshot and add encryption to the copy. For more information, refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CopySnapshot.html#copying_a_DB_snapshot[Copying a DB snapshot].
+The deployment creates an RDS database based on a public unencrypted snapshot. To encrypt the snapshot, first copy the latest version of the **db3dec<version>** snapshot and add encryption to the copy. For more information, refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CopySnapshot.html#copying_a_DB_snapshot[Copying a DB snapshot^].
 
-=== FAQ before deployment
 
 ==== Automation
-
+//TODO The Partner Solution does not deploy EC2, so why a question about EC2 management?
 *Q*: Concerning EC2 management, will there be any residual work needed for preparing the environment after the quickstart templates has been executed during deployment?
 
 *A*: Only EKS managed nodes are deployed, and as such no further work is needed.
-
-==== Authentication & Authorization:
-
-*Q*: How many types of users/roles do we have?  (i.e. User vs. priviliged admin users)?
-
-*A*: Only 1 ("user" type). The notion of user role in 3decision (3 roles exists) is business oriented and only affect the layout of the application.
-
-The notion of "administrator" does not exist.
-
-Administration of the data is managed by a very granular grant management of projects and structure access within the app by the owner of the data.
-The owner of the data is the user that uploaded the structures in 3decision or a user that was granted the ownership.
-
-This aspect is part of the training/onboarding.
-
-*Q*: How do we manage access control and User Management within application!
-
-*A*: User access management is performed at the level of the identity provicer (Azure, Okta) by granting/revoking acces to the Open ID connect application.
-
-Access to the data to users is managed in the application by a data owners (people that uploaded the data or that are made owners).
-
-Data access policy within the app is deny-by-default for private data.
-
-Users can only public data by default.
 
 ==== AWS platform overview
 
@@ -127,6 +103,7 @@ Users can only public data by default.
 
 *A*: No, analysed data and metadata is stored in an Oracle RDS database. Your RAW data (uploaded structures and files) is also persisted on encrypted EBS volumes as a "datasafe".
 
+//TODO This is covered in the Architecture section.
 *Q*: Loadbalancing / failover ?
 
 *A*: The quickstart deploys an application load balancer (flexibility over network configuration is included in the cloudformation options, especially for Route53).
