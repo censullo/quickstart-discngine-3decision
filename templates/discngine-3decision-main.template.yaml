@@ -130,15 +130,15 @@ Metadata:
       NodeGroupName:
         default: Name of the node group
       DBSnapshotIdentifier:
-        default: Identifier of the database snapshot
+        default: Database snapshot identifier
       DBInstanceIdentifier:
-        default: Identifier of the database
+        default: Database identifier
       DBName:
-        default: Name of the database
+        default: Database name
       DBInstanceClass:
         default: Database instance type
       DBMultiZone:
-        default: DB high availability
+        default: Database high availability
       TNamespace:
         default: 3decision Helm chart namespace
       JWTSecretName:

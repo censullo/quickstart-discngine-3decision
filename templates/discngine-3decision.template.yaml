@@ -62,78 +62,78 @@ Metadata:
           - QSS3KeyPrefix
     ParameterLabels:
       EKSClusterName:
-        default: Name of EKS Cluster
+        default: EKS cluster name
       VPCID:
         default: ID of the VPC
       QSS3BucketName:
-        default: Quick Start S3 bucket name
+        default: Partner Solution S3 bucket name
       QSS3BucketRegion:
-        default: Quick Start S3 bucket region
+        default: Partner Solution S3 bucket Region
       QSS3KeyPrefix:
-        default: Quick Start S3 key prefix
+        default: Partner Solution S3 key prefix
       DBSnapshotIdentifier:
-        default: Identifier of the database snapshot
+        default: Database snapshot identifier
       DBInstanceIdentifier:
-        default: Identifier of the database
+        default: Database identifier
       DBName:
-        default: Name of the database
+        default: Database name
       DBSubnets:
-        default: Subnets in the db subnet group
+        default: Database subnet group subnets
       DBInstanceClass:
-        default: Instance type of the database
+        default: Database instance type
       DBMultiZone:
-        default: Whether the DB is highly available
+        default: Database high availability
       TNamespace:
         default: 3decision Helm chart namespace
       JWTSecretName:
         default: Secret Name
       ConfigureEKS:
-        default: Boolean determining whether to configure EKS
+        default: Configure EKS
       HostedZoneId:
-        default: Route 53 hosted zone Id
+        default: Route 53 hosted zone ID
       DomainName:
-        default: Domain name used for load balancing
+        default: Load balancing domain name
       MainSubdomain:
-        default: Subdomain name for app landing page
+        default: App landing page subdomain name
       ApiSubdomain:
-        default: Subdomain of the api
+        default: API subdomain
       HelpSubdomain:
-        default: Subdomain of the help page
+        default: Help page subdomain
       CertificateArn:
-        default: Arn of a certificate
+        default: Certificate ARN
       LoadBalancerType:
-        default: Type of loadbalancer created
+        default: Load balancer type
       LoadBalancerClass:
-        default: Loadbalancer class
+        default: Load balancer class
       AzureClientId:
-        default: Azure app client id
+        default: Azure app client ID
       AzureSecret:
         default: Azure app secret
       AzureTenant:
         default: Azure tenant
       AzureRedirectUri:
-        default: Azure app redirect uri
+        default: Azure app redirect URI
       OktaClientId:
-        default: Okta app client id
+        default: Okta app client ID
       OktaSecret:
         default: Okta app secret
       OktaDomain:
         default: Okta domain
       OktaServerId:
-        default: Okta server id
+        default: Okta server ID
       OktaRedirectUri:
-        default: Okta app redirect uri
+        default: Okta app redirect URI
       NodeGroupArn:
-        default: Arn of the default node group
+        default: Default node group ARN
       NodeSecurityGroup:
-        default: Security group of the default node group
+        default: Default node group security group
 Parameters:
   EKSClusterName:
-    Description: "Required: The name of the EKS cluster in which the stacks will be deployed"
+    Description: (Required) Name of the EKS cluster in which the stacks are deployed.
     Type: String
   VPCID:
     Type: String
-    Description: "Required: The id of the VPC in which the EKS cluster is deployed"
+    Description: (Required) ID of the VPC in which the EKS cluster is deployed.
   QSS3BucketName:
     AllowedPattern: ^[0-9a-z]+([0-9a-z-\.]*[0-9a-z])*$
     ConstraintDescription: >-
@@ -171,14 +171,11 @@ Parameters:
     Type: String
   DBSnapshotIdentifier:
     Default: ""
-    Description: "Optionnal: the snapshot arn used for the database.
-                  If left empty, the default snapshot will be used.
-                  But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
+    Description: (Optional) To use a database snapshot other than the default, enter a snapshot ARN. To encrypt the default database, create a snapshot copy, add encryption to the copy, and use the ARN of the copy.
     Type: String
   DBInstanceIdentifier:
     Default: db3dec
-    Description: "Optional: The database instance name.
-                  This defaults to db3dec."
+    Description: (Optional) Database instance name.
     Type: String
     MinLength: '1'
     MaxLength: '8'
