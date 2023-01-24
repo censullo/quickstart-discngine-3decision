@@ -88,7 +88,7 @@ The deployment creates an RDS database based on a public unencrypted snapshot. T
 
 
 ==== Automation
-//TODO The Partner Solution does not deploy EC2, so why a question about EC2 management?
+
 *Q*: Concerning EC2 management, will there be any residual work needed for preparing the environment after the quickstart templates has been executed during deployment?
 
 *A*: Only EKS managed nodes are deployed, and as such no further work is needed.
@@ -146,17 +146,6 @@ The deployment creates an RDS database based on a public unencrypted snapshot. T
 
   * `rsync.ebi.ac.uk` on port 873
   * `rsync.wwpdb.org` on ports 873 and 33444
-
-==== Testing/verification
-
-*Q*: Support of Automated System Verification test cases?
-
-*A*: Currently no automated testing available for now. Smoke tests will arrive later in 2023.
-
-*Q*: Automated health checks ?
-
-*A*: Each 3decision microservice provides a liveness and readiness endpoint but no canary monitoring is provided out of the box. Monitoring probes must be configured by the customer.
-
 
 ==== Database sizing and shapes
 

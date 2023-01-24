@@ -42,9 +42,46 @@ Both records must target the 3decision Application Load Balancer. To obtain the 
 
 * **Infrastructure monitoring and log collection.** This Partner Solution does not include infrastructure monitoring or log collection. 3decision updates are provided as Helm charts updates. Although these updates are free, you must apply Helm upgrades manually to the deployed EKS cluster.
 
-* **Data administration.** Although there are three roles in 3decision, these only affect the application layout. There is only one user type; an "administrator" user does not exist. In 3decision, the data owner — the user that uploads the structure to 3decision or is granted ownership by another user — manages data administration.
+* **Data administration.** Although there are three roles in 3decision, these only affect the application layout. There is only one user type; an "administrator" user does not exist. In 3decision, the data owner—the user that uploads the structure to 3decision or is granted ownership by another user—manages data administration.
 
 * **User access management.** Configure user access management in the authentication provider (Okta or Azure) by granting access to the OpenID Connect application. For more information, refer to link:#_authentication_provider[Authentication provider], earlier in this guide. By default, the data access policy in 3decision denies access to private data. Users can only access public data by default.
 
+* **Operations and security.**
+
+* **Testing and verification.** This Partner Solution does not currently support automated testing. Although each 3decision microservice provides a liveness and readiness endpoint, you must configure monitoring probes.
+
+* **Database size and instance type.** The recommended database instance type for up to 20 concurrent users is `t3.xlarge`. You specify database instance type with the ... parameter during deployment.
+
+==== Database sizing and shapes
+
+*Q*: What are sizing specs for the database ?
+
+*A*: Database shape for up to 20 users (concurrent) t3.xlarge is recommended. This can be increased during the deployment.
+
+Oracle RDS storage is 1Tb (extensible to 3Tb, some customers use up to 2Tb).
+
+*Q*: Sizing of storage:
+
+*A*: EBS: overall storage is ~1.2Tb.
+
+EBS volumes : 8 * 50Go + 1 * 8 Go + 1 * 512 Go
+
+*Q*: what is the minimal kubernetes nodes specs ?
+
+*A*: Customers are using application in different ways, and config may differ.
+
+The minimal configuration is 3 nodes. Shape size should be kept as 3 * t3.xlarge.
+
+*Q*: DB is Amazon ORACLE RDS?
+
+*A*: Yes, ORACLE RDS Standard edition
+
+License is included in the shape AWS (license included, and is charged over AWS consumption)
+
+*Q*: Sizing for cost estimates approach?
+
+*A*: With default sizing, the 3decision environement should cost around 1000euros per month.
+
+The best estimate is done by deploying a temporary 3decision environnement in an AWS sandbox and use AWS finops tools to track the costs for a sort period of time.
 
 
