@@ -11,7 +11,7 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: "Network configuration"
+          default: Network configuration
         Parameters:
           - VPCCIDR
           - PublicSubnet1CIDR
@@ -58,7 +58,7 @@ Metadata:
           - DBInstanceClass
           - DBMultiZone
       - Label:
-          default: Discngine 3decision kube configuration
+          default: Discngine 3decision Kubernetes configuration
         Parameters:
           - TNamespace
           - JWTSecretName
@@ -75,7 +75,7 @@ Metadata:
           - OktaServerId
           - OktaRedirectUri
       - Label:
-          default: AWS Quick Start configuration
+          default: AWS Partner Solution configuration
         Parameters:
           - QSS3BucketName
           - QSS3BucketRegion
@@ -98,11 +98,11 @@ Metadata:
       PublicSubnet3CIDR:
         default: Public subnet 3 CIDR
       QSS3BucketName:
-        default: Quick Start S3 bucket name
+        default: Partner Solution S3 bucket name
       QSS3BucketRegion:
-        default: Quick Start S3 bucket region
+        default: Partner Solution S3 bucket Region
       QSS3KeyPrefix:
-        default: Quick Start S3 key prefix
+        default: Partner Solution S3 key prefix
       RemoteAccessCIDR:
         default: Allowed external access CIDR
       VPCCIDR:
@@ -120,11 +120,11 @@ Metadata:
       AdditionalEKSAdminRoleArn:
         default: Additional EKS admin ARN (IAM role)
       ConfigSetName:
-        default: Config set name
+        default: Configuration set name
       KubernetesVersion:
         default: Kubernetes version
       CustomAmiId:
-        default: Custom AMI Id
+        default: Custom AMI ID
       NodeVolumeSize:
         default: Size of worker nodes volumes
       NodeGroupName:
@@ -136,59 +136,58 @@ Metadata:
       DBName:
         default: Name of the database
       DBInstanceClass:
-        default: Instance type of the database
+        default: Database instance type
       DBMultiZone:
-        default: Whether the DB is highly available
+        default: DB high availability
       TNamespace:
         default: 3decision Helm chart namespace
       JWTSecretName:
-        default: Secret Name
+        default: Secret name
       HostedZoneId:
-        default: Route 53 hosted zone Id
+        default: Route 53 hosted zone ID
       DomainName:
-        default: Domain name used for load balancing
+        default: Load balancing domain name
       MainSubdomain:
-        default: Subdomain name for app landing page
+        default: App landing page subdomain name
       ApiSubdomain:
-        default: Subdomain of the api
+        default: API subdomain
       HelpSubdomain:
-        default: Subdomain of the help page
+        default: Help page subdomain
       CertificateArn:
-        default: Arn of a certificate
+        default: Certificate ARN
       LoadBalancerType:
-        default: Type of loadbalancer created
+        default: Load balancer type
       LoadBalancerClass:
-        default: Loadbalancer class
+        default: Load balancer class
       ProvisionBastionHost:
-        default: Whether to provision a bastion host
+        default: Provision bastion host
       AzureClientId:
-        default: Azure app client id
+        default: Azure app client ID
       AzureSecret:
         default: Azure app secret
       AzureTenant:
         default: Azure tenant
       AzureRedirectUri:
-        default: Azure app redirect uri
+        default: Azure app redirect URI
       OktaClientId:
-        default: Okta app client id
+        default: Okta app client ID
       OktaSecret:
         default: Okta app secret
       OktaDomain:
         default: Okta domain
       OktaServerId:
-        default: Okta server id
+        default: Okta server ID
       OktaRedirectUri:
-        default: Okta app redirect uri
+        default: Okta app redirect URI
 Parameters:
   KeyPairName:
     Description: A public/private key pair, which allows you to connect securely to your instance after it launches.
     Type: AWS::EC2::KeyPair::KeyName
-    ConstraintDescription: Must be the name of an existing Keyname
+    ConstraintDescription: Must be an existing key name.
   NodeInstanceType:
     Type: String
     Default: t3.xlarge
-    Description: EKS node instance type.
-                 We recommend using t3.xlarge as this is the minimal required node shape, but scaling is not noticeable by scaling this up.
+    Description: EKS node instance type. We recommend using "t3.xlarge", the minimal required node shape. Scaling is not noticeable by scaling this up.
     AllowedValues:
       - t3.xlarge
       - t3.2xlarge
@@ -232,68 +231,80 @@ Parameters:
       - z1d.12xlarge
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    ConstraintDescription: CIDR block parameter must be in the form "x.x.x.x/16-28".
     Default: 10.0.0.0/16
     Description: The CIDR block for the VPC.
     Type: String
   PublicSubnet1CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    ConstraintDescription: CIDR block parameter must be in the form "x.x.x.x/16-28".
     Default: 10.0.128.0/20
-    Description: The CIDR block used for the public subnet located in Availability Zone 1.
+    Description: The CIDR block used for the public subnet, located in Availability Zone 1.
     Type: String
   PublicSubnet2CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    ConstraintDescription: CIDR block parameter must be in the form "x.x.x.x/16-28".
     Default: 10.0.144.0/20
-    Description: The CIDR block used for the public subnet located in Availability Zone 2.
+    Description: The CIDR block used for the public subnet, located in Availability Zone 2.
     Type: String
   PublicSubnet3CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    ConstraintDescription: CIDR block parameter must be in the form "x.x.x.x/16-28".
     Default: 10.0.160.0/20
-    Description: The CIDR block for the public (DMZ) subnet 3 located in Availability Zone 3.
+    Description: The CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3.
     Type: String
   PrivateSubnet1CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    ConstraintDescription: CIDR block parameter must be in the form "x.x.x.x/16-28".
     Default: 10.0.0.0/19
-    Description: The CIDR block used for the private subnet located in Availability Zone 1.
+    Description: The CIDR block used for the private subnet, located in Availability Zone 1.
     Type: String
   PrivateSubnet2CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    ConstraintDescription: CIDR block parameter must be in the form "x.x.x.x/16-28".
     Default: 10.0.32.0/19
-    Description: The CIDR block used for the private subnet located in Availability Zone 2.
+    Description: The CIDR block used for the private subnet, located in Availability Zone 2.
     Type: String
   PrivateSubnet3CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    ConstraintDescription: CIDR block parameter must be in the form "x.x.x.x/16-28".
     Default: 10.0.64.0/19
-    Description: The CIDR block for private subnet 3 located in Availability Zone 3.
+    Description: The CIDR block for private subnet 3, located in Availability Zone 3.
     Type: String
   QSS3BucketName:
-    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
-      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
-      (-).
+    AllowedPattern: ^[0-9a-z]+([0-9a-z-\.]*[0-9a-z])*$
+    ConstraintDescription: >-
+      The S3 bucket name can include numbers, lowercase letters,
+      and hyphens (-), but it cannot start or end with a hyphen.
     Default: aws-quickstart
-    Description: S3 bucket name for the Quick Start assets. This string can include
-      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
-      or end with a hyphen (-).
+    Description: >-
+      Name of the S3 bucket for your copy of the deployment assets. Keep the default
+      name unless you are customizing the template. Changing the name updates code
+      references to point to a new location.
+    MinLength: 3
+    MaxLength: 63
     Type: String
   QSS3BucketRegion:
-    Default: 'eu-central-1'
-    Description: "The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value."
+    Default: us-east-1
+    Description: >-
+      AWS Region where the S3 bucket (QSS3BucketName) is hosted. Keep
+      the default Region unless you are customizing the template. Changing the Region
+      updates code references to point to a new location. When using your own bucket,
+      specify the Region.
     Type: String
   QSS3KeyPrefix:
-    AllowedPattern: ^[0-9a-zA-Z-/]*$
-    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slash (/).
+    AllowedPattern: ^([0-9a-zA-Z!-_\.\*'\(\)/]+/)*$
+    ConstraintDescription: >-
+      The S3 key prefix can include numbers, lowercase letters, uppercase letters,
+      hyphens (-), underscores (_), periods (.), asterisks (*), single quotes ('),
+      open parenthesis ((), close parenthesis ()), and forward slashes (/). End the
+      prefix with a forward slash.
     Default: quickstart-discngine-3decision/
-    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
-      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
-      forward slash (/).
+    Description: >-
+      S3 key prefix that is used to simulate a folder for your copy of the
+      deployment assets. Keep the default prefix unless you are customizing
+      the template. Changing the prefix updates code references to point to
+      a new location.
     Type: String
   RemoteAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
@@ -331,7 +342,7 @@ Parameters:
     Default: 'AutoDetect'
     Description: You can set "Yes" or "No" according to whether another EKS quickstart has been deployed in your account.
                  Setting "AutoDetect" will check that for you.
-                 However, this option should not be used if you have SCPs blocking all access in certain regions as all cloudformation stacks will be listed in all regions. 
+                 However, this option should not be used if you have SCPs blocking all access in certain regions as all cloudformation stacks will be listed in all regions.
   PerRegionSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
@@ -345,7 +356,7 @@ Parameters:
   DBSnapshotIdentifier:
     Default: ""
     Description: "Optionnal: the snapshot arn used for the database.
-                  If left empty, the default snapshot will be used. 
+                  If left empty, the default snapshot will be used.
                   But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
     Type: String
   DBInstanceIdentifier:
