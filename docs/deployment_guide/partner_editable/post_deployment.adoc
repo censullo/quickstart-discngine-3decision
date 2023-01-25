@@ -6,7 +6,7 @@
 
 If you did not provide an SSL certificate during the Partner Solution deployment, edit the listener to configure an SSL certificate.
 
-. Open the https://console.aws.amazon.com/ec2/[Amazon EC2] console.
+. Open the https://console.aws.amazon.com/ec2/[Amazon EC2^] console.
 
 . In the navigation pane, under *Load Balancing*, choose *Load Balancers*.
 
@@ -20,11 +20,11 @@ If you did not provide an SSL certificate during the Partner Solution deployment
 
 . Change the default Secure Socket Layer (SSL) certificate. For *Default SSL certificate*, do one of the following:
 
-** If you created or https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html[imported] a certificate using AWS Certificate Manager, choose *From ACM* and choose the certificate.
+** If you created or https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html[imported^] a certificate using AWS Certificate Manager, choose *From ACM* and choose the certificate.
 
 ** If you uploaded a certificate using IAM, choose *From IAM* and choose the certificate.
 
-** If you have a certificate that isn't managed by ACM or IAM, https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html[import] it to ACM and add it to your listener. For more information, refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html[Listeners for your Network Load Balancer].
+** If you have a certificate that isn't managed by ACM or IAM, https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html[import^] it to ACM and add it to your listener. For more information, refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html[Listeners for your Network Load Balancer^].
 
 === (Optional) Create a CNAME record in your DNS provider
 
@@ -36,35 +36,37 @@ If you did not provide a Route 53 hosted zone ID during the Partner Solution ins
 
 . 3decision help URI: `3decision-help.<your domain>`.
 
-Both records must target the 3decision Application Load Balancer. To obtain the address of the Application Load Balancer, open the https://console.aws.amazon.com/ec2/[Amazon EC2] console. In the navigation pane, under *Load Balancing*, choose *Load Balancers*. The address of the Application Load Balancer is in the *DNS Name* column. For more information, refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html[Network Load Balancers].
+Both records must target the 3decision Application Load Balancer. To obtain the address of the Application Load Balancer, open the https://console.aws.amazon.com/ec2/[Amazon EC2^] console. In the navigation pane, under *Load Balancing*, choose *Load Balancers*. The address of the Application Load Balancer is in the *DNS Name* column. For more information, refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html[Network Load Balancers^].
 
 === Additional information
 
-* **Infrastructure monitoring and log collection.** This Partner Solution does not include infrastructure monitoring or log collection. 3decision updates are provided as Helm charts updates. Although these updates are free, you must apply Helm upgrades manually to the deployed EKS cluster.
+==== Infrastructure monitoring and log collection
 
-* **Data administration.** Although there are three roles in 3decision, these only affect the application layout. There is only one user type; an "administrator" user does not exist. In 3decision, the data owner—the user that uploads the structure to 3decision or is granted ownership by another user—manages data administration.
+This Partner Solution does not include infrastructure monitoring or log collection. 3decision updates are provided as Helm charts updates. Although these updates are free, you must apply Helm upgrades manually to the deployed EKS cluster.
 
-* **User access management.** Configure user access management in the authentication provider (Okta or Azure) by granting access to the OpenID Connect application. For more information, refer to link:#_authentication_provider[Authentication provider], earlier in this guide. By default, the data access policy in 3decision denies access to private data. Users can only access public data by default.
+==== Data administration
 
-* **Operations and security.**
+Although there are three roles in 3decision, they only affect the application layout. There is only one user type; an "administrator" user does not exist. In 3decision, the data owner—the user that uploads the structure to 3decision or is granted ownership by another user—manages data administration.
 
-* **Testing and verification.** This Partner Solution does not currently support automated testing. Although each 3decision microservice provides a liveness and readiness endpoint, you must configure monitoring probes.
+==== User access management
 
-* **Database size and instance type.** The recommended database instance type for up to 20 concurrent users is `t3.xlarge`. You specify database instance type with the ... parameter during deployment.
+Configure user access management in the authentication provider (Okta or Azure) by granting access to the OpenID Connect application. For more information, refer to link:#_authentication_provider[Authentication provider], earlier in this guide. By default, the data access policy in 3decision denies access to private data. Users can only access public data by default.
 
-==== Database sizing and shapes
+==== Operations and security
 
-*Q*: What are sizing specs for the database ?
+sdf
 
-*A*: Database shape for up to 20 users (concurrent) t3.xlarge is recommended. This can be increased during the deployment.
+==== Testing and verification
 
-Oracle RDS storage is 1Tb (extensible to 3Tb, some customers use up to 2Tb).
+This Partner Solution does not currently support automated testing. Although each 3decision microservice provides a liveness and readiness endpoint, you must configure monitoring probes.
 
-*Q*: Sizing of storage:
+==== Database size and instance type
 
-*A*: EBS: overall storage is ~1.2Tb.
+The recommended database instance type for up to 20 concurrent users is `t3.xlarge`. You can choose the database instance type during deployment. The deployed Amazon RDS for Oracle database storage is 1TB (extensible to 3TB). Amazon EBS overall storage is ~1.2TB.
 
-EBS volumes : 8 * 50Go + 1 * 8 Go + 1 * 512 Go
+For costs and licenses information, refer to the https://fwd.aws/tA69w?[AWS Partner Solution General Information Guide] or contact your Discngine sales representative.
+
+
 
 *Q*: what is the minimal kubernetes nodes specs ?
 
@@ -72,16 +74,9 @@ EBS volumes : 8 * 50Go + 1 * 8 Go + 1 * 512 Go
 
 The minimal configuration is 3 nodes. Shape size should be kept as 3 * t3.xlarge.
 
-*Q*: DB is Amazon ORACLE RDS?
-
-*A*: Yes, ORACLE RDS Standard edition
-
-License is included in the shape AWS (license included, and is charged over AWS consumption)
 
 *Q*: Sizing for cost estimates approach?
 
-*A*: With default sizing, the 3decision environement should cost around 1000euros per month.
-
-The best estimate is done by deploying a temporary 3decision environnement in an AWS sandbox and use AWS finops tools to track the costs for a sort period of time.
+*A*:
 
 
