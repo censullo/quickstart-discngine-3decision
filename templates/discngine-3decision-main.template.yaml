@@ -333,48 +333,41 @@ Parameters:
   NodeGroupName:
     Type: String
     Default: "Default"
-    Description: (Optional) Name of the node group created in EKS. Normally this is not changed.
+    Description: (Optional) Name of the node group created in EKS. Normally this is not changed from the default.
   PerAccountSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
     Default: 'AutoDetect'
-    Description: You can set "Yes" or "No" according to whether another EKS quickstart has been deployed in your account.
-                 Setting "AutoDetect" will check that for you.
-                 However, this option should not be used if you have SCPs blocking all access in certain regions as all cloudformation stacks will be listed in all regions.
+    Description: Choose "No" to skip creation of per-account shared resources. Choose "No" if you already have an existing EKS stack deployed in this AWS account, in this Region or another. By default, "AutoDetect" will check for you. Do not use if you have service control policies (SCPs) denying access to certain Regions.
   PerRegionSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
     Default: 'AutoDetect'
-    Description: You can set "Yes" or "No" according to whether another EKS quickstart has been deployed in your region.
-                 Setting "AutoDetect" will check that for you.
+    Description: Choose "No" to skip creation of per-account shared resources. Choose "No" if you already have an existing EKS stack deployed in this AWS account in this Region. By default, "AutoDetect" will check for you.
   NumberOfNodes:
     Default: 3
-    Description: The number of Amazon EKS node instances. The default is one for each of the three Availability Zones.
+    Description: Number of Amazon EKS node instances. The default is "3", one for each Availability Zone.
     Type: Number
   DBSnapshotIdentifier:
     Default: ""
-    Description: "Optionnal: the snapshot arn used for the database.
-                  If left empty, the default snapshot will be used.
-                  But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
+    Description: (Optional) To use a database snapshot other than the default, enter a snapshot ARN. To encrypt the default public unencrypted snapshot, create a copy, add encryption to the copy, and use the ARN of the copy.
     Type: String
   DBInstanceIdentifier:
     Default: db3dec
-    Description: "Required: The database instance name.
-                  This defaults to db3dec."
+    Description: (Optional) Database instance name.
     Type: String
     MinLength: '1'
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
   DBName:
     Default: ORCL
-    Description: "Required: The name given to the RDS Oracle database.
-                  This defaults to ORCL."
+    Description: (Optional) Enter a name for the RDS Oracle database.
     Type: String
     MinLength: '1'
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
   DBInstanceClass:
     AllowedValues:
       - db.t3.medium
