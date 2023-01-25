@@ -350,7 +350,7 @@ Parameters:
     Type: Number
   DBSnapshotIdentifier:
     Default: ""
-    Description: (Optional) To use a database snapshot other than the default, enter a snapshot ARN. To encrypt the default public unencrypted snapshot, create a copy, add encryption to the copy, and use the ARN of the copy.
+    Description: (Optional) To use a database snapshot other than the default, enter a snapshot ARN. To encrypt the default public unencrypted snapshot, create and encrypt a copy and use the ARN of the copy.
     Type: String
   DBInstanceIdentifier:
     Default: db3dec
@@ -379,56 +379,51 @@ Parameters:
       - db.m5.2xlarge
       - db.m5.4xlarge
     Default: db.t3.xlarge
-    Description: Amazon RDS instance type for the Oracle Database instance.
-                 We recommend t3.xlarge for production use as a lower shape will be rather slow.
+    Description: Amazon RDS instance type for the Oracle Database instance. We recommend "t3.xlarge" for production use.
     Type: String
   DBMultiZone:
-    Description: High Availability (Multi-AZ) for Oracle RDS.
-        More informtion is available here - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html
+    Description: Choose "true" for high availability (Multi-AZ deployment) for Oracle RDS. For more information, refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html.
     Type: String
     AllowedValues: [ 'true', 'false' ]
     Default: 'false'
   TNamespace:
     Default: tdecision
-    Description: "Required: The name of the kubernetes namespace in which the 3decision helm chart will be deployed.
-                  This will default to tdecision if not given.
-                  The namespace will be created if it doesn't already exists."
+    Description: (Required) Name of the Kubernetes namespace in which the 3decision helm chart is deployed. The deployment creates a namespace if one does not already exist.
     Type: String
   JWTSecretName:
     Default: "3dec-JWT-ssh"
-    Description: "Name of the secret created in secrets manager that will contain an ssh key fed to the application."
+    Description: Secret created in AWS Secrets Manager that stores the application SSH key.
     Type: String
   AdditionalEKSAdminUserArn:
     Default: ""
-    Description: "Optional: IAM user Amazon Resource Name (ARN) to be granted administrative access to the EKS cluster."
+    Description: (Optional) ARN of the IAM user to grant administrative access to the EKS cluster.
     Type: String
   AdditionalEKSAdminRoleArn:
     Default: ""
-    Description: "Optional: IAM role Amazon Resource Name (ARN) to be granted administrative access to the EKS cluster."
+    Description: (Optional) ARN of the IAM role to grant administrative access to the EKS cluster.
     Type: String
   HostedZoneId:
     Default: ""
-    Description: "Optional: Creates dns records for the given route 53 hosted zone if given."
+    Description: (Optional) Enter the ID of a Route 53 hosted zone to create DNS records for it.
     Type: String
   DomainName:
-    Description: "Required: Root domain name used for load balancer rules
-                  This is only the root domain name not the fqdn, eg: example.com"
+    Description: (Required) Domain name (not the FQDN) used for load balancer rules (for example, "example.com").
     Type: String
   MainSubdomain:
     Default: "3decision"
-    Description: "Required: Name used for the main app subdomain"
+    Description: (Required) Main application subdomain name.
     Type: String
   ApiSubdomain:
     Default: "3decision-api"
-    Description: "Required: Name used for the api subdomain"
+    Description: (Required) API subdomain name.
     Type: String
   HelpSubdomain:
     Default: "3decision-help"
-    Description: "Required: Name used for the help subdomain"
+    Description: (Required) Help page subdomain name.
     Type: String
   CertificateArn:
     Default: ""
-    Description: "Optional: Arn of a certificate of the associated domain you want added to the load balancer"
+    Description: (Optional) Certificate ARN of an associated domain you want to add to the load balancer.
     Type: String
   LoadBalancerType:
     AllowedValues:
