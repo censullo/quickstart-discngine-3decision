@@ -259,33 +259,27 @@ Parameters:
       - internet-facing
       - internal
     Default: "internal"
-    Description: "Type of loadbalancer created.
-                  This can either be equal to internet-facing for public loadbalancer or internal for private loadbalancers"
+    Description: Choose "internal" for a private load balancer. Leave the default for an internet-facing public load balancer.
     Type: String
   LoadBalancerClass:
     AllowedValues:
       - alb
       - nginx
     Default: "alb"
-    Description: "Type of loadbalancer created.
-                  This will create an application loadBalancer by default and should generally not be changed.
-                  By selecting nginx you will have a classic load balancer with a self signed certificate."
+    Description: Leave the default "alb" for an application load balancer. Choose "nginx" for a classic load balancer with a self-signed certificate.
     Type: String
   AzureClientId:
     Type: String
     Default: ""
-    Description: "Optional: Will enable azure authentication if set.
-                  Client id of azure app"
+    Description: (Optional) Enter an Azure app client ID to enable Azure authentication.
   AzureTenant:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if azure client id variable is set.
-                  Tenant id of the azure app"
+    Description: Enter the Azure app tenant ID to set up Azure authentication. Required if you enter an Azure app client ID.
   AzureSecret:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if azure client id variable is set.
-                  Secret of the azure app"
+    Description: Enter the Azure app secret to set up Azure authentication. Required if you enter an Azure app client ID.
   AzureRedirectUri:
     Type: String
     Default: ""
