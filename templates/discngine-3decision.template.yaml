@@ -3,7 +3,7 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: "This template sets up Discngine 3decision infrastructure. (qs-1snm79fb4)."
 Metadata:
   QuickStartDocumentation:
-    EntrypointName: "Launch into an existing EKS cluster"
+    EntrypointName: "Launch into an existing Amazon EKS cluster"
   LintSpellExclude:
     - Discngine
     - 3decision
@@ -62,7 +62,7 @@ Metadata:
           - QSS3KeyPrefix
     ParameterLabels:
       EKSClusterName:
-        default: EKS cluster name
+        default: Amazon EKS cluster name
       VPCID:
         default: ID of the VPC
       QSS3BucketName:
@@ -129,11 +129,11 @@ Metadata:
         default: Default node group security group
 Parameters:
   EKSClusterName:
-    Description: (Required) Name of the EKS cluster in which the stacks are deployed.
+    Description: (Required) Name of the Amazon EKS cluster in which the stacks are deployed.
     Type: String
   VPCID:
     Type: String
-    Description: (Required) ID of the VPC into which the EKS cluster is deployed.
+    Description: (Required) ID of the VPC into which the Amazon EKS cluster is deployed.
   QSS3BucketName:
     AllowedPattern: ^[0-9a-z]+([0-9a-z-\.]*[0-9a-z])*$
     ConstraintDescription: >-
@@ -183,15 +183,14 @@ Parameters:
     ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
   DBName:
     Default: ORCL
-    Description: (Optional) Enter a name for the RDS Oracle database.
+    Description: (Optional) Enter a name for the Amazon RDS for Oracle database.
     Type: String
     MinLength: '1'
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
   DBSubnets:
-    Description: 'Required: Subnets to use for the creation of the db subnet group.
-                  These need to be the same subnets as the ones containing your eks nodes'
+    Description: (Required) Enter the subnets that contain your Amazon EKS nodes to use to create a DB subnet group.
     Type: CommaDelimitedList
   DBInstanceClass:
     AllowedValues:
@@ -204,8 +203,7 @@ Parameters:
       - db.m5.2xlarge
       - db.m5.4xlarge
     Default: db.t3.xlarge
-    Description: Amazon RDS instance type for the Oracle Database instance.
-                 We recommend t3.xlarge for production use as a lower shape will be rather slow.
+    Description: Amazon RDS for Oracle instance type. We recommend "t3.xlarge" for production use.
     Type: String
   DBMultiZone:
     Description: Choose "true" for high availability (Multi-AZ deployment) for Oracle RDS. For more information, refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html.
@@ -221,15 +219,15 @@ Parameters:
     Description: Secret created in AWS Secrets Manager that stores the application SSH key.
     Type: String
   ConfigureEKS:
-    Description: "Optionnal: Set to true to create EKS quickstart specific resources for your EKS cluster"
+    Description: (Optional) Choose "true" to create Amazon EKS Partner Solution-specific resources for your Amazon EKS cluster.
     Default: 'false'
     Type: String
     AllowedValues: ['true', 'false']
   NodeGroupArn:
     Type: String
-    Description: "Required: Arn of the default NodeGroup used"
+    Description: (Required) ARN of the default node group used.
   NodeSecurityGroup:
-    Description: "Required: Id of the EKS SecurityGroup in which we will add the RDS ingress"
+    Description: (Required) ID of the Amazon EKS security group in which to add Amazon RDS ingress.
     Type: String
   HostedZoneId:
     Default: ""
@@ -271,45 +269,39 @@ Parameters:
   AzureClientId:
     Type: String
     Default: ""
-    Description: (Optional) Enter an Azure app client ID to enable Azure authentication.
+    Description: (Optional) Enter an Azure app client ID to enable Azure authentication. If used, you should also enter Azure app tenant ID, secret, and redirect URI parameters.
   AzureTenant:
     Type: String
     Default: ""
-    Description: Enter the Azure app tenant ID to set up Azure authentication. Required if you enter an Azure app client ID.
+    Description: Enter the Azure app tenant ID. Recommended if you enter an Azure app client ID to set up Azure authentication.
   AzureSecret:
     Type: String
     Default: ""
-    Description: Enter the Azure app secret to set up Azure authentication. Required if you enter an Azure app client ID.
+    Description: Enter the Azure app secret. Recommended if you enter an Azure app client ID to set up Azure authentication.
   AzureRedirectUri:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if azure client id variable is set.
-                  This is the redirect_uri set in the azure app, by default should be https://<ApiSubdomain>.<DomainName>/auth/azure/callback"
+    Description: Enter the redirect URI set in the Azure app, in the form "https://<ApiSubdomain>.<DomainName>/auth/azure/callback". Recommended if you enter an Azure app client ID to set up Azure authentication.
   OktaClientId:
     Type: String
     Default: ""
-    Description: "Optional: Will enable okta authentication if set.
-                  Client ID of the okta app"
+    Description: (Optional) Enter an Okta app client ID to enable Okta authentication. If used, you should also enter Okta app secret, domain, server ID, and redirect URI parameters.
   OktaSecret:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  Secret of the okta app"
+    Description: Enter the Okta app secret. Recommended if you enter an Okta app client ID to set up Okta authentication.
   OktaDomain:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  Domain of the okta environment"
+    Description: Enter the Okta environment domain. Recommended if you enter an Okta app client ID to set up Okta authentication.
   OktaServerId:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  Server Id of the okta environment"
+    Description: Enter the Okta environment server ID. Recommended if you enter an Okta app client ID to set up Okta authentication.
   OktaRedirectUri:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  This is the redirect_uri set in the okta app, by default should be https://<ApiSubdomain>.<DomainName>/auth/okta/callback"
+    Description: Enter the redirect URI set in the Okta app, in the form "https://<ApiSubdomain>.<DomainName>/auth/okta/callback". Recommended if you enter an Okta app client ID to set up Okta authentication.
 
 Rules:
   DiscngineSupportedRegionRule:

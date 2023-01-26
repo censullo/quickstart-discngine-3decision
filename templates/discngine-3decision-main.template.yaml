@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "This creates a VPC, Public Subnets and Private Subnets, EKS cluster, and sets up Discngine 3decision infrastructure. (qs-1snm79fes)."
+Description: "This creates a VPC, public and private subnets, Amazon EKS cluster, and sets up Discngine 3decision infrastructure. (qs-1snm79fes)."
 Metadata:
   QuickStartDocumentation:
     EntrypointName: "Launch into a new VPC"
@@ -116,9 +116,9 @@ Metadata:
       NumberOfNodes:
         default: Number of nodes
       AdditionalEKSAdminUserArn:
-        default: Additional EKS admin ARN (IAM user)
+        default: Additional Amazon EKS admin ARN (IAM user)
       AdditionalEKSAdminRoleArn:
-        default: Additional EKS admin ARN (IAM role)
+        default: Additional Amazon EKS admin ARN (IAM role)
       ConfigSetName:
         default: Configuration set name
       KubernetesVersion:
@@ -187,7 +187,7 @@ Parameters:
   NodeInstanceType:
     Type: String
     Default: t3.xlarge
-    Description: EC2 instance type for EKS nodes. We recommend using the default "t3.xlarge".
+    Description: EC2 instance type for Amazon EKS nodes. We recommend using the default "t3.xlarge".
     AllowedValues:
       - t3.xlarge
       - t3.2xlarge
@@ -315,7 +315,7 @@ Parameters:
   ConfigSetName:
     Type: String
     Default: "dng-3decision"
-    Description: (Required) SSM name used to map advanced parameters to an EKS cluster.
+    Description: (Required) SSM name used to map advanced parameters to an Amazon EKS cluster.
   KubernetesVersion:
   # https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-release-calendar
     Type: String
@@ -329,7 +329,7 @@ Parameters:
   CustomAmiId:
     Type: String
     Default: ""
-    Description: (Optional) Enter an AMI ID to use for cluster nodes instead of the default EKS images.
+    Description: (Optional) Enter an AMI ID to use for cluster nodes instead of the default Amazon EKS images.
   NodeGroupName:
     Type: String
     Default: "Default"
@@ -343,7 +343,7 @@ Parameters:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
     Default: 'AutoDetect'
-    Description: Choose "No" to skip creation of per-account shared resources if you already have an existing EKS stack deployed in this AWS account in this Region. By default, "AutoDetect" will check for you.
+    Description: Choose "No" to skip creation of per-account shared resources if you already have an existing Amazon EKS stack deployed in this AWS account in this Region. By default, "AutoDetect" will check for you.
   NumberOfNodes:
     Default: 3
     Description: Number of Amazon EKS node instances. The default is "3", one for each Availability Zone.
@@ -362,7 +362,7 @@ Parameters:
     ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
   DBName:
     Default: ORCL
-    Description: (Optional) Enter a name for the RDS Oracle database.
+    Description: (Optional) Enter a name for the Amazon RDS for Oracle database.
     Type: String
     MinLength: '1'
     MaxLength: '8'
@@ -379,7 +379,7 @@ Parameters:
       - db.m5.2xlarge
       - db.m5.4xlarge
     Default: db.t3.xlarge
-    Description: Amazon RDS instance type for the Oracle Database instance. We recommend "t3.xlarge" for production use.
+    Description: Amazon RDS for Oracle instance type. We recommend "t3.xlarge" for production use.
     Type: String
   DBMultiZone:
     Description: Choose "true" for high availability (Multi-AZ deployment) of Amazon RDS for Oracle. For more information, refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html.
@@ -396,11 +396,11 @@ Parameters:
     Type: String
   AdditionalEKSAdminUserArn:
     Default: ""
-    Description: (Optional) ARN of the IAM user to grant administrative access to the EKS cluster.
+    Description: (Optional) ARN of the IAM user to grant administrative access to the Amazon EKS cluster.
     Type: String
   AdditionalEKSAdminRoleArn:
     Default: ""
-    Description: (Optional) ARN of the IAM role to grant administrative access to the EKS cluster.
+    Description: (Optional) ARN of the IAM role to grant administrative access to the Amazon EKS cluster.
     Type: String
   HostedZoneId:
     Default: ""
@@ -443,49 +443,43 @@ Parameters:
     Type: String
     AllowedValues: [ "Enabled", "Disabled" ]
     Default: "Disabled"
-    Description: Choose "Enabled" to create a bastion host. This could be used to debug EKS nodes.
+    Description: Choose "Enabled" to create a bastion host, which can be used to debug Amazon EKS nodes.
   AzureClientId:
     Type: String
     Default: ""
-    Description: (Optional) Enter an Azure app client ID to enable Azure authentication.
+    Description: (Optional) Enter an Azure app client ID to enable Azure authentication. If used, you should also enter Azure app tenant ID, secret, and redirect URI parameters.
   AzureTenant:
     Type: String
     Default: ""
-    Description: Enter the Azure app tenant ID to set up Azure authentication. Required if you enter an Azure app client ID.
+    Description: Enter the Azure app tenant ID. Recommended if you enter an Azure app client ID to set up Azure authentication.
   AzureSecret:
     Type: String
     Default: ""
-    Description: Enter the Azure app secret to set up Azure authentication. Required if you enter an Azure app client ID.
+    Description: Enter the Azure app secret. Recommended if you enter an Azure app client ID to set up Azure authentication.
   AzureRedirectUri:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if azure client id variable is set.
-                  This is the redirect_uri set in the azure app, by default should be https://<ApiSubdomain>.<DomainName>/auth/azure/callback"
+    Description: Enter the redirect URI set in the Azure app, in the form "https://<ApiSubdomain>.<DomainName>/auth/azure/callback". Recommended if you enter an Azure app client ID to set up Azure authentication.
   OktaClientId:
     Type: String
     Default: ""
-    Description: "Optional: Will enable okta authentication if set.
-                  Client ID of the okta app"
+    Description: (Optional) Enter an Okta app client ID to enable Okta authentication. If used, you should also enter Okta app secret, domain, server ID, and redirect URI parameters.
   OktaSecret:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  Secret of the okta app"
+    Description: Enter the Okta app secret. Recommended if you enter an Okta app client ID to set up Okta authentication.
   OktaDomain:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  Domain of the okta environment"
+    Description: Enter the Okta environment domain. Recommended if you enter an Okta app client ID to set up Okta authentication.
   OktaServerId:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  Server Id of the okta environment"
+    Description: Enter the Okta environment server ID. Recommended if you enter an Okta app client ID to set up Okta authentication.
   OktaRedirectUri:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  This is the redirect_uri set in the okta app, by default should be https://<ApiSubdomain>.<DomainName>/auth/okta/callback"
+    Description: Enter the redirect URI set in the Okta app, in the form "https://<ApiSubdomain>.<DomainName>/auth/okta/callback". Recommended if you enter an Okta app client ID to set up Okta authentication.
 Rules:
   DiscngineSupportedRegionRule:
     Assertions:
