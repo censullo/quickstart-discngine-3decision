@@ -55,7 +55,7 @@ Metadata:
           - OktaServerId
           - OktaRedirectUri
       - Label:
-          default: AWS Quick Start configuration
+          default: AWS Partner Solution configuration
         Parameters:
           - QSS3BucketName
           - QSS3BucketRegion

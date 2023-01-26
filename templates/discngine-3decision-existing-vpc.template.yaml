@@ -75,7 +75,7 @@ Metadata:
           - OktaServerId
           - OktaRedirectUri
       - Label:
-          default: AWS Quick Start configuration
+          default: AWS Partner Solution configuration
         Parameters:
           - QSS3BucketName
           - QSS3BucketRegion
@@ -98,11 +98,11 @@ Metadata:
       PublicSubnet3ID:
         default: Public subnet 3 ID
       QSS3BucketName:
-        default: Quick Start S3 bucket name
+        default: Partner Solution S3 bucket name
       QSS3BucketRegion:
-        default: Quick Start S3 bucket region
+        default: Partner Solution S3 bucket Region
       QSS3KeyPrefix:
-        default: Quick Start S3 key prefix
+        default: Partner Solution S3 key prefix
       RemoteAccessCIDR:
         default: Allowed external access CIDR
       VPCID:
@@ -116,79 +116,78 @@ Metadata:
       NumberOfNodes:
         default: Number of nodes
       AdditionalEKSAdminUserArn:
-        default: Additional EKS admin ARN (IAM user)
+        default: Additional Amazon EKS admin ARN (IAM user)
       AdditionalEKSAdminRoleArn:
-        default: Additional EKS admin ARN (IAM role)
+        default: Additional Amazon EKS admin ARN (IAM role)
       ConfigSetName:
-        default: Config set name
+        default: Configuration set name
       KubernetesVersion:
         default: Kubernetes version
       CustomAmiId:
-        default: Custom AMI Id
+        default: Custom AMI ID
       NodeVolumeSize:
         default: Size of worker nodes volumes
       NodeGroupName:
         default: Name of the node group
       DBSnapshotIdentifier:
-        default: Identifier of the database snapshot
+        default: Database snapshot identifier
       DBInstanceIdentifier:
-        default: Identifier of the database
+        default: Database identifier
       DBName:
-        default: Name of the database
+        default: Database name
       DBInstanceClass:
-        default: Instance type of the database
+        default: Database instance type
       DBMultiZone:
-        default: Whether the DB is highly available
+        default: Database high availability
       TNamespace:
         default: 3decision Helm chart namespace
       JWTSecretName:
-        default: Secret Name
+        default: Secret name
       HostedZoneId:
-        default: Route 53 hosted zone Id
+        default: Route 53 hosted zone ID
       DomainName:
-        default: Domain name used for load balancing
+        default: Load balancing domain name
       MainSubdomain:
-        default: Subdomain name for app landing page
+        default: App landing page subdomain name
       ApiSubdomain:
-        default: Subdomain of the api
+        default: API subdomain
       HelpSubdomain:
-        default: Subdomain of the help page
+        default: Help page subdomain
       CertificateArn:
-        default: Arn of a certificate
+        default: Certificate ARN
       LoadBalancerType:
-        default: Type of loadbalancer created
+        default: Load balancer type
       LoadBalancerClass:
-        default: Loadbalancer class
+        default: Load balancer class
       ProvisionBastionHost:
-        default: Whether to provision a bastion host
+        default: Provision bastion host
       AzureClientId:
-        default: Azure app client id
+        default: Azure app client ID
       AzureSecret:
         default: Azure app secret
       AzureTenant:
         default: Azure tenant
       AzureRedirectUri:
-        default: Azure app redirect uri
+        default: Azure app redirect URI
       OktaClientId:
-        default: Okta app client id
+        default: Okta app client ID
       OktaSecret:
         default: Okta app secret
       OktaDomain:
         default: Okta domain
       OktaServerId:
-        default: Okta server id
+        default: Okta server ID
       OktaRedirectUri:
-        default: Okta app redirect uri
+        default: Okta app redirect URI
 Parameters:
   KeyPairName:
     Description: A public/private key pair, which allows you to connect securely to your instance after it launches.
     Type: AWS::EC2::KeyPair::KeyName
-    ConstraintDescription: Must be the name of an existing Keyname
+    ConstraintDescription: Must be an existing key pair name.
   NodeInstanceType:
     Type: String
     Default: t3.xlarge
-    Description: EKS node instance type.
-                 We recommend using t3.xlarge as this is the minimal required node shape, but scaling is not noticeable by scaling this up.
+    Description: EC2 instance type for Amazon EKS nodes. We recommend using the default "t3.xlarge".
     AllowedValues:
       - t3.xlarge
       - t3.2xlarge
@@ -231,62 +230,74 @@ Parameters:
       - z1d.6xlarge
       - z1d.12xlarge
   VPCID:
-    Description: "Required: The ID of the VPC."
+    Description: (Required) ID of the VPC into which the Amazon EKS cluster is deployed.
     Type: String
   PublicSubnet1ID:
     Default: ""
-    Description: "Optional: The ID of the public subnet located in Availability Zone 1."
+    Description: (Optional) ID of the public subnet in Availability Zone 1 of your existing VPC.
     Type: String
   PublicSubnet2ID:
     Default: ""
-    Description: "Optional: The ID of the public subnet located in Availability Zone 2."
+    Description: (Optional) ID of the public subnet in Availability Zone 2 of your existing VPC.
     Type: String
   PublicSubnet3ID:
     Default: ""
-    Description: "Optional: The ID of the public subnet 3 located in Availability Zone 3."
+    Description: (Optional) ID of public subnet in Availability Zone 3 of your existing VPC.
     Type: String
   PrivateSubnet1ID:
-    Description: "Required: The ID of the private subnet located in Availability Zone 1."
+    Description: (Required) ID of the private subnet in Availability Zone 1 of your existing VPC.
     Type: String
   PrivateSubnet2ID:
-    Description: "Required: The ID of the private subnet located in Availability Zone 2."
+    Description: (Required) ID of the private subnet in Availability Zone 2 of your existing VPC.
     Type: String
   PrivateSubnet3ID:
-    Description: "Optional: The ID of the private subnet 3 located in Availability Zone 3."
+    Description: (Required) ID of the private subnet in Availability Zone 3 of your existing VPC.
     Type: String
   QSS3BucketName:
-    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
-      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
-      (-).
+    AllowedPattern: ^[0-9a-z]+([0-9a-z-\.]*[0-9a-z])*$
+    ConstraintDescription: >-
+      The S3 bucket name can include numbers, lowercase letters,
+      and hyphens (-), but it cannot start or end with a hyphen.
     Default: aws-quickstart
-    Description: S3 bucket name for the Quick Start assets. This string can include
-      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
-      or end with a hyphen (-).
+    Description: >-
+      Name of the S3 bucket for your copy of the deployment assets. Keep the default
+      name unless you are customizing the template. Changing the name updates code
+      references to point to a new location.
+    MinLength: 3
+    MaxLength: 63
     Type: String
   QSS3BucketRegion:
-    Default: 'eu-central-1'
-    Description: "The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value."
+    Default: us-east-1
+    Description: >-
+      AWS Region where the S3 bucket (QSS3BucketName) is hosted. Keep
+      the default Region unless you are customizing the template. Changing the Region
+      updates code references to point to a new location. When using your own bucket,
+      specify the Region.
     Type: String
   QSS3KeyPrefix:
-    AllowedPattern: ^[0-9a-zA-Z-/]*$
-    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slash (/).
+    AllowedPattern: ^([0-9a-zA-Z!-_\.\*'\(\)/]+/)*$
+    ConstraintDescription: >-
+      The S3 key prefix can include numbers, lowercase letters, uppercase letters,
+      hyphens (-), underscores (_), periods (.), asterisks (*), single quotes ('),
+      open parenthesis ((), close parenthesis ()), and forward slashes (/). End the
+      prefix with a forward slash.
     Default: quickstart-discngine-3decision/
-    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
-      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
-      forward slash (/).
+    Description: >-
+      S3 key prefix that is used to simulate a folder for your copy of the
+      deployment assets. Keep the default prefix unless you are customizing
+      the template. Changing the prefix updates code references to point to
+      a new location.
     Type: String
   RemoteAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access the bastion instance. This will have no effect if the bastion creation is set to false.
+    Description: CIDR IP range permitted to access the bastion host instance, if created.
     Default: "127.0.0.1/32"
     Type: String
   ConfigSetName:
     Type: String
     Default: "dng-3decision"
-    Description: "Required: SSM Name used to map advanced parameters to an EKS cluster."
+    Description: (Required) SSM name used to map advanced parameters to an Amazon EKS cluster.
   KubernetesVersion:
   # https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-release-calendar
     Type: String
@@ -296,44 +307,36 @@ Parameters:
   NodeVolumeSize:
     Type: String
     Default: 100
-    Description: "Required: Size of EBS volumes attached to worker nodes.
-                  Increase this size if your pods are getting evicted with a disk pressure annotation."
+    Description: (Required) Size of EBS volumes attached to worker nodes. Increase size to remediate node-pressure pod eviction.
   CustomAmiId:
     Type: String
     Default: ""
-    Description: "Optional: If an AMI ID is specified, it is used instead of the default EKS images for cluster nodes."
+    Description: (Optional) Enter an AMI ID to use for cluster nodes instead of the default Amazon EKS images.
   NodeGroupName:
     Type: String
     Default: "Default"
-    Description: "Optional: Name of the NodeGroup created in EKS.
-                  This should usually not be changed"
+    Description: (Optional) Name of the node group created in EKS. Normally this is not changed from the default.
   PerAccountSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
     Default: 'AutoDetect'
-    Description: You can set "Yes" or "No" according to whether another EKS quickstart has been deployed in your account.
-                 Setting "AutoDetect" will check that for you.
-                 However, this option should not be used if you have SCPs blocking all access in certain regions as all cloudformation stacks will be listed in all regions. 
+    Description: Choose "No" to skip creation of per-account shared resources if you already have an existing EKS stack deployed in this AWS account. Choose "Yes" to create per-account shared resources. By default, "AutoDetect" will check for you. Do not use if you have service control policies (SCPs) denying access to certain Regions.
   PerRegionSharedResources:
     Type: String
     AllowedValues: ['AutoDetect', 'Yes', 'No']
     Default: 'AutoDetect'
-    Description: You can set "Yes" or "No" according to whether another EKS quickstart has been deployed in your region.
-                 Setting "AutoDetect" will check that for you.
+    Description: Choose "No" to skip creation of per-account shared resources if you already have an existing Amazon EKS stack deployed in this AWS account in this Region. Choose "Yes" to create per-Region shared resources. By default, "AutoDetect" will check for you.
   NumberOfNodes:
     Default: 3
-    Description: The number of Amazon EKS node instances. The default is one for each of the three Availability Zones.
+    Description: Number of Amazon EKS node instances. The default is "3", one for each Availability Zone.
     Type: Number
   DBSnapshotIdentifier:
     Default: ""
-    Description: "Optional: the snapshot arn used for the database.
-                  If left empty, the default snapshot will be used. 
-                  But if you wish to have an encrypted database, you will have to copy the public snapshot locally and select encryption and use that arn"
+    Description: (Optional) To use a database snapshot other than the default, enter a snapshot ARN. To encrypt the default public unencrypted snapshot, create and encrypt a copy and use the ARN of the copy.
     Type: String
   DBInstanceIdentifier:
     Default: db3dec
-    Description: "Required: The database instance name.
-                  This defaults to db3dec."
+    Description: (Optional) Database instance name.
     Type: String
     MinLength: '1'
     MaxLength: '8'
@@ -341,13 +344,12 @@ Parameters:
     ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
   DBName:
     Default: ORCL
-    Description: "Required: The name given to the RDS Oracle database.
-                  This defaults to ORCL."
+    Description: (Optional) Enter a name for the Amazon RDS for Oracle database.
     Type: String
     MinLength: '1'
     MaxLength: '8'
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
   DBInstanceClass:
     AllowedValues:
       - db.t3.medium
@@ -359,124 +361,107 @@ Parameters:
       - db.m5.2xlarge
       - db.m5.4xlarge
     Default: db.t3.xlarge
-    Description: Amazon RDS instance type for the Oracle Database instance.
-                 We recommend t3.xlarge for production use as a lower shape will be rather slow.
+    Description: Amazon RDS for Oracle instance type. We recommend "t3.xlarge" for production use.
     Type: String
   DBMultiZone:
-    Description: High Availability (Multi-AZ) for Oracle RDS.
-        More information is available here - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html.
+    Description: Choose "true" for high availability (Multi-AZ deployment) of Amazon RDS for Oracle. For more information, refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html.
     Type: String
     AllowedValues: [ 'true', 'false' ]
     Default: 'false'
   TNamespace:
     Default: tdecision
-    Description: "Required: The name of the kubernetes namespace in which the 3decision helm chart will be deployed.
-                  This will default to tdecision if not given.
-                  The namespace will be created if it doesn't already exists."
+    Description: (Required) Name of the Kubernetes namespace in which the 3decision helm chart is deployed. The deployment creates a namespace if one does not already exist.
     Type: String
   JWTSecretName:
     Default: "3dec-JWT-ssh"
-    Description: "Name of the secret created in secrets manager that will contain an ssh key fed to the application."
+    Description: Secret created in AWS Secrets Manager that stores the application SSH key.
     Type: String
   AdditionalEKSAdminUserArn:
     Default: ""
-    Description: "Optional: IAM user Amazon Resource Name (ARN) to be granted administrative access to the EKS cluster."
+    Description: (Optional) ARN of the IAM user to grant administrative access to the Amazon EKS cluster.
     Type: String
   AdditionalEKSAdminRoleArn:
     Default: ""
-    Description: "Optional: IAM role Amazon Resource Name (ARN) to be granted administrative access to the EKS cluster."
+    Description: (Optional) ARN of the IAM role to grant administrative access to the Amazon EKS cluster.
     Type: String
   HostedZoneId:
     Default: ""
-    Description: "Optional: Creates dns records for the given route 53 hosted zone if given."
+    Description: (Optional) Enter the ID of a Route 53 hosted zone to create DNS records for it.
     Type: String
   DomainName:
-    Description: "Required: Root domain name used for load balancer rules
-                  This is only the root domain name not the fqdn, eg: example.com"
+    Description: (Required) Domain name (not the FQDN) used for load balancer rules (for example, "example.com").
     Type: String
   MainSubdomain:
     Default: "3decision"
-    Description: "Required: Name used for the main app subdomain"
+    Description: (Required) Main application subdomain name.
     Type: String
   ApiSubdomain:
     Default: "3decision-api"
-    Description: "Required: Name used for the api subdomain"
+    Description: (Required) API subdomain name.
     Type: String
   HelpSubdomain:
     Default: "3decision-help"
-    Description: "Required: Name used for the help subdomain"
+    Description: (Required) Help page subdomain name.
     Type: String
   CertificateArn:
     Default: ""
-    Description: "Optional: Arn of a certificate of the associated domain you want added to the load balancer"
+    Description: (Optional) Certificate ARN of an associated domain you want to add to the load balancer.
     Type: String
   LoadBalancerType:
     AllowedValues:
       - internet-facing
       - internal
     Default: "internal"
-    Description: "Type of loadbalancer created.
-                  This can either be equal to internet-facing for public loadbalancer or internal for private loadbalancers"
+    Description: Choose "internal" for a private load balancer. Leave the default for an internet-facing public load balancer.
     Type: String
   LoadBalancerClass:
     AllowedValues:
       - alb
       - nginx
     Default: "alb"
-    Description: "Type of loadbalancer created.
-                  This will create an application loadBalancer by default and should generally not be changed.
-                  By selecting nginx you will have a classic load balancer with a self signed certificate."
+    Description: Leave the default "alb" for an application load balancer. Choose "nginx" for a classic load balancer with a self-signed certificate.
     Type: String
   ProvisionBastionHost:
     Type: String
     AllowedValues: [ "Enabled", "Disabled" ]
     Default: "Disabled"
-    Description: Choose "Enabled" to create a bastion host. This could be used to debug EKS nodes.
+    Description: Choose "Enabled" to create a bastion host, which can be used to debug Amazon EKS nodes.
   AzureClientId:
     Type: String
     Default: ""
-    Description: "Optional: Will enable azure authentication if set.
-                  Client id of azure app"
+    Description: (Optional) Enter an Azure app client ID to enable Azure authentication. If used, you should also enter Azure app tenant ID, secret, and redirect URI parameters.
   AzureTenant:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if azure client id variable is set.
-                  Tenant id of the azure app"
+    Description: Enter the Azure app tenant ID. Recommended if you enter an Azure app client ID to set up Azure authentication.
   AzureSecret:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if azure client id variable is set.
-                  Secret of the azure app"
+    Description: Enter the Azure app secret. Recommended if you enter an Azure app client ID to set up Azure authentication.
   AzureRedirectUri:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if azure client id variable is set.
-                  This is the redirect_uri set in the azure app, by default should be https://<ApiSubdomain>.<DomainName>/auth/azure/callback"
+    Description: Enter the redirect URI set in the Azure app, in the form "https://<ApiSubdomain>.<DomainName>/auth/azure/callback". Recommended if you enter an Azure app client ID to set up Azure authentication.
   OktaClientId:
     Type: String
     Default: ""
-    Description: "Optional: Will enable okta authentication if set.
-                  Client ID of the okta app"
+    Description: (Optional) Enter an Okta app client ID to enable Okta authentication. If used, you should also enter Okta app secret, domain, server ID, and redirect URI parameters.
   OktaSecret:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  Secret of the okta app"
+    Description: Enter the Okta app secret. Recommended if you enter an Okta app client ID to set up Okta authentication.
   OktaDomain:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  Domain of the okta environment"
+    Description: Enter the Okta environment domain. Recommended if you enter an Okta app client ID to set up Okta authentication.
   OktaServerId:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  Server Id of the okta environment"
+    Description: Enter the Okta environment server ID. Recommended if you enter an Okta app client ID to set up Okta authentication.
   OktaRedirectUri:
     Type: String
     Default: ""
-    Description: "Conditional: Should be given if okta client id variable is set.
-                  This is the redirect_uri set in the okta app, by default should be https://<ApiSubdomain>.<DomainName>/auth/okta/callback"
+    Description: Enter the redirect URI set in the Okta app, in the form "https://<ApiSubdomain>.<DomainName>/auth/okta/callback". Recommended if you enter an Okta app client ID to set up Okta authentication.
 
 Rules:
   DiscngineSupportedRegionRule:
@@ -580,14 +565,14 @@ Resources:
         LoadBalancerType: !Ref LoadBalancerType
         LoadBalancerClass: !Ref LoadBalancerClass
         DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
-        AzureClientId: !Ref AzureClientId 
-        AzureTenant: !Ref AzureTenant 
-        AzureSecret: !Ref AzureSecret 
-        AzureRedirectUri: !Ref AzureRedirectUri 
-        OktaClientId: !Ref OktaClientId 
-        OktaSecret: !Ref OktaSecret 
-        OktaDomain: !Ref OktaDomain 
-        OktaServerId: !Ref OktaServerId 
+        AzureClientId: !Ref AzureClientId
+        AzureTenant: !Ref AzureTenant
+        AzureSecret: !Ref AzureSecret
+        AzureRedirectUri: !Ref AzureRedirectUri
+        OktaClientId: !Ref OktaClientId
+        OktaSecret: !Ref OktaSecret
+        OktaDomain: !Ref OktaDomain
+        OktaServerId: !Ref OktaServerId
         OktaRedirectUri: !Ref OktaRedirectUri
         MainSubdomain: !Ref MainSubdomain
         ApiSubdomain: !Ref ApiSubdomain
