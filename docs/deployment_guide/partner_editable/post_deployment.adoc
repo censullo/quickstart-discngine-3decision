@@ -46,11 +46,11 @@ This Partner Solution does not include infrastructure monitoring or log collecti
 
 ==== Data administration
 
-Although there are three roles in 3decision, they only affect the application layout. There is only one user type; an "administrator" user does not exist. In 3decision, the data owner—the user that uploads the structure to 3decision or is granted ownership by another user—manages data administration.
+In 3decision, the data owner (the users that uploads the structure to 3decision or is granted ownership by another user) manages data administration.
 
 ==== User access management
 
-Configure user access management in the authentication provider (Okta or Azure) by granting access to the OpenID Connect application. For more information, refer to link:#_authentication_provider[Authentication provider], earlier in this guide. By default, the data access policy in 3decision denies access to private data. Users can only access public data by default.
+Configure user access management in the authentication provider (Okta or Azure) by granting access to the OpenID Connect application. For more information, refer to link:#_authentication_provider[Authentication provider^], earlier in this guide. By default, the data access policy in 3decision denies access to private data. Users can only access public data by default.
 
 ==== Operations and security
 
@@ -64,7 +64,7 @@ This Partner Solution does not currently support automated testing. Although eac
 
 The recommended database instance type for up to 20 concurrent users is `t3.xlarge`. You can choose the database instance type during deployment. The deployed Amazon RDS for Oracle database storage is 1TB (extensible to 3TB). Amazon EBS overall storage is ~1.2TB.
 
-For costs and licenses information, refer to the https://fwd.aws/tA69w?[AWS Partner Solution General Information Guide] or contact your Discngine sales representative.
+For costs and licenses information, refer to the https://fwd.aws/tA69w?[AWS Partner Solution General Information Guide^] or contact your Discngine sales representative.
 
 
 
