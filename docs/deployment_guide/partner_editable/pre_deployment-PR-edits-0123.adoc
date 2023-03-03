@@ -108,37 +108,37 @@ The deployment creates an RDS database based on a public unencrypted snapshot. T
 
 *A*: We highly recommend enabling RDS backups (done by default) and EBS volumes backups for failover/BCP: creating a new 3decision environement from backups using the cloudformation template is easy.
 
-*Q*: Patch management (who and how is this handled?)
+//*Q*: Patch management (who and how is this handled?)
 
-*A*: 3decision quickstart only use AWS managed services: EC2 nodes are managed by AWS. RDS database is AWS managed. No patching management is required.
+//*A*: 3decision quickstart only use AWS managed services: EC2 nodes are managed by AWS. RDS database is AWS managed. No patching management is required.
 
-*Q*: Security patching of Bastion host ?
-*A*: By default, the bastion is not deployed. If you do chosse to deploy it, you will need to handle the patching.
+//*Q*: Security patching of Bastion host ?
+//*A*: By default, the bastion is not deployed. If you do chosse to deploy it, you will need to handle the patching.
 
-*Q*: Deployment & maintenance as a service ?
+//*Q*: Deployment & maintenance as a service ?
 
-*A*: If Discngine technical staff can be provided with sufficiant AWS privileges (AWS administration privileges), deployment and maintenance can be provided as extra support.
+//*A*: If Discngine technical staff can be provided with sufficiant AWS privileges (AWS administration privileges), deployment and maintenance can be provided as extra support.
 
 *Q*: Staff will be needing access to cluster, should we pay for additionnal web seats ?
 
 *A*: No. Admin access are free, even in production.
 
-*Q*: How about structure upload documentation/requirement ?
+//*Q*: How about structure upload documentation/requirement ?
 
-*A*: A full requirement list and documentation exists, please ask your 3decision sale contact to provide it.
+//*A*: A full requirement list and documentation exists, please ask your 3decision sale contact to provide it.
 
 *Q*: Can continuous deployment can be configured ?
 
 *A*: No, CD only concerns the 3decision SaaS version. Updates will be deployed by the customer cluster manager. Update commands and instructions will be provided out of the box. Discngine will provide support for the updates too.
 
-*Q*: Will 3decision make HTTP calls to internet websites?
+//*Q*: Will 3decision make HTTP calls to internet websites?
 
-*A*: Yes, 3decision synchronizes with public structures made available by the RCSB PDB (Research Collaboratory for Structural Bioinformatics PDB). The data synchronization uses the Rsync protocol.
+//*A*: Yes, 3decision synchronizes with public structures made available by the RCSB PDB (Research Collaboratory for Structural Bioinformatics PDB). The data synchronization uses the Rsync protocol.
 
-3decision calls the following domains:
+//3decision calls the following domains:
 
-  * `rsync.ebi.ac.uk` on port 873
-  * `rsync.wwpdb.org` on ports 873 and 33444
+//  * `rsync.ebi.ac.uk` on port 873
+//  * `rsync.wwpdb.org` on ports 873 and 33444
 
 ==== Database sizing and shapes
 

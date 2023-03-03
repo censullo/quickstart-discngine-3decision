@@ -50,11 +50,23 @@ In 3decision, the data owner (the users that uploads the structure to 3decision 
 
 ==== User access management
 
-Configure user access management in the authentication provider (Okta or Azure) by granting access to the OpenID Connect application. For more information, refer to link:#_authentication_provider[Authentication provider^], earlier in this guide. By default, the data access policy in 3decision denies access to private data. Users can only access public data by default.
+Configure user access management in the authentication provider (Okta or Azure) by granting access to the OpenID Connect application. For more information, refer to link:#_authentication_provider[Authentication provider], earlier in this guide. By default, the data access policy in 3decision denies access to private data. Users can only access public data by default.
 
 ==== Operations and security
 
-sdf
+By default, Amazon RDS and Amazon EBS backup databases and volumes, respectively. You can create a new 3decision environment from backups using the solution's CloudFormation template.
+
+You do not need to manage patching of AWS managed services. You must maintain security patching of the optional bastion host if you choose to deploy it.
+
+Consult your Discngine representative for information about available deployment and maintenance services and upload requirements.
+
+3decision synchronizes with public structures made available by the Research Collaboratory for Structural Bioinformatics Protein Data Bank (RCSB PDB). Data synchronization uses the rsync protocol. 3decision calls the following domains:
+
+* `rsync.ebi.ac.uk` on port 873.
+
+* `rsync.wwpdb.org` on ports 873 and 33444.
+
+
 
 ==== Testing and verification
 
