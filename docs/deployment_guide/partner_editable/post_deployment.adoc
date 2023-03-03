@@ -74,17 +74,13 @@ This Partner Solution does not currently support automated testing. Although eac
 
 ==== Database size and instance type
 
-The recommended database instance type for up to 20 concurrent users is `t3.xlarge`. You can choose the database instance type during deployment. The deployed Amazon RDS for Oracle database storage is 1TB (extensible to 3TB). Amazon EBS overall storage is ~1.2TB.
+The recommended database instance type for up to 20 concurrent users is `t3.xlarge`. You can choose the database instance type during deployment. The deployed Amazon RDS for Oracle database storage is 1TB (extensible to 3TB). The overall Amazon EBS storage for the solution is ~1.2Tb. For more information, refer to https://aws.amazon.com/ebs/[Amazon Elastic Block Store (EBS)^].
 
 For costs and licenses information, refer to the https://fwd.aws/tA69w?[AWS Partner Solution General Information Guide^] or contact your Discngine sales representative.
 
+==== Kubernetes nodes
 
-
-*Q*: what is the minimal kubernetes nodes specs ?
-
-*A*: Customers are using application in different ways, and config may differ.
-
-The minimal configuration is 3 nodes. Shape size should be kept as 3 * t3.xlarge.
+The minimal configuration is three nodes. The recommended EC2 instance type for EKS worker nodes is `t3.xlarge`.
 
 
 *Q*: Sizing for cost estimates approach?
