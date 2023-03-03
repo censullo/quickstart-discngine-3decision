@@ -104,9 +104,9 @@ The deployment creates an RDS database based on a public unencrypted snapshot. T
 
 ==== Operations & security:
 
-*Q*: Backup options?
+//*Q*: Backup options?
 
-*A*: We highly recommend enabling RDS backups (done by default) and EBS volumes backups for failover/BCP: creating a new 3decision environement from backups using the cloudformation template is easy.
+//*A*: We highly recommend enabling RDS backups (done by default) and EBS volumes backups for failover/BCP: creating a new 3decision environement from backups using the cloudformation template is easy.
 
 //*Q*: Patch management (who and how is this handled?)
 
@@ -166,11 +166,11 @@ The deployment creates an RDS database based on a public unencrypted snapshot. T
 
 //License is included in the shape AWS (license included, and is charged over AWS consumption)
 
-*Q*: Sizing for cost estimates approach?
+//*Q*: Sizing for cost estimates approach?
 
-*A*: With default sizing, the 3decision environement should cost around 1000euros per month.
+//*A*: With default sizing, the 3decision environement should cost around 1000euros per month.
 
-The best estimate is done by deploying a temporary 3decision environnement in an AWS sandbox and use AWS finops tools to track the costs for a sort period of time.
+//The best estimate is done by deploying a temporary 3decision environnement in an AWS sandbox and use AWS finops tools to track the costs for a sort period of time.
 
 
 ==== Storage capacity specifications

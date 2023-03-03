@@ -83,8 +83,4 @@ For costs and licenses information, refer to the https://fwd.aws/tA69w?[AWS Part
 The minimal configuration is three nodes. The recommended EC2 instance type for EKS worker nodes is `t3.xlarge`.
 
 
-*Q*: Sizing for cost estimates approach?
-
-*A*:
-
 
