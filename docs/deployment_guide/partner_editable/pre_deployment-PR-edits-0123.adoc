@@ -175,14 +175,14 @@ The deployment creates an RDS database based on a public unencrypted snapshot. T
 
 ==== Storage capacity specifications
 
-*Q*: How much  storage space does a typical (3 Å resolution) CryoEM entry require- including meta data and the corresponding mrc file ?
+//*Q*: How much  storage space does a typical (3 Å resolution) Cryo-electron entry require- including meta data and the corresponding mrc file ?
 
-*A*: This is variable and highly dependent on your data. The mrc files can be over 1GB if the the system includs many protein chains but for typical drug discovery projectsn the CryoEM structure entries are 1-2 Mb and their associated mrc file 30-150 Mb.
+//*A*: This is variable and highly dependent on your data. The mrc files can be over 1GB if the the system includs many protein chains but for typical drug discovery projectsn the CryoEM structure entries are 1-2 Mb and their associated mrc file 30-150 Mb.
 
-*Q*: How much does an Xray based structure, including all data, fill ?
+//*Q*: How much does an Xray based structure, including all data, fill ?
 
-*A*: A typical X-Ray file is between 100Ko and 1Mb. Associated data depends on customer data: Pdf files are within the same range, density maps are a bit larger (1Mb to 10Mb), word documents also within the range of 1Mb, etc.
+//*A*: A typical x-ray file is between 100 KB and 1 MB. Associated data depends on customer data: Pdf files are within the same range, density maps are a bit larger (1Mb to 10Mb), word documents also within the range of 1Mb, etc.
 
-*Q*: Does Discngine have any average figures to draw on, from existing customers, in regards to amount of cloud storage that will be needed (i.e. in best, worst and most likely scenarios). These figures will be used to calculate expected storage usage, also for inputs to cost drivers and budgeting.
+//*Q*: Does Discngine have any average figures to draw on, from existing customers, in regards to amount of cloud storage that will be needed (i.e. in best, worst and most likely scenarios). These figures will be used to calculate expected storage usage, also for inputs to cost drivers and budgeting.
 
-*A*: EBS: overall storage is ~1.2Tb. RDS Oracle: 1Tb (extensible to 3Tb, some customers use up to 2Tb). You can roughly consider that uploading large scale datasets like Alphafold will require 1 additionnal Tb for EBS and 1 additionnal Tb for RDS.
+//*A*: EBS: overall storage is ~1.2Tb. RDS Oracle: 1Tb (extensible to 3Tb, some customers use up to 2Tb). You can roughly consider that uploading large scale datasets like Alphafold will require 1 additionnal Tb for EBS and 1 additionnal Tb for RDS.

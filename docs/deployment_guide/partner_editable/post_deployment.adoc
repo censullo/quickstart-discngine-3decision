@@ -74,13 +74,12 @@ This Partner Solution does not currently support automated testing. Although eac
 
 ==== Database size and instance type
 
-The recommended database instance type for up to 20 concurrent users is `t3.xlarge`. You can choose the database instance type during deployment. The deployed Amazon RDS for Oracle database storage is 1TB (extensible to 3TB). The overall Amazon EBS storage for the solution is ~1.2Tb. For more information, refer to https://aws.amazon.com/ebs/[Amazon Elastic Block Store (EBS)^].
+The recommended database instance type for up to 20 concurrent users is `t3.xlarge`. You can choose the database instance type during deployment. The deployed Amazon RDS for Oracle database storage is 1 TB (extensible to 3 TB). The overall Amazon EBS storage for the solution is about 1.2 TB. For more information, refer to https://aws.amazon.com/ebs/[Amazon Elastic Block Store (EBS)^].
 
-For costs and licenses information, refer to the https://fwd.aws/tA69w?[AWS Partner Solution General Information Guide^] or contact your Discngine sales representative.
+Uploading large-scale datasets like Alphafold may require up to 1 TB additional Amazon EBS storage and up to 1 TB additional Amazon RDS storage. A typical cryo-electron microscopy (cryo-EM) entry of 3.0 Å resolution is 1–2 MB, with an associated Medical Research Council (MRC) file of 30–150 MB. MRC files can reach over 1 GB depending on the number of protein chains. A typical x-ray file is between 100 KB–1 MB, with associated file sizes depending on the amount of customer data included.
+
+For AWS Partner Solution costs and licenses information, refer to the https://fwd.aws/tA69w?[AWS Partner Solution General Information Guide^] or contact your Discngine sales representative.
 
 ==== Kubernetes nodes
 
-The minimal configuration is three nodes. The recommended EC2 instance type for EKS worker nodes is `t3.xlarge`.
-
-
-
+The minimal configuration is three Amazon EKS nodes, one per Availability Zone. The recommended EC2 instance type for EKS worker nodes is `t3.xlarge`.
