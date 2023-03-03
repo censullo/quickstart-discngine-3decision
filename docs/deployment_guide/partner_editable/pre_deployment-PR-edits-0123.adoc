@@ -127,9 +127,9 @@ The deployment creates an RDS database based on a public unencrypted snapshot. T
 
 //*A*: A full requirement list and documentation exists, please ask your 3decision sale contact to provide it.
 
-*Q*: Can continuous deployment can be configured ?
+//*Q*: Can continuous deployment can be configured ?
 
-*A*: No, CD only concerns the 3decision SaaS version. Updates will be deployed by the customer cluster manager. Update commands and instructions will be provided out of the box. Discngine will provide support for the updates too.
+//*A*: No, CD only concerns the 3decision SaaS version. Updates will be deployed by the customer cluster manager. Update commands and instructions will be provided out of the box. Discngine will provide support for the updates too.
 
 //*Q*: Will 3decision make HTTP calls to internet websites?
 

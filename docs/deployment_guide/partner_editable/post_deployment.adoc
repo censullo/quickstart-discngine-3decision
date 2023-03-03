@@ -66,7 +66,7 @@ Consult your Discngine representative for information about available deployment
 
 * `rsync.wwpdb.org` on ports 873 and 33444.
 
-
+3decision in this Partner Solution supports updating 3decision from the command line. Contact Discngine for 3decision update commands and instructions. For more information about 3decision SaaS with continuous deployment, contact your Discngine representative.
 
 ==== Testing and verification
 
